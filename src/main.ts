@@ -53,8 +53,8 @@ function getTransferEvents(ctx: ProcessorContext<Store>): TransferEvent[] {
                     blockNumber: block.header.height,
                     timestamp: new Date(block.header.timestamp),
                     extrinsicHash: event.extrinsic?.hash,
-                    from: ss58.codec('kusama').encode(rec.from),
-                    to: ss58.codec('kusama').encode(rec.to),
+                    from: ss58.codec('cere').encode(rec.from),
+                    to: ss58.codec('cere').encode(rec.to),
                     amount: rec.amount,
                     fee: event.extrinsic?.fee || 0n,
                 })
