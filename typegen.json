@@ -1,6 +1,6 @@
 {
   "outDir": "src/types",
-  "specVersions": "https://v2.archive.subsquid.io/metadata/kusama",
+  "specVersions": "specs/testnet-3249917.jsonl",
   "pallets": {
     "Balances": {
       "events": [
