@@ -17,7 +17,9 @@
         "BucketRemoved"
       ],
       "calls": [],
-      "storage": [],
+      "storage": [
+        "Buckets"
+      ],
       "constants": []
     }
   }
