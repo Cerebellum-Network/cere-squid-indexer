@@ -9,6 +9,16 @@
       "calls": [],
       "storage": [],
       "constants": []
+    },
+    "DdcCustomers": {
+      "events": [
+        "BucketCreated",
+        "BucketUpdated",
+        "BucketRemoved"
+      ],
+      "calls": [],
+      "storage": [],
+      "constants": []
     }
   }
 }
