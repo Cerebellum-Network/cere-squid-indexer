@@ -1,4 +1,4 @@
-import {assertNotNull} from '@subsquid/util-internal'
+import { assertNotNull } from '@subsquid/util-internal'
 import {
     BlockHeader,
     DataHandlerContext,
@@ -9,7 +9,7 @@ import {
     Extrinsic as _Extrinsic
 } from '@subsquid/substrate-processor'
 
-import {events} from './types'
+import { events } from './types'
 
 export const processor = new SubstrateBatchProcessor()
     // Lookup archive by the network name in Subsquid registry
