@@ -2,10 +2,11 @@ import { TypeormDatabase, Store } from '@subsquid/typeorm-store'
 import { In } from 'typeorm'
 import * as ss58 from '@subsquid/ss58'
 import assert from 'assert'
+import { assertNotNull } from '@subsquid/util-internal'
 
 import { processor, ProcessorContext } from './processor'
-import { Account, Transfer } from './model'
-import { events } from './types'
+import { Account, DdcBucket, Transfer } from './model'
+import { events, storage } from './types'
 
 processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     let transferEvents: TransferEvent[] = getTransferEvents(ctx)
@@ -15,6 +16,24 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
 
     await ctx.store.upsert([...accounts.values()])
     await ctx.store.insert(transfers)
+
+    const eventsInfo = await getEventsInfo(ctx)
+    let bucketOwnerAccounts = await ctx.store
+        .findBy(Account, { id: In([...eventsInfo.accountIds]) })
+        .then(bucketOwnerAccounts => new Map(bucketOwnerAccounts.map(account => [account.id, account])))
+    for (let accountId of eventsInfo.accountIds) {
+        if (!bucketOwnerAccounts.has(accountId)) {
+            bucketOwnerAccounts.set(accountId, new Account({ id: accountId }))
+        }
+    }
+
+    for (const ddcBucket of eventsInfo.ddcBuckets) {
+        ddcBucket[0].ownerId = assertNotNull(bucketOwnerAccounts.get(ddcBucket[1]))
+        ddcBucket[0].id = ddcBucket[0].bucketId.toString()
+    }
+
+    await ctx.store.upsert([...bucketOwnerAccounts.values()])
+    await ctx.store.insert(eventsInfo.ddcBuckets.map(el => el[0]))
 })
 
 interface TransferEvent {
@@ -108,4 +127,58 @@ function createTransfers(transferEvents: TransferEvent[], accounts: Map<string, 
         }))
     }
     return transfers
+}
+
+type Tuple<T, K> = [T, K]
+
+interface EventsInfo {
+    accountIds: Set<string>
+    ddcBuckets: Tuple<DdcBucket, string>[]
+}
+
+async function getEventsInfo(ctx: ProcessorContext<Store>): Promise<EventsInfo> {
+    let eventsInfo: EventsInfo = {
+        ddcBuckets: [],
+        accountIds: new Set<string>(),
+    }
+
+    for (let block of ctx.blocks) {
+        for (let e of block.events) {
+            if (e.name === events.ddcCustomers.bucketCreated.name) {
+                let rec: { bucketId: bigint; ownerId: string; clusterId: string; isPublic: boolean; isRemoved: boolean }
+
+                if (events.ddcCustomers.bucketCreated.v48201.is(e)) {
+                    const bucketId = events.ddcCustomers.bucketCreated.v48201.decode(e)
+                    const storageBucket = assertNotNull(await storage.ddcCustomers.buckets.v48201.get(block.header, bucketId))
+                    if (bucketId !== storageBucket.bucketId) {
+                        throw Error(`Requested bucketId ${bucketId} is not equal to embedded bucketId ${storageBucket.bucketId}`)
+                    }
+                    rec = { isRemoved: false, ...storageBucket }
+                } else if (events.ddcCustomers.bucketCreated.v48602.is(e)) {
+                    const bucketId = events.ddcCustomers.bucketCreated.v48602.decode(e).bucketId
+                    const storageBucket = assertNotNull(await storage.ddcCustomers.buckets.v50000.get(block.header, bucketId))
+                    if (bucketId !== storageBucket.bucketId) {
+                        throw Error(`Requested bucketId ${bucketId} is not equal to embedded bucketId ${storageBucket.bucketId}`)
+                    }
+                    rec = { ...storageBucket }
+                } else {
+                    throw new Error('Unsupported spec')
+                }
+
+                const ownerId = ss58.codec('cere').encode(rec.ownerId)
+                eventsInfo.ddcBuckets.push([
+                    new DdcBucket({
+                        bucketId: rec.bucketId,
+                        clusterId: rec.clusterId,
+                        isPublic: rec.isPublic,
+                        isRemoved: rec.isRemoved,
+                    }),
+                    ownerId,
+                ])
+                eventsInfo.accountIds.add(ownerId)
+            }
+        }
+    }
+
+    return eventsInfo
 }
