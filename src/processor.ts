@@ -14,7 +14,7 @@ import { events } from './types'
 export const processor = new SubstrateBatchProcessor()
     // Lookup archive by the network name in Subsquid registry
     // See https://docs.subsquid.io/substrate-indexing/supported-networks/
-    .setGateway('https://v2.archive.subsquid.io/network/kusama')
+    // .setGateway('https://v2.archive.subsquid.io/network/kusama')
     // Chain RPC endpoint is required on Substrate for metadata and real-time updates
     .setRpcEndpoint({
         // Set via .env for local runs or via secrets when deploying to Subsquid Cloud
