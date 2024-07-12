@@ -25,7 +25,10 @@ export const processor = new SubstrateBatchProcessor()
     })
     .setBlockRange({ from: 750 })
     .addEvent({
-        name: [events.balances.transfer.name],
+        name: [
+            events.balances.transfer.name,
+            events.ddcCustomers.bucketCreated.name,
+        ],
         extrinsic: true
     })
     .setFields({
