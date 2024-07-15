@@ -133,6 +133,7 @@ type Tuple<T, K> = [T, K]
 
 interface EventsInfo {
     accountIds: Set<string>
+    // TODO: rename to ddcBucketCreated, add ddcBucketUpdated, ddcBucketRemoved.
     ddcBuckets: Tuple<DdcBucket, string>[]
 }
 
@@ -150,6 +151,7 @@ async function getEventsInfo(ctx: ProcessorContext<Store>): Promise<EventsInfo> 
                 if (events.ddcCustomers.bucketCreated.v48201.is(e)) {
                     const bucketId = events.ddcCustomers.bucketCreated.v48201.decode(e)
                     const storageBucket = assertNotNull(await storage.ddcCustomers.buckets.v48201.get(block.header, bucketId))
+                    // TODO: replace with assert
                     if (bucketId !== storageBucket.bucketId) {
                         throw Error(`Requested bucketId ${bucketId} is not equal to embedded bucketId ${storageBucket.bucketId}`)
                     }
@@ -157,6 +159,7 @@ async function getEventsInfo(ctx: ProcessorContext<Store>): Promise<EventsInfo> 
                 } else if (events.ddcCustomers.bucketCreated.v48602.is(e)) {
                     const bucketId = events.ddcCustomers.bucketCreated.v48602.decode(e).bucketId
                     const storageBucket = assertNotNull(await storage.ddcCustomers.buckets.v50000.get(block.header, bucketId))
+                    // TODO: replace with assert
                     if (bucketId !== storageBucket.bucketId) {
                         throw Error(`Requested bucketId ${bucketId} is not equal to embedded bucketId ${storageBucket.bucketId}`)
                     }
