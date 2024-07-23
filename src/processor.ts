@@ -21,9 +21,11 @@ export const processor = new SubstrateBatchProcessor()
         // https://docs.subsquid.io/deploy-squid/env-variables/
         url: assertNotNull(process.env.RPC_CERE_HTTP, 'No RPC endpoint supplied'),
         // More RPC connection options at https://docs.subsquid.io/substrate-indexing/setup/general/#set-data-source
-        rateLimit: 10
+        rateLimit: parseInt(process.env.SQD_RATE_LIMIT || "500"),
+        capacity: parseInt(process.env.SQD_CAPACITY || "10"),
+        //maxBatchCallSize: 1000,
     })
-    .setBlockRange({ from: 750 })
+    .setBlockRange({ from: parseInt(process.env.SQD_FIRST_BLOCK || "1") })
     .addEvent({
         name: [
             events.balances.transfer.name,
