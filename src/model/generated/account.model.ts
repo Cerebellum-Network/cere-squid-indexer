@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, OneToMany as OneToMany_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, OneToMany as OneToMany_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
 import {Transfer} from "./transfer.model"
 import {DdcBucket} from "./ddcBucket.model"
 
@@ -22,4 +22,7 @@ export class Account {
 
     @OneToMany_(() => DdcBucket, e => e.ownerId)
     ddcBuckets!: DdcBucket[]
+
+    @BigIntColumn_({nullable: false})
+    ddcBalance!: bigint
 }

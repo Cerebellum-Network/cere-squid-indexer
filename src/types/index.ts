@@ -1,6 +1,7 @@
 export * as v295 from './v295'
 export * as v297 from './v297'
 export * as v48201 from './v48201'
+export * as v48602 from './v48602'
 export * as v50000 from './v50000'
 export * as events from './events'
 export * as storage from './storage'

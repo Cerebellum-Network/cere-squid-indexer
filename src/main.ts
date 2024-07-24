@@ -1,4 +1,4 @@
-import {TypeormDatabase, Store} from '@subsquid/typeorm-store'
+import {Store, TypeormDatabase} from '@subsquid/typeorm-store'
 import {In} from 'typeorm'
 import * as ss58 from '@subsquid/ss58'
 import assert from 'assert'
@@ -34,6 +34,16 @@ processor.run(new TypeormDatabase({supportHotBlocks: true}), async (ctx) => {
 
     await ctx.store.upsert([...bucketOwnerAccounts.values()])
     await ctx.store.upsert(eventsInfo.ddcBuckets.map(el => el[0]))
+
+    const ddcBalanceEvents = await getDdcBalanceEvents(ctx)
+    for (const ddcBalanceEvent of ddcBalanceEvents) {
+        const account = ss58.codec("cere").encode(ddcBalanceEvent[0])
+        const entity = await ctx.store.findOne(Account, {where: {id: account}})
+        if (entity) {
+            entity.ddcBalance += ddcBalanceEvent[1]
+            await ctx.store.save(entity)
+        }
+    }
 })
 
 interface TransferEvent {
@@ -234,4 +244,50 @@ async function getEventsInfo(ctx: ProcessorContext<Store>): Promise<EventsInfo> 
     }
 
     return eventsInfo
+}
+
+async function getDdcBalanceEvents(ctx: ProcessorContext<Store>): Promise<Tuple<string, bigint>[]> {
+    let balanceEvents: Tuple<string, bigint>[] = []
+    for (let block of ctx.blocks) {
+        for (let e of block.events) {
+            switch (e.name) {
+                case events.ddcCustomers.deposited.name: {
+                    if (events.ddcCustomers.deposited.v48201.is(e)) {
+                        const parsedEvent = events.ddcCustomers.deposited.v48201.decode(e)
+                        balanceEvents.push([parsedEvent[0], parsedEvent[1]])
+                    }
+                    if (events.ddcCustomers.deposited.v48602.is(e)) {
+                        const parsedEvent = events.ddcCustomers.deposited.v48602.decode(e)
+                        balanceEvents.push([parsedEvent.ownerId, parsedEvent.amount])
+                    }
+                    break
+                }
+                case events.ddcCustomers.charged.name: {
+                    if (events.ddcCustomers.charged.v48201.is(e)) {
+                        const parsedEvent = events.ddcCustomers.charged.v48201.decode(e)
+                        balanceEvents.push([parsedEvent[0], -parsedEvent[1]])
+                    }
+                    if (events.ddcCustomers.charged.v48602.is(e)) {
+                        const parsedEvent = events.ddcCustomers.charged.v48602.decode(e)
+                        balanceEvents.push([parsedEvent.ownerId, -parsedEvent.charged])
+                    }
+                    break
+                }
+                case events.ddcCustomers.withdrawn.name: {
+                    if (events.ddcCustomers.withdrawn.v48201.is(e)) {
+                        const parsedEvent = events.ddcCustomers.withdrawn.v48201.decode(e)
+                        balanceEvents.push([parsedEvent[0], -parsedEvent[1]])
+                    }
+                    if (events.ddcCustomers.withdrawn.v48602.is(e)) {
+                        const parsedEvent = events.ddcCustomers.withdrawn.v48602.decode(e)
+                        balanceEvents.push([parsedEvent.ownerId, -parsedEvent.amount])
+                    }
+                    break
+                }
+                default:
+                    break
+            }
+        }
+    }
+    return balanceEvents
 }

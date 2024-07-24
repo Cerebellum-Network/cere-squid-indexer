@@ -14,7 +14,14 @@
       "events": [
         "BucketCreated",
         "BucketUpdated",
-        "BucketRemoved"
+        "BucketRemoved",
+
+        "Deposited",
+        "Withdrawn",
+        "Charged",
+
+        "BucketTotalNodesUsageUpdated",
+        "BucketTotalCustomersUsageUpdated"
       ],
       "calls": [],
       "storage": [

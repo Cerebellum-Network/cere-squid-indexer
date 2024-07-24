@@ -4,6 +4,7 @@ type Account @entity {
   transfersTo: [Transfer!] @derivedFrom(field: "to")
   transfersFrom: [Transfer!] @derivedFrom(field: "from")
   ddcBuckets: [DdcBucket!] @derivedFrom(field: "ownerId")
+  ddcBalance: BigInt!
 }
 
 type Transfer @entity {
