@@ -30,6 +30,8 @@ export const processor = new SubstrateBatchProcessor()
         name: [
             events.balances.transfer.name,
             events.ddcCustomers.bucketCreated.name,
+            events.ddcCustomers.bucketUpdated.name,
+            events.ddcCustomers.bucketRemoved.name,
         ],
         extrinsic: true
     })
