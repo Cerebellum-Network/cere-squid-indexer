@@ -8,8 +8,13 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432"
-    volumes:
-      - ./data/db:/var/lib/postgresql/data:rw
+#    volumes:
+#      - ./data/db:/var/lib/postgresql/data:rw
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-d", "db_prod" ]
+      interval: 5s
+      timeout: 60s
+      retries: 5
   processor:
     image: cere-squid
     environment:
@@ -17,10 +22,11 @@ services:
       - DB_PORT=5432
       - DB_HOST=db
       - DB_PASS=postgres
-      - RPC_CERE_HTTP=wss://archive.testnet.cere.network/ws
-      - SQD_RATE_LIMIT=10
-      - SQD_CAPACITY=2
-      - SQD_FIRST_BLOCK=3725489
+      - RPC_CERE_HTTP=wss://archive.devnet.cere.network/ws
+      - SQD_RATE_LIMIT=5000
+      - SQD_CAPACITY=100
+      - SQD_FIRST_BLOCK=14909
+      - TYPES_BUNDLE=/squid/cere-types-bundle.json
     command: ["sqd", "process:prod"]
     depends_on:
       - db

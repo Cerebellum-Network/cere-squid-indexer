@@ -1,40 +1,101 @@
-import { assertNotNull } from '@subsquid/util-internal'
+import {assertNotNull} from '@subsquid/util-internal'
 import {
     BlockHeader,
     DataHandlerContext,
-    SubstrateBatchProcessor,
-    SubstrateBatchProcessorFields,
     Event as _Event,
-    Call as _Call,
-    Extrinsic as _Extrinsic
+    SubstrateBatchProcessor,
+    SubstrateBatchProcessorFields
 } from '@subsquid/substrate-processor'
-
-import { events } from './types'
+import {events} from './types'
 
 export const processor = new SubstrateBatchProcessor()
-    // Lookup archive by the network name in Subsquid registry
-    // See https://docs.subsquid.io/substrate-indexing/supported-networks/
-    // .setGateway('https://v2.archive.subsquid.io/network/kusama')
-    // Chain RPC endpoint is required on Substrate for metadata and real-time updates
     .setRpcEndpoint({
-        // Set via .env for local runs or via secrets when deploying to Subsquid Cloud
-        // https://docs.subsquid.io/deploy-squid/env-variables/
         url: assertNotNull(process.env.RPC_CERE_HTTP, 'No RPC endpoint supplied'),
-        // More RPC connection options at https://docs.subsquid.io/substrate-indexing/setup/general/#set-data-source
         rateLimit: parseInt(process.env.SQD_RATE_LIMIT || "500"),
         capacity: parseInt(process.env.SQD_CAPACITY || "10"),
-        //maxBatchCallSize: 1000,
     })
-    .setBlockRange({ from: parseInt(process.env.SQD_FIRST_BLOCK || "1") })
+    .setBlockRange({from: parseInt(process.env.SQD_FIRST_BLOCK || "0")})
+    .setTypesBundle(process.env.TYPES_BUNDLE || '../specs/cere-types-bundle.json')
     .addEvent({
         name: [
+            events.balances.endowed.name,
+            events.balances.dustLost.name,
             events.balances.transfer.name,
-            events.ddcCustomers.bucketCreated.name,
-            events.ddcCustomers.bucketUpdated.name,
-            events.ddcCustomers.bucketRemoved.name,
+            events.balances.balanceSet.name,
+            events.balances.deposit.name,
+            events.balances.reserved.name,
+            events.balances.unreserved.name,
+            events.balances.reserveRepatriated.name,
+            events.balances.withdraw.name,
+            events.balances.slashed.name,
+            events.balances.minted.name,
+            events.balances.burned.name,
+            events.balances.suspended.name,
+            events.balances.restored.name,
+            events.balances.upgraded.name,
+            events.balances.issued.name,
+            events.balances.rescinded.name,
+            events.balances.locked.name,
+            events.balances.unlocked.name,
+            events.balances.frozen.name,
+            events.balances.thawed.name,
+
+            events.ddcClusters.clusterCreated.name,
+            events.ddcClusters.clusterNodeAdded.name,
+            events.ddcClusters.clusterNodeRemoved.name,
+            events.ddcClusters.clusterParamsSet.name,
+            events.ddcClusters.clusterGovParamsSet.name,
+            events.ddcClusters.clusterProtocolParamsSet.name,
+            events.ddcClusters.clusterActivated.name,
+            events.ddcClusters.clusterBonded.name,
+            events.ddcClusters.clusterUnbonded.name,
+            events.ddcClusters.clusterNodeValidated.name,
+            events.ddcClusters.clusterUnbonding.name,
+
             events.ddcCustomers.deposited.name,
+            events.ddcCustomers.initiatDepositUnlock.name,
             events.ddcCustomers.withdrawn.name,
             events.ddcCustomers.charged.name,
+            events.ddcCustomers.bucketCreated.name,
+            events.ddcCustomers.initialDepositUnlock.name,
+            events.ddcCustomers.bucketUpdated.name,
+            events.ddcCustomers.bucketRemoved.name,
+            events.ddcCustomers.bucketTotalNodesUsageUpdated.name,
+            events.ddcCustomers.bucketTotalCustomersUsageUpdated.name,
+
+            events.ddcNodes.nodeCreated.name,
+            events.ddcNodes.nodeDeleted.name,
+            events.ddcNodes.nodeParamsChanged.name,
+
+            events.ddcPayouts.billingReportInitialized.name,
+            events.ddcPayouts.chargingStarted.name,
+            events.ddcPayouts.charged.name,
+            events.ddcPayouts.chargeFailed.name,
+            events.ddcPayouts.indebted.name,
+            events.ddcPayouts.chargingFinished.name,
+            events.ddcPayouts.treasuryFeesCollected.name,
+            events.ddcPayouts.clusterReserveFeesCollected.name,
+            events.ddcPayouts.validatorFeesCollected.name,
+            events.ddcPayouts.rewardingStarted.name,
+            events.ddcPayouts.rewarded.name,
+            events.ddcPayouts.rewardingFinished.name,
+            events.ddcPayouts.billingReportFinalized.name,
+            events.ddcPayouts.authorisedCaller.name,
+            events.ddcPayouts.notDistributedReward.name,
+            events.ddcPayouts.notDistributedOverallReward.name,
+            events.ddcPayouts.chargeError.name,
+            events.ddcPayouts.providerRewarded.name,
+            events.ddcPayouts.validatorRewarded.name,
+
+            events.ddcStaking.bonded.name,
+            events.ddcStaking.unbonded.name,
+            events.ddcStaking.withdrawn.name,
+            events.ddcStaking.chilled.name,
+            events.ddcStaking.chillSoon.name,
+            events.ddcStaking.payoutNodes.name,
+            events.ddcStaking.activated.name,
+            events.ddcStaking.leaveSoon.name,
+            events.ddcStaking.left.name,
         ],
         extrinsic: true
     })
@@ -42,20 +103,12 @@ export const processor = new SubstrateBatchProcessor()
         event: {
             args: true
         },
-        extrinsic: {
-            hash: true,
-            fee: true
-        },
         block: {
             timestamp: true
         }
     })
-    // Uncomment to disable RPC ingestion and drastically reduce no of RPC calls
-    //.useArchiveOnly()
 
 export type Fields = SubstrateBatchProcessorFields<typeof processor>
 export type Block = BlockHeader<Fields>
 export type Event = _Event<Fields>
-export type Call = _Call<Fields>
-export type Extrinsic = _Extrinsic<Fields>
 export type ProcessorContext<Store> = DataHandlerContext<Store, Fields>

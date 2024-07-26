@@ -1,293 +1,512 @@
-import {Store, TypeormDatabase} from '@subsquid/typeorm-store'
-import {In} from 'typeorm'
-import * as ss58 from '@subsquid/ss58'
-import assert from 'assert'
-import {assertNotNull} from '@subsquid/util-internal'
-
-import {processor, ProcessorContext} from './processor'
-import {Account, DdcBucket, Transfer} from './model'
-import {events, storage} from './types'
+import {processor} from "./processor";
+import {TypeormDatabase} from "@subsquid/typeorm-store";
+import {Account, DdcBucket} from "./model";
+import {events, storage} from "./types";
+import * as ss58 from "@subsquid/ss58";
 
 processor.run(new TypeormDatabase({supportHotBlocks: true}), async (ctx) => {
-    let transferEvents: TransferEvent[] = getTransferEvents(ctx)
+    const logger = ctx.log
 
-    let accounts: Map<string, Account> = await createAccounts(ctx, transferEvents)
-    let transfers: Transfer[] = createTransfers(transferEvents, accounts)
+    const accounts = new Map<string, Account>
 
-    await ctx.store.upsert([...accounts.values()])
-    await ctx.store.insert(transfers)
-
-    const eventsInfo = await getEventsInfo(ctx)
-    let bucketOwnerAccounts = await ctx.store
-        .findBy(Account, {id: In([...eventsInfo.accountIds])})
-        .then(bucketOwnerAccounts => new Map(bucketOwnerAccounts.map(account => [account.id, account])))
-    for (let accountId of eventsInfo.accountIds) {
-        if (!bucketOwnerAccounts.has(accountId)) {
-            bucketOwnerAccounts.set(accountId, new Account({id: accountId}))
-        }
-    }
-
-    for (const ddcBucket of eventsInfo.ddcBuckets) {
-        ddcBucket[0].ownerId = assertNotNull(bucketOwnerAccounts.get(ddcBucket[1]))
-        ddcBucket[0].id = ddcBucket[0].bucketId.toString()
-    }
-
-    await ctx.store.upsert([...bucketOwnerAccounts.values()])
-    await ctx.store.upsert(eventsInfo.ddcBuckets.map(el => el[0]))
-
-    const ddcBalanceEvents = await getDdcBalanceEvents(ctx)
-    for (const ddcBalanceEvent of ddcBalanceEvents) {
-        const account = ss58.codec("cere").encode(ddcBalanceEvent[0])
-        const entity = await ctx.store.findOne(Account, {where: {id: account}})
-        if (entity) {
-            entity.ddcBalance += ddcBalanceEvent[1]
-            await ctx.store.save(entity)
-        }
-    }
-})
-
-interface TransferEvent {
-    id: string
-    blockNumber: number
-    timestamp: Date
-    extrinsicHash?: string
-    from: string
-    to: string
-    amount: bigint
-    fee?: bigint
-}
-
-function getTransferEvents(ctx: ProcessorContext<Store>): TransferEvent[] {
-    // Filters and decodes the arriving events
-    let transfers: TransferEvent[] = []
-    for (let block of ctx.blocks) {
-        for (let event of block.events) {
-            if (event.name == events.balances.transfer.name) {
-                let rec: { from: string; to: string; amount: bigint }
-                if (events.balances.transfer.v295.is(event)) {
-                    let [from, to, amount] = events.balances.transfer.v295.decode(event)
-                    rec = {from, to, amount}
-                } else if (events.balances.transfer.v297.is(event)) {
-                    rec = events.balances.transfer.v297.decode(event)
-                } else {
-                    throw new Error('Unsupported spec')
+    // process events
+    for (let b of ctx.blocks) {
+        const block = b.header
+        for (let event of b.events) {
+            // process Balances pallet events
+            const processBalancesEvent = async (accountId: string) => {
+                try {
+                    let accountInStorage
+                    if (storage.balances.account.v266.is(block)) {
+                        accountInStorage = await storage.balances.account.v266.get(block, accountId)
+                    } else if (storage.balances.account.v48900.is(block)) {
+                        accountInStorage = await storage.balances.account.v48900.get(block, accountId)
+                    } else {
+                        throwUnsupportedSpec()
+                    }
+                    if (accountInStorage) {
+                        const accountEntity = accounts.get(accountId) ?? new Account({id: accountId})
+                        accountEntity.cereFreeBalance = accountInStorage.free
+                        accounts.set(accountId, accountEntity)
+                    } else {
+                        logStorageError("account", accountId)
+                    }
+                } catch (error) {
+                    logAndThrowProcessingError(error)
                 }
-
-                assert(block.header.timestamp, `Got an undefined timestamp at block ${block.header.height}`)
-
-                transfers.push({
-                    id: event.id,
-                    blockNumber: block.header.height,
-                    timestamp: new Date(block.header.timestamp),
-                    extrinsicHash: event.extrinsic?.hash,
-                    from: ss58.codec('cere').encode(rec.from),
-                    to: ss58.codec('cere').encode(rec.to),
-                    amount: rec.amount,
-                    fee: event.extrinsic?.fee || 0n,
-                })
             }
-        }
-    }
-    return transfers
-}
 
-async function createAccounts(ctx: ProcessorContext<Store>, transferEvents: TransferEvent[]): Promise<Map<string, Account>> {
-    const accountIds = new Set<string>()
-    for (let t of transferEvents) {
-        accountIds.add(t.from)
-        accountIds.add(t.to)
-    }
-
-    const accounts = await ctx.store.findBy(Account, {id: In([...accountIds])}).then((accounts) => {
-        return new Map(accounts.map((a) => [a.id, a]))
-    })
-
-    for (let t of transferEvents) {
-        updateAccounts(t.from)
-        updateAccounts(t.to)
-    }
-
-    function updateAccounts(id: string): void {
-        const acc = accounts.get(id)
-        if (acc == null) {
-            accounts.set(id, new Account({id}))
-        }
-    }
-
-    return accounts
-}
-
-function createTransfers(transferEvents: TransferEvent[], accounts: Map<string, Account>): Transfer[] {
-    let transfers: Transfer[] = []
-    for (let t of transferEvents) {
-        let {id, blockNumber, timestamp, extrinsicHash, amount, fee} = t
-        let from = accounts.get(t.from)
-        let to = accounts.get(t.to)
-        transfers.push(new Transfer({
-            id,
-            blockNumber,
-            timestamp,
-            extrinsicHash,
-            from,
-            to,
-            amount,
-            fee,
-        }))
-    }
-    return transfers
-}
-
-type Tuple<T, K> = [T, K]
-
-interface EventsInfo {
-    accountIds: Set<string>
-    // TODO: rename to ddcBucketCreated, add ddcBucketUpdated, ddcBucketRemoved.
-    ddcBuckets: Tuple<DdcBucket, string>[]
-}
-
-async function getEventsInfo(ctx: ProcessorContext<Store>): Promise<EventsInfo> {
-    let eventsInfo: EventsInfo = {
-        ddcBuckets: [],
-        accountIds: new Set<string>(),
-    }
-
-    for (let block of ctx.blocks) {
-        for (let e of block.events) {
-            if (e.name === events.ddcCustomers.bucketCreated.name) {
-                let rec: { bucketId: bigint; ownerId: string; clusterId: string; isPublic: boolean; isRemoved: boolean }
-
-                if (events.ddcCustomers.bucketCreated.v48201.is(e)) {
-                    const bucketId = events.ddcCustomers.bucketCreated.v48201.decode(e)
-                    const storageBucket = assertNotNull(await storage.ddcCustomers.buckets.v48201.get(block.header, bucketId))
-                    // TODO: replace with assert
-                    if (bucketId !== storageBucket.bucketId) {
-                        throw Error(`Requested bucketId ${bucketId} is not equal to embedded bucketId ${storageBucket.bucketId}`)
+            // process DDC Customer balances pallet events
+            const processDdcCustomersBalancesEvents = async (accountId: string) => {
+                try {
+                    let accountInStorage
+                    if (storage.ddcCustomers.ledger.v48013.is(block)) {
+                        accountInStorage = await storage.ddcCustomers.ledger.v48013.get(block, accountId)
+                    } else {
+                        throwUnsupportedSpec()
                     }
-                    rec = {isRemoved: false, ...storageBucket}
-                } else if (events.ddcCustomers.bucketCreated.v48602.is(e)) {
-                    const bucketId = events.ddcCustomers.bucketCreated.v48602.decode(e).bucketId
-                    const storageBucket = assertNotNull(await storage.ddcCustomers.buckets.v50000.get(block.header, bucketId))
-                    // TODO: replace with assert
-                    if (bucketId !== storageBucket.bucketId) {
-                        throw Error(`Requested bucketId ${bucketId} is not equal to embedded bucketId ${storageBucket.bucketId}`)
+                    if (accountInStorage) {
+                        const accountEntity = accounts.get(accountId) ?? new Account({id: accountId})
+                        accountEntity.ddcActiveBalance = accountInStorage.active
+                        accounts.set(accountId, accountEntity)
+                    } else {
+                        logStorageError("DDC Customer ledger", accountId)
                     }
-                    rec = {...storageBucket}
-                } else {
-                    throw new Error('Unsupported spec')
+                } catch (error) {
+                    logAndThrowProcessingError(error)
                 }
-
-                const ownerId = ss58.codec('cere').encode(rec.ownerId)
-                eventsInfo.ddcBuckets.push([
-                    new DdcBucket({
-                        bucketId: rec.bucketId,
-                        clusterId: rec.clusterId,
-                        isPublic: rec.isPublic,
-                        isRemoved: rec.isRemoved,
-                    }),
-                    ownerId,
-                ])
-                eventsInfo.accountIds.add(ownerId)
             }
-            if (e.name === events.ddcCustomers.bucketRemoved.name && events.ddcCustomers.bucketRemoved.v50000.is(e)) {
-                let rec: { bucketId: bigint; ownerId: string; clusterId: string; isPublic: boolean; isRemoved: boolean }
-                const bucketId = events.ddcCustomers.bucketRemoved.v50000.decode(e).bucketId
-                const storageBucket = assertNotNull(await storage.ddcCustomers.buckets.v50000.get(block.header, bucketId))
-                rec = {...storageBucket}
-                const ownerId = ss58.codec('cere').encode(rec.ownerId)
-                eventsInfo.ddcBuckets.push([
-                    new DdcBucket({
-                        bucketId: rec.bucketId,
-                        clusterId: rec.clusterId,
-                        isPublic: rec.isPublic,
-                        isRemoved: rec.isRemoved,
-                    }),
-                    ownerId,
-                ])
-                eventsInfo.accountIds.add(ownerId)
-            }
-            if (e.name === events.ddcCustomers.bucketUpdated.name) {
-                let rec: { bucketId: bigint; ownerId: string; clusterId: string; isPublic: boolean; isRemoved: boolean }
 
-                if (events.ddcCustomers.bucketUpdated.v48201.is(e)) {
-                    const bucketId = events.ddcCustomers.bucketUpdated.v48201.decode(e)
-                    const storageBucket = assertNotNull(await storage.ddcCustomers.buckets.v48201.get(block.header, bucketId))
-                    // TODO: replace with assert
-                    if (bucketId !== storageBucket.bucketId) {
-                        throw Error(`Requested bucketId ${bucketId} is not equal to embedded bucketId ${storageBucket.bucketId}`)
+            // process DDC Customer buckets pallet events
+            const processDdcBucketsEvents = async (bucketId: bigint) => {
+                try {
+                    let bucketEntity
+                    let accountId
+                    if (storage.ddcCustomers.buckets.v48013.is(block)) {
+                        const bucket = await storage.ddcCustomers.buckets.v48013.get(block, bucketId)
+                        if (bucket) {
+                            bucketEntity = new DdcBucket({
+                                bucketId: bucketId,
+                                clusterId: bucket.clusterId,
+                                isPublic: true,
+                                isRemoved: false,
+                                transferredBytes: 0n,
+                                storedBytes: 0n,
+                                numberOfPuts: 0n,
+                                numberOfGets: 0n,
+                            })
+                            accountId = bucket.ownerId
+                        } else {
+                            logStorageError("bucket", bucketId)
+                        }
+                    } else if (storage.ddcCustomers.buckets.v48017.is(block)) {
+                        const bucket = await storage.ddcCustomers.buckets.v48017.get(block, bucketId)
+                        if (bucket) {
+                            bucketEntity = new DdcBucket({
+                                bucketId: bucketId,
+                                clusterId: bucket.clusterId,
+                                isPublic: bucket.isPublic,
+                                isRemoved: false,
+                                transferredBytes: 0n,
+                                storedBytes: 0n,
+                                numberOfPuts: 0n,
+                                numberOfGets: 0n,
+                            })
+                            accountId = bucket.ownerId
+                        } else {
+                            logStorageError("bucket", bucketId)
+                        }
+                    } else if (storage.ddcCustomers.buckets.v50000.is(block)) {
+                        const bucket = await storage.ddcCustomers.buckets.v50000.get(block, bucketId)
+                        if (bucket) {
+                            bucketEntity = new DdcBucket({
+                                bucketId: bucketId,
+                                clusterId: bucket.clusterId,
+                                isPublic: bucket.isPublic,
+                                isRemoved: bucket.isRemoved,
+                                transferredBytes: 0n,
+                                storedBytes: 0n,
+                                numberOfPuts: 0n,
+                                numberOfGets: 0n,
+                            })
+                            accountId = bucket.ownerId
+                        } else {
+                            logStorageError("bucket", bucketId)
+                        }
+                    } else if (storage.ddcCustomers.buckets.v54100.is(block)) {
+                        const bucket = await storage.ddcCustomers.buckets.v54100.get(block, bucketId)
+                        if (bucket) {
+                            bucketEntity = new DdcBucket({
+                                bucketId: bucketId,
+                                clusterId: bucket.clusterId,
+                                isPublic: bucket.isPublic,
+                                isRemoved: bucket.isRemoved,
+                                transferredBytes: bucket.totalCustomersUsage?.transferredBytes ?? 0n,
+                                storedBytes: bucket.totalCustomersUsage?.storedBytes ?? 0n,
+                                numberOfPuts: bucket.totalCustomersUsage?.numberOfPuts ?? 0n,
+                                numberOfGets: bucket.totalCustomersUsage?.numberOfGets ?? 0n,
+                            })
+                            accountId = bucket.ownerId
+                        } else {
+                            logStorageError("bucket", bucketId)
+                        }
+                    } else {
+                        throwUnsupportedSpec()
                     }
-                    rec = {isRemoved: false, ...storageBucket}
-                } else if (events.ddcCustomers.bucketUpdated.v48602.is(e)) {
-                    const bucketId = events.ddcCustomers.bucketUpdated.v48602.decode(e).bucketId
-                    const storageBucket = assertNotNull(await storage.ddcCustomers.buckets.v50000.get(block.header, bucketId))
-                    // TODO: replace with assert
-                    if (bucketId !== storageBucket.bucketId) {
-                        throw Error(`Requested bucketId ${bucketId} is not equal to embedded bucketId ${storageBucket.bucketId}`)
+                    if (bucketEntity) {
+                        if (accountId) {
+                            const accountEntity = accounts.get(accountId) ?? new Account({
+                                id: accountId,
+                                ddcBuckets: []
+                            })
+                            accountEntity.ddcBuckets.push(bucketEntity)
+                            accounts.set(accountId, accountEntity)
+                        }
                     }
-                    rec = {...storageBucket}
-                } else {
-                    throw new Error('Unsupported spec')
+                } catch (error) {
+                    logAndThrowProcessingError(error)
                 }
-
-                const ownerId = ss58.codec('cere').encode(rec.ownerId)
-                eventsInfo.ddcBuckets.push([
-                    new DdcBucket({
-                        bucketId: rec.bucketId,
-                        clusterId: rec.clusterId,
-                        isPublic: rec.isPublic,
-                        isRemoved: rec.isRemoved,
-                    }),
-                    ownerId,
-                ])
-                eventsInfo.accountIds.add(ownerId)
             }
-        }
-    }
 
-    return eventsInfo
-}
+            //util logging functions
+            // TODO make configurable behaviour for different types of errors
+            const throwUnsupportedSpec = () => {
+                throw Error(`Unsupported spec version for event ${event.name} at block ${block.height} (${block.hash})`)
+            }
 
-async function getDdcBalanceEvents(ctx: ProcessorContext<Store>): Promise<Tuple<string, bigint>[]> {
-    let balanceEvents: Tuple<string, bigint>[] = []
-    for (let block of ctx.blocks) {
-        for (let e of block.events) {
-            switch (e.name) {
-                case events.ddcCustomers.deposited.name: {
-                    if (events.ddcCustomers.deposited.v48201.is(e)) {
-                        const parsedEvent = events.ddcCustomers.deposited.v48201.decode(e)
-                        balanceEvents.push([parsedEvent[0], parsedEvent[1]])
-                    }
-                    if (events.ddcCustomers.deposited.v48602.is(e)) {
-                        const parsedEvent = events.ddcCustomers.deposited.v48602.decode(e)
-                        balanceEvents.push([parsedEvent.ownerId, parsedEvent.amount])
+            const logStorageError = (entity: string, key: any) => {
+                logger.warn(`Unable to find ${entity} by key ${key} at block ${block.height} (${block.hash})`)
+            }
+
+            const logAndThrowProcessingError = (error: any) => {
+                logger.error(`Unable to process event ${event.name} at block ${block.height} (${block.hash})`)
+                logger.error(`${error}`)
+                logger.error(`Event args: ${JSON.stringify(event.args)}`)
+                logger.error(`Event extrinsic: ${event.extrinsic?.id}`)
+                throw error
+            }
+
+            logger.info(`Received event ${event.name} at block ${block.height} (${block.hash})`)
+
+            switch (event.name) {
+                // Balances
+                case events.balances.endowed.name: {
+                    if (events.balances.endowed.v266.is(event)) {
+                        const accountId = events.balances.endowed.v266.decode(event)[0]
+                        await processBalancesEvent(accountId)
+                    } else if (events.balances.endowed.v297.is(event)) {
+                        const accountId = events.balances.endowed.v297.decode(event).account
+                        await processBalancesEvent(accountId)
+                    } else {
+                        throwUnsupportedSpec()
                     }
                     break
                 }
-                case events.ddcCustomers.charged.name: {
-                    if (events.ddcCustomers.charged.v48201.is(e)) {
-                        const parsedEvent = events.ddcCustomers.charged.v48201.decode(e)
-                        balanceEvents.push([parsedEvent[0], -parsedEvent[1]])
+                case events.balances.dustLost.name: {
+                    if (events.balances.dustLost.v266.is(event)) {
+                        const accountId = events.balances.dustLost.v266.decode(event)[0]
+                        await processBalancesEvent(accountId)
+                    } else if (events.balances.dustLost.v297.is(event)) {
+                        const accountId = events.balances.dustLost.v297.decode(event).account
+                        await processBalancesEvent(accountId)
+                    } else {
+                        throwUnsupportedSpec()
                     }
-                    if (events.ddcCustomers.charged.v48602.is(e)) {
-                        const parsedEvent = events.ddcCustomers.charged.v48602.decode(e)
-                        balanceEvents.push([parsedEvent.ownerId, -parsedEvent.charged])
+                    break
+                }
+                case events.balances.transfer.name: {
+                    if (events.balances.transfer.v266.is(event)) {
+                        const accountId = events.balances.transfer.v266.decode(event)[0]
+                        await processBalancesEvent(accountId)
+                    } else if (events.balances.transfer.v297.is(event)) {
+                        const accountId = events.balances.transfer.v297.decode(event).from
+                        await processBalancesEvent(accountId)
+                    } else {
+                        throwUnsupportedSpec()
+                    }
+                    break
+                }
+                case events.balances.balanceSet.name: {
+                    if (events.balances.balanceSet.v266.is(event)) {
+                        const accountId = events.balances.balanceSet.v266.decode(event)[0]
+                        await processBalancesEvent(accountId)
+                    } else if (events.balances.balanceSet.v297.is(event)) {
+                        const accountId = events.balances.balanceSet.v297.decode(event).who
+                        await processBalancesEvent(accountId)
+                    } else if (events.balances.balanceSet.v48900.is(event)) {
+                        const accountId = events.balances.balanceSet.v48900.decode(event).who
+                        await processBalancesEvent(accountId)
+                    } else {
+                        throwUnsupportedSpec()
+                    }
+                    break
+                }
+                case events.balances.deposit.name: {
+                    if (events.balances.deposit.v266.is(event)) {
+                        const accountId = events.balances.deposit.v266.decode(event)[0]
+                        await processBalancesEvent(accountId)
+                    } else if (events.balances.deposit.v297.is(event)) {
+                        const accountId = events.balances.deposit.v297.decode(event).who
+                        await processBalancesEvent(accountId)
+                    } else {
+                        throwUnsupportedSpec()
+                    }
+                    break
+                }
+                case events.balances.reserved.name: {
+                    if (events.balances.reserved.v266.is(event)) {
+                        const accountId = events.balances.reserved.v266.decode(event)[0]
+                        await processBalancesEvent(accountId)
+                    } else if (events.balances.reserved.v297.is(event)) {
+                        const accountId = events.balances.reserved.v297.decode(event).who
+                        await processBalancesEvent(accountId)
+                    } else {
+                        throwUnsupportedSpec()
+                    }
+                    break
+                }
+                case events.balances.unreserved.name: {
+                    if (events.balances.unreserved.v266.is(event)) {
+                        const accountId = events.balances.unreserved.v266.decode(event)[0]
+                        await processBalancesEvent(accountId)
+                    } else if (events.balances.unreserved.v297.is(event)) {
+                        const accountId = events.balances.unreserved.v297.decode(event).who
+                        await processBalancesEvent(accountId)
+                    } else {
+                        throwUnsupportedSpec()
+                    }
+                    break
+                }
+                case events.balances.reserveRepatriated.name: {
+                    if (events.balances.reserveRepatriated.v266.is(event)) {
+                        const accountId = events.balances.reserveRepatriated.v266.decode(event)[0]
+                        await processBalancesEvent(accountId)
+                    } else if (events.balances.reserveRepatriated.v297.is(event)) {
+                        const accountId = events.balances.reserveRepatriated.v297.decode(event).from
+                        await processBalancesEvent(accountId)
+                    } else {
+                        throwUnsupportedSpec()
+                    }
+                    break
+                }
+                case events.balances.withdraw.name: {
+                    if (events.balances.withdraw.v296.is(event)) {
+                        const accountId = events.balances.withdraw.v296.decode(event)[0]
+                        await processBalancesEvent(accountId)
+                    } else if (events.balances.withdraw.v297.is(event)) {
+                        const accountId = events.balances.withdraw.v297.decode(event).who
+                        await processBalancesEvent(accountId)
+                    } else {
+                        throwUnsupportedSpec()
+                    }
+                    break
+                }
+                case events.balances.slashed.name: {
+                    if (events.balances.slashed.v296.is(event)) {
+                        const accountId = events.balances.slashed.v296.decode(event)[0]
+                        await processBalancesEvent(accountId)
+                    } else if (events.balances.slashed.v297.is(event)) {
+                        const accountId = events.balances.slashed.v297.decode(event).who
+                        await processBalancesEvent(accountId)
+                    } else {
+                        throwUnsupportedSpec()
+                    }
+                    break
+                }
+                case events.balances.minted.name: {
+                    if (events.balances.minted.v48900.is(event)) {
+                        const accountId = events.balances.minted.v48900.decode(event).who
+                        await processBalancesEvent(accountId)
+                    } else {
+                        throwUnsupportedSpec()
+                    }
+                    break
+                }
+                case events.balances.burned.name: {
+                    if (events.balances.burned.v48900.is(event)) {
+                        const accountId = events.balances.burned.v48900.decode(event).who
+                        await processBalancesEvent(accountId)
+                    } else {
+                        throwUnsupportedSpec()
+                    }
+                    break
+                }
+                case events.balances.suspended.name: {
+                    if (events.balances.suspended.v48900.is(event)) {
+                        const accountId = events.balances.suspended.v48900.decode(event).who
+                        await processBalancesEvent(accountId)
+                    } else {
+                        throwUnsupportedSpec()
+                    }
+                    break
+                }
+                case events.balances.restored.name: {
+                    if (events.balances.restored.v48900.is(event)) {
+                        const accountId = events.balances.restored.v48900.decode(event).who
+                        await processBalancesEvent(accountId)
+                    } else {
+                        throwUnsupportedSpec()
+                    }
+                    break
+                }
+                case events.balances.upgraded.name: {
+                    if (events.balances.upgraded.v48900.is(event)) {
+                        const accountId = events.balances.upgraded.v48900.decode(event).who
+                        await processBalancesEvent(accountId)
+                    } else {
+                        throwUnsupportedSpec()
+                    }
+                    break
+                }
+                case events.balances.locked.name: {
+                    if (events.balances.locked.v48900.is(event)) {
+                        const accountId = events.balances.locked.v48900.decode(event).who
+                        await processBalancesEvent(accountId)
+                    } else {
+                        throwUnsupportedSpec()
+                    }
+                    break
+                }
+                case events.balances.unlocked.name: {
+                    if (events.balances.unlocked.v48900.is(event)) {
+                        const accountId = events.balances.unlocked.v48900.decode(event).who
+                        await processBalancesEvent(accountId)
+                    } else {
+                        throwUnsupportedSpec()
+                    }
+                    break
+                }
+                case events.balances.frozen.name: {
+                    if (events.balances.frozen.v48900.is(event)) {
+                        const accountId = events.balances.frozen.v48900.decode(event).who
+                        await processBalancesEvent(accountId)
+                    } else {
+                        throwUnsupportedSpec()
+                    }
+                    break
+                }
+                case events.balances.thawed.name: {
+                    if (events.balances.thawed.v48900.is(event)) {
+                        const accountId = events.balances.thawed.v48900.decode(event).who
+                        await processBalancesEvent(accountId)
+                    } else {
+                        throwUnsupportedSpec()
+                    }
+                    break
+                }
+
+                // DDC Customers
+                // balances
+                case events.ddcCustomers.deposited.name: {
+                    if (events.ddcCustomers.deposited.v48013.is(event)) {
+                        const accountId = events.ddcCustomers.deposited.v48013.decode(event)[0]
+                        await processDdcCustomersBalancesEvents(accountId)
+                    } else if (events.ddcCustomers.deposited.v48800.is(event)) {
+                        const accountId = events.ddcCustomers.deposited.v48800.decode(event).ownerId
+                        await processDdcCustomersBalancesEvents(accountId)
+                    } else {
+                        throwUnsupportedSpec()
+                    }
+                    break
+                }
+                case events.ddcCustomers.initiatDepositUnlock.name: {
+                    if (events.ddcCustomers.initiatDepositUnlock.v48013.is(event)) {
+                        const accountId = events.ddcCustomers.initiatDepositUnlock.v48013.decode(event)[0]
+                        await processDdcCustomersBalancesEvents(accountId)
+                    } else {
+                        throwUnsupportedSpec()
                     }
                     break
                 }
                 case events.ddcCustomers.withdrawn.name: {
-                    if (events.ddcCustomers.withdrawn.v48201.is(e)) {
-                        const parsedEvent = events.ddcCustomers.withdrawn.v48201.decode(e)
-                        balanceEvents.push([parsedEvent[0], -parsedEvent[1]])
-                    }
-                    if (events.ddcCustomers.withdrawn.v48602.is(e)) {
-                        const parsedEvent = events.ddcCustomers.withdrawn.v48602.decode(e)
-                        balanceEvents.push([parsedEvent.ownerId, -parsedEvent.amount])
+                    if (events.ddcCustomers.withdrawn.v48013.is(event)) {
+                        const accountId = events.ddcCustomers.withdrawn.v48013.decode(event)[0]
+                        await processDdcCustomersBalancesEvents(accountId)
+                    } else if (events.ddcCustomers.withdrawn.v48800.is(event)) {
+                        const accountId = events.ddcCustomers.withdrawn.v48800.decode(event).ownerId
+                        await processDdcCustomersBalancesEvents(accountId)
+                    } else {
+                        throwUnsupportedSpec()
                     }
                     break
                 }
-                default:
+                case events.ddcCustomers.charged.name: {
+                    if (events.ddcCustomers.charged.v48013.is(event)) {
+                        // incorrect version, just skip
+                    } else if (events.ddcCustomers.charged.v48014.is(event)) {
+                        const accountId = events.ddcCustomers.charged.v48014.decode(event)[0]
+                        await processDdcCustomersBalancesEvents(accountId)
+                    } else if (events.ddcCustomers.charged.v48800.is(event)) {
+                        const accountId = events.ddcCustomers.charged.v48800.decode(event).ownerId
+                        await processDdcCustomersBalancesEvents(accountId)
+                    } else {
+                        throwUnsupportedSpec()
+                    }
                     break
+                }
+                case events.ddcCustomers.initialDepositUnlock.name: {
+                    if (events.ddcCustomers.initialDepositUnlock.v48014.is(event)) {
+                        const accountId = events.ddcCustomers.initialDepositUnlock.v48014.decode(event)[0]
+                        await processDdcCustomersBalancesEvents(accountId)
+                    } else if (events.ddcCustomers.initialDepositUnlock.v48800.is(event)) {
+                        const accountId = events.ddcCustomers.charged.v48800.decode(event).ownerId
+                        await processDdcCustomersBalancesEvents(accountId)
+                    } else {
+                        throwUnsupportedSpec()
+                    }
+                    break
+                }
+                // buckets
+                case events.ddcCustomers.bucketCreated.name: {
+                    if (events.ddcCustomers.bucketCreated.v48013.is(event)) {
+                        const bucketId = events.ddcCustomers.bucketCreated.v48013.decode(event)
+                        await processDdcBucketsEvents(bucketId)
+                    } else if (events.ddcCustomers.bucketCreated.v48800.is(event)) {
+                        const bucketId = events.ddcCustomers.bucketCreated.v48800.decode(event).bucketId
+                        await processDdcBucketsEvents(bucketId)
+                    } else if (events.ddcCustomers.bucketCreated.v54100.is(event)) {
+                        const bucketId = events.ddcCustomers.bucketCreated.v54100.decode(event).bucketId
+                        await processDdcBucketsEvents(bucketId)
+                    } else {
+                        throwUnsupportedSpec()
+                    }
+                    break
+                }
+                case events.ddcCustomers.bucketUpdated.name: {
+                    if (events.ddcCustomers.bucketUpdated.v48017.is(event)) {
+                        const bucketId = events.ddcCustomers.bucketUpdated.v48017.decode(event)
+                        await processDdcBucketsEvents(bucketId)
+                    } else if (events.ddcCustomers.bucketUpdated.v48800.is(event)) {
+                        const bucketId = events.ddcCustomers.bucketUpdated.v48800.decode(event).bucketId
+                        await processDdcBucketsEvents(bucketId)
+                    } else if (events.ddcCustomers.bucketUpdated.v54100.is(event)) {
+                        const bucketId = events.ddcCustomers.bucketUpdated.v54100.decode(event).bucketId
+                        await processDdcBucketsEvents(bucketId)
+                    } else {
+                        throwUnsupportedSpec()
+                    }
+                    break
+                }
+                case events.ddcCustomers.bucketRemoved.name: {
+                    if (events.ddcCustomers.bucketRemoved.v50000.is(event)) {
+                        const bucketId = events.ddcCustomers.bucketRemoved.v50000.decode(event).bucketId
+                        await processDdcBucketsEvents(bucketId)
+                    } else {
+                        throwUnsupportedSpec()
+                    }
+                    break
+                }
+                case events.ddcCustomers.bucketTotalNodesUsageUpdated.name: {
+                    if (events.ddcCustomers.bucketTotalNodesUsageUpdated.v54100.is(event)) {
+                        const bucketId = events.ddcCustomers.bucketTotalNodesUsageUpdated.v54100.decode(event).bucketId
+                        await processDdcBucketsEvents(bucketId)
+                    } else {
+                        throwUnsupportedSpec()
+                    }
+                    break
+                }
+                case events.ddcCustomers.bucketTotalCustomersUsageUpdated.name: {
+                    if (events.ddcCustomers.bucketTotalCustomersUsageUpdated.v54100.is(event)) {
+                        const bucketId = events.ddcCustomers.bucketTotalCustomersUsageUpdated.v54100.decode(event).bucketId
+                        await processDdcBucketsEvents(bucketId)
+                    } else {
+                        throwUnsupportedSpec()
+                    }
+                    break
+                }
+
+                default: {
+                    break;
+                }
             }
         }
+
+        // convert address to cere address
+        accounts.forEach((account, id) => {
+            account.id = ss58.codec("cere").encode(id)
+        })
+
+        // save to db
+        await ctx.store.upsert([...accounts.values()])
     }
-    return balanceEvents
-}
+})

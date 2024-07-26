@@ -10,7 +10,7 @@ export class DdcBucket {
     @PrimaryColumn_()
     id!: string
 
-    @Index_()
+    @Index_({unique: true})
     @BigIntColumn_({nullable: false})
     bucketId!: bigint
 
@@ -27,4 +27,16 @@ export class DdcBucket {
 
     @BooleanColumn_({nullable: false})
     isRemoved!: boolean
+
+    @BigIntColumn_({nullable: false})
+    transferredBytes!: bigint
+
+    @BigIntColumn_({nullable: false})
+    storedBytes!: bigint
+
+    @BigIntColumn_({nullable: false})
+    numberOfPuts!: bigint
+
+    @BigIntColumn_({nullable: false})
+    numberOfGets!: bigint
 }

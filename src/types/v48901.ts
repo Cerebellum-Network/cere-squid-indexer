@@ -1,27 +1,5 @@
 import {sts, Result, Option, Bytes, BitSequence} from './support'
 
-export interface Bucket {
-    bucketId: bigint
-    ownerId: AccountId32
-    clusterId: H160
-    isPublic: boolean
-    isRemoved: boolean
-}
-
-export type H160 = Bytes
-
-export type AccountId32 = Bytes
-
-export const Bucket: sts.Type<Bucket> = sts.struct(() => {
-    return  {
-        bucketId: sts.bigint(),
-        ownerId: AccountId32,
-        clusterId: H160,
-        isPublic: sts.boolean(),
-        isRemoved: sts.boolean(),
-    }
-})
-
 export const DispatchError: sts.Type<DispatchError> = sts.closedEnum(() => {
     return  {
         Arithmetic: ArithmeticError,
@@ -33,7 +11,6 @@ export const DispatchError: sts.Type<DispatchError> = sts.closedEnum(() => {
         Module: ModuleError,
         NoProviders: sts.unit(),
         Other: sts.unit(),
-        RootNotAllowed: sts.unit(),
         Token: TokenError,
         TooManyConsumers: sts.unit(),
         Transactional: TransactionalError,
@@ -61,7 +38,6 @@ export interface TransactionalError_NoLayer {
 export const TokenError: sts.Type<TokenError> = sts.closedEnum(() => {
     return  {
         BelowMinimum: sts.unit(),
-        Blocked: sts.unit(),
         CannotCreate: sts.unit(),
         CannotCreateHold: sts.unit(),
         Frozen: sts.unit(),
@@ -73,14 +49,10 @@ export const TokenError: sts.Type<TokenError> = sts.closedEnum(() => {
     }
 })
 
-export type TokenError = TokenError_BelowMinimum | TokenError_Blocked | TokenError_CannotCreate | TokenError_CannotCreateHold | TokenError_Frozen | TokenError_FundsUnavailable | TokenError_NotExpendable | TokenError_OnlyProvider | TokenError_UnknownAsset | TokenError_Unsupported
+export type TokenError = TokenError_BelowMinimum | TokenError_CannotCreate | TokenError_CannotCreateHold | TokenError_Frozen | TokenError_FundsUnavailable | TokenError_NotExpendable | TokenError_OnlyProvider | TokenError_UnknownAsset | TokenError_Unsupported
 
 export interface TokenError_BelowMinimum {
     __kind: 'BelowMinimum'
-}
-
-export interface TokenError_Blocked {
-    __kind: 'Blocked'
 }
 
 export interface TokenError_CannotCreate {
@@ -149,7 +121,7 @@ export interface ArithmeticError_Underflow {
     __kind: 'Underflow'
 }
 
-export type DispatchError = DispatchError_Arithmetic | DispatchError_BadOrigin | DispatchError_CannotLookup | DispatchError_ConsumerRemaining | DispatchError_Corruption | DispatchError_Exhausted | DispatchError_Module | DispatchError_NoProviders | DispatchError_Other | DispatchError_RootNotAllowed | DispatchError_Token | DispatchError_TooManyConsumers | DispatchError_Transactional | DispatchError_Unavailable
+export type DispatchError = DispatchError_Arithmetic | DispatchError_BadOrigin | DispatchError_CannotLookup | DispatchError_ConsumerRemaining | DispatchError_Corruption | DispatchError_Exhausted | DispatchError_Module | DispatchError_NoProviders | DispatchError_Other | DispatchError_Token | DispatchError_TooManyConsumers | DispatchError_Transactional | DispatchError_Unavailable
 
 export interface DispatchError_Arithmetic {
     __kind: 'Arithmetic'
@@ -187,10 +159,6 @@ export interface DispatchError_NoProviders {
 
 export interface DispatchError_Other {
     __kind: 'Other'
-}
-
-export interface DispatchError_RootNotAllowed {
-    __kind: 'RootNotAllowed'
 }
 
 export interface DispatchError_Token {

@@ -2,7 +2,7 @@ name: Release to dev
 on:
   push:
     branches:
-      - dev
+      - devv
   workflow_dispatch:
 
 permissions:
