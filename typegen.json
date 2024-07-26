@@ -1,33 +1,46 @@
 {
   "outDir": "src/types",
-  "specVersions": "specs/testnet-748-3249917.jsonl",
+  "specVersions": "specs/devnet-0-5054152.jsonl",
+  "typesBundle": "specs/cere-types-bundle.json",
   "pallets": {
     "Balances": {
-      "events": [
-        "Transfer"
-      ],
-      "calls": [],
-      "storage": [],
-      "constants": []
-    },
-    "DdcCustomers": {
-      "events": [
-        "BucketCreated",
-        "BucketUpdated",
-        "BucketRemoved",
-
-        "Deposited",
-        "Withdrawn",
-        "Charged",
-
-        "BucketTotalNodesUsageUpdated",
-        "BucketTotalCustomersUsageUpdated"
-      ],
+      "events": true,
       "calls": [],
       "storage": [
-        "Buckets"
+        "Account",
+        "TotalIssuance"
       ],
       "constants": []
+    },
+    "DdcClusters": {
+      "events": true,
+      "calls": [],
+      "storage": true,
+      "constants": true
+    },
+    "DdcCustomers": {
+      "events": true,
+      "calls": [],
+      "storage": true,
+      "constants": true
+    },
+    "DdcNodes": {
+      "events": true,
+      "calls": [],
+      "storage": true,
+      "constants": true
+    },
+    "DdcPayouts": {
+      "events": true,
+      "calls": [],
+      "storage": true,
+      "constants": true
+    },
+    "DdcStaking": {
+      "events": true,
+      "calls": [],
+      "storage": true,
+      "constants": true
     }
   }
 }

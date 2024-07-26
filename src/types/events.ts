@@ -1,2 +1,6 @@
 export * as balances from './balances/events'
+export * as ddcStaking from './ddc-staking/events'
+export * as ddcNodes from './ddc-nodes/events'
+export * as ddcClusters from './ddc-clusters/events'
 export * as ddcCustomers from './ddc-customers/events'
+export * as ddcPayouts from './ddc-payouts/events'

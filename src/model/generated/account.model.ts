@@ -1,5 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, OneToMany as OneToMany_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
-import {Transfer} from "./transfer.model"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, BigIntColumn as BigIntColumn_, OneToMany as OneToMany_} from "@subsquid/typeorm-store"
 import {DdcBucket} from "./ddcBucket.model"
 
 @Entity_()
@@ -8,21 +7,15 @@ export class Account {
         Object.assign(this, props)
     }
 
-    /**
-     * Account address
-     */
     @PrimaryColumn_()
     id!: string
 
-    @OneToMany_(() => Transfer, e => e.to)
-    transfersTo!: Transfer[]
+    @BigIntColumn_({nullable: false})
+    cereFreeBalance!: bigint
 
-    @OneToMany_(() => Transfer, e => e.from)
-    transfersFrom!: Transfer[]
+    @BigIntColumn_({nullable: false})
+    ddcActiveBalance!: bigint
 
     @OneToMany_(() => DdcBucket, e => e.ownerId)
     ddcBuckets!: DdcBucket[]
-
-    @BigIntColumn_({nullable: false})
-    ddcBalance!: bigint
 }
