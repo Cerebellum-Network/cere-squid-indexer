@@ -3,6 +3,7 @@ import {TypeormDatabase} from "@subsquid/typeorm-store";
 import {Account, DdcBucket} from "./model";
 import {events, storage} from "./types";
 import * as ss58 from "@subsquid/ss58";
+import {buckets} from "./types/ddc-customers/storage";
 
 processor.run(new TypeormDatabase({supportHotBlocks: true}), async (ctx) => {
     const logger = ctx.log
@@ -511,15 +512,18 @@ processor.run(new TypeormDatabase({supportHotBlocks: true}), async (ctx) => {
             }
         }
 
-        // convert address to cere address
+        // convert address to cere address and extract buckets
+        const buckets: DdcBucket[] = []
         accounts.forEach((account, id) => {
             account.id = ss58.codec("cere").encode(id)
             account.ddcBuckets.forEach(bucket => {
                 bucket.ownerId = account
             })
+            buckets.push(...account.ddcBuckets.splice(0))
         })
 
         // save to db
         await ctx.store.upsert([...accounts.values()])
+        await ctx.store.upsert(buckets)
     }
 })
