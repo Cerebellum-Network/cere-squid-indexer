@@ -42,7 +42,7 @@ processor.run(new TypeormDatabase({supportHotBlocks: true}), async (ctx) => {
                     }
                 } catch (error) {
                     if (error?.toString() === 'Error: Unexpected EOF') {
-                        console.log("EOF")
+                        logStorageError("account", accountId)
                     } else {
                         logAndThrowProcessingError(error)
                     }
