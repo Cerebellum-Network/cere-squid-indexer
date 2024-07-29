@@ -1,140 +1,14 @@
 import {sts, Result, Option, Bytes, BitSequence} from './support'
 
-export const BlockWeights: sts.Type<BlockWeights> = sts.struct(() => {
-    return  {
-        baseBlock: Weight,
-        maxBlock: Weight,
-        perClass: Type_122,
-    }
-})
-
-export const Type_122: sts.Type<Type_122> = sts.struct(() => {
-    return  {
-        normal: WeightsPerClass,
-        operational: WeightsPerClass,
-        mandatory: WeightsPerClass,
-    }
-})
-
-export const WeightsPerClass: sts.Type<WeightsPerClass> = sts.struct(() => {
-    return  {
-        baseExtrinsic: Weight,
-        maxExtrinsic: sts.option(() => Weight),
-        maxTotal: sts.option(() => Weight),
-        reserved: sts.option(() => Weight),
-    }
-})
-
-export interface WeightsPerClass {
-    baseExtrinsic: Weight
-    maxExtrinsic?: (Weight | undefined)
-    maxTotal?: (Weight | undefined)
-    reserved?: (Weight | undefined)
-}
-
-export interface Weight {
-    refTime: bigint
-    proofSize: bigint
-}
-
-export interface Type_122 {
-    normal: WeightsPerClass
-    operational: WeightsPerClass
-    mandatory: WeightsPerClass
-}
-
-export const Weight: sts.Type<Weight> = sts.struct(() => {
-    return  {
-        refTime: sts.bigint(),
-        proofSize: sts.bigint(),
-    }
-})
-
-export interface BlockWeights {
-    baseBlock: Weight
-    maxBlock: Weight
-    perClass: Type_122
-}
-
-export interface ClusterGovParams {
-    treasuryShare: Perbill
-    validatorsShare: Perbill
-    clusterReserveShare: Perbill
-    cdnBondSize: bigint
-    cdnChillDelay: number
-    cdnUnbondingDelay: number
-    storageBondSize: bigint
-    storageChillDelay: number
-    storageUnbondingDelay: number
-    unitPerMbStored: bigint
-    unitPerMbStreamed: bigint
-    unitPerPutRequest: bigint
-    unitPerGetRequest: bigint
-}
-
-export type Perbill = number
-
-export const ClusterGovParams: sts.Type<ClusterGovParams> = sts.struct(() => {
-    return  {
-        treasuryShare: Perbill,
-        validatorsShare: Perbill,
-        clusterReserveShare: Perbill,
-        cdnBondSize: sts.bigint(),
-        cdnChillDelay: sts.number(),
-        cdnUnbondingDelay: sts.number(),
-        storageBondSize: sts.bigint(),
-        storageChillDelay: sts.number(),
-        storageUnbondingDelay: sts.number(),
-        unitPerMbStored: sts.bigint(),
-        unitPerMbStreamed: sts.bigint(),
-        unitPerPutRequest: sts.bigint(),
-        unitPerGetRequest: sts.bigint(),
-    }
-})
-
-export const Perbill = sts.number()
-
-export interface Cluster {
-    clusterId: H160
-    managerId: AccountId32
-    reserveId: AccountId32
-    props: ClusterProps
-}
-
-export interface ClusterProps {
-    nodeProviderAuthContract?: (AccountId32 | undefined)
-}
-
-export const Cluster: sts.Type<Cluster> = sts.struct(() => {
-    return  {
-        clusterId: H160,
-        managerId: AccountId32,
-        reserveId: AccountId32,
-        props: ClusterProps,
-    }
-})
-
-export const ClusterProps: sts.Type<ClusterProps> = sts.struct(() => {
-    return  {
-        nodeProviderAuthContract: sts.option(() => AccountId32),
-    }
-})
-
-export type AccountId32 = Bytes
-
-export type H160 = Bytes
-
-export const H160 = sts.bytes()
-
 export interface EventRecord {
-    phase: Phase
+    phase: Type_118
     event: Event
     topics: H256[]
 }
 
 export type H256 = Bytes
 
-export type Event = Event_Balances | Event_Bounties | Event_CereDDCModule | Event_ChainBridge | Event_ChildBounties | Event_Contracts | Event_Council | Event_DdcClusters | Event_DdcCustomers | Event_DdcMetricsOffchainWorker | Event_DdcNodes | Event_DdcPayouts | Event_DdcStaking | Event_Democracy | Event_ElectionProviderMultiPhase | Event_Elections | Event_Erc20 | Event_Erc721 | Event_FastUnstake | Event_Grandpa | Event_Identity | Event_ImOnline | Event_Indices | Event_Multisig | Event_NominationPools | Event_Offences | Event_Proxy | Event_Recovery | Event_Scheduler | Event_Session | Event_Society | Event_Staking | Event_Sudo | Event_System | Event_TechnicalCommittee | Event_TechnicalMembership | Event_Tips | Event_TransactionPayment | Event_Treasury | Event_Utility | Event_Vesting | Event_VoterList
+export type Event = Event_Balances | Event_Bounties | Event_ChainBridge | Event_ChildBounties | Event_Contracts | Event_Council | Event_DdcClusters | Event_DdcCustomers | Event_DdcNodes | Event_DdcPayouts | Event_DdcStaking | Event_Democracy | Event_ElectionProviderMultiPhase | Event_Elections | Event_Erc20 | Event_Erc721 | Event_FastUnstake | Event_Grandpa | Event_Identity | Event_ImOnline | Event_Indices | Event_Multisig | Event_NominationPools | Event_Offences | Event_Preimage | Event_Proxy | Event_Recovery | Event_Scheduler | Event_Session | Event_Staking | Event_Sudo | Event_System | Event_TechnicalCommittee | Event_TechnicalMembership | Event_Tips | Event_TransactionPayment | Event_Treasury | Event_Utility | Event_Vesting | Event_VoterList
 
 export interface Event_Balances {
     __kind: 'Balances'
@@ -144,11 +18,6 @@ export interface Event_Balances {
 export interface Event_Bounties {
     __kind: 'Bounties'
     value: BountiesEvent
-}
-
-export interface Event_CereDDCModule {
-    __kind: 'CereDDCModule'
-    value: CereDDCModuleEvent
 }
 
 export interface Event_ChainBridge {
@@ -179,11 +48,6 @@ export interface Event_DdcClusters {
 export interface Event_DdcCustomers {
     __kind: 'DdcCustomers'
     value: DdcCustomersEvent
-}
-
-export interface Event_DdcMetricsOffchainWorker {
-    __kind: 'DdcMetricsOffchainWorker'
-    value: DdcMetricsOffchainWorkerEvent
 }
 
 export interface Event_DdcNodes {
@@ -266,6 +130,11 @@ export interface Event_Offences {
     value: OffencesEvent
 }
 
+export interface Event_Preimage {
+    __kind: 'Preimage'
+    value: PreimageEvent
+}
+
 export interface Event_Proxy {
     __kind: 'Proxy'
     value: ProxyEvent
@@ -284,11 +153,6 @@ export interface Event_Scheduler {
 export interface Event_Session {
     __kind: 'Session'
     value: SessionEvent
-}
-
-export interface Event_Society {
-    __kind: 'Society'
-    value: SocietyEvent
 }
 
 export interface Event_Staking {
@@ -347,10 +211,7 @@ export interface Event_VoterList {
 }
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export type VoterListEvent = VoterListEvent_Rebagged | VoterListEvent_ScoreUpdated
 
@@ -373,11 +234,10 @@ export interface VoterListEvent_ScoreUpdated {
     newScore: bigint
 }
 
+export type AccountId32 = Bytes
+
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export type VestingEvent = VestingEvent_VestingCompleted | VestingEvent_VestingUpdated
 
@@ -400,10 +260,7 @@ export interface VestingEvent_VestingUpdated {
 }
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export type UtilityEvent = UtilityEvent_BatchCompleted | UtilityEvent_BatchCompletedWithErrors | UtilityEvent_BatchInterrupted | UtilityEvent_DispatchedAs | UtilityEvent_ItemCompleted | UtilityEvent_ItemFailed
 
@@ -454,7 +311,7 @@ export interface UtilityEvent_ItemFailed {
     error: DispatchError
 }
 
-export type DispatchError = DispatchError_Arithmetic | DispatchError_BadOrigin | DispatchError_CannotLookup | DispatchError_ConsumerRemaining | DispatchError_Corruption | DispatchError_Exhausted | DispatchError_Module | DispatchError_NoProviders | DispatchError_Other | DispatchError_Token | DispatchError_TooManyConsumers | DispatchError_Transactional | DispatchError_Unavailable
+export type DispatchError = DispatchError_Arithmetic | DispatchError_BadOrigin | DispatchError_CannotLookup | DispatchError_ConsumerRemaining | DispatchError_Corruption | DispatchError_Exhausted | DispatchError_Module | DispatchError_NoProviders | DispatchError_Other | DispatchError_RootNotAllowed | DispatchError_Token | DispatchError_TooManyConsumers | DispatchError_Transactional | DispatchError_Unavailable
 
 export interface DispatchError_Arithmetic {
     __kind: 'Arithmetic'
@@ -494,6 +351,10 @@ export interface DispatchError_Other {
     __kind: 'Other'
 }
 
+export interface DispatchError_RootNotAllowed {
+    __kind: 'RootNotAllowed'
+}
+
 export interface DispatchError_Token {
     __kind: 'Token'
     value: TokenError
@@ -522,22 +383,38 @@ export interface TransactionalError_NoLayer {
     __kind: 'NoLayer'
 }
 
-export type TokenError = TokenError_BelowMinimum | TokenError_CannotCreate | TokenError_Frozen | TokenError_NoFunds | TokenError_UnknownAsset | TokenError_Unsupported | TokenError_WouldDie
+export type TokenError = TokenError_BelowMinimum | TokenError_Blocked | TokenError_CannotCreate | TokenError_CannotCreateHold | TokenError_Frozen | TokenError_FundsUnavailable | TokenError_NotExpendable | TokenError_OnlyProvider | TokenError_UnknownAsset | TokenError_Unsupported
 
 export interface TokenError_BelowMinimum {
     __kind: 'BelowMinimum'
+}
+
+export interface TokenError_Blocked {
+    __kind: 'Blocked'
 }
 
 export interface TokenError_CannotCreate {
     __kind: 'CannotCreate'
 }
 
+export interface TokenError_CannotCreateHold {
+    __kind: 'CannotCreateHold'
+}
+
 export interface TokenError_Frozen {
     __kind: 'Frozen'
 }
 
-export interface TokenError_NoFunds {
-    __kind: 'NoFunds'
+export interface TokenError_FundsUnavailable {
+    __kind: 'FundsUnavailable'
+}
+
+export interface TokenError_NotExpendable {
+    __kind: 'NotExpendable'
+}
+
+export interface TokenError_OnlyProvider {
+    __kind: 'OnlyProvider'
 }
 
 export interface TokenError_UnknownAsset {
@@ -546,10 +423,6 @@ export interface TokenError_UnknownAsset {
 
 export interface TokenError_Unsupported {
     __kind: 'Unsupported'
-}
-
-export interface TokenError_WouldDie {
-    __kind: 'WouldDie'
 }
 
 export interface ModuleError {
@@ -572,12 +445,9 @@ export interface ArithmeticError_Underflow {
 }
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
-export type TreasuryEvent = TreasuryEvent_Awarded | TreasuryEvent_Burnt | TreasuryEvent_Deposit | TreasuryEvent_Proposed | TreasuryEvent_Rejected | TreasuryEvent_Rollover | TreasuryEvent_SpendApproved | TreasuryEvent_Spending
+export type TreasuryEvent = TreasuryEvent_Awarded | TreasuryEvent_Burnt | TreasuryEvent_Deposit | TreasuryEvent_Proposed | TreasuryEvent_Rejected | TreasuryEvent_Rollover | TreasuryEvent_SpendApproved | TreasuryEvent_Spending | TreasuryEvent_UpdatedInactive
 
 /**
  * Some funds have been allocated.
@@ -649,10 +519,16 @@ export interface TreasuryEvent_Spending {
 }
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The inactive funds of the pallet have been updated.
+ */
+export interface TreasuryEvent_UpdatedInactive {
+    __kind: 'UpdatedInactive'
+    reactivated: bigint
+    deactivated: bigint
+}
+
+/**
+ * The `Event` enum of this pallet
  */
 export type TransactionPaymentEvent = TransactionPaymentEvent_TransactionFeePaid
 
@@ -668,10 +544,7 @@ export interface TransactionPaymentEvent_TransactionFeePaid {
 }
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export type TipsEvent = TipsEvent_NewTip | TipsEvent_TipClosed | TipsEvent_TipClosing | TipsEvent_TipRetracted | TipsEvent_TipSlashed
 
@@ -720,10 +593,7 @@ export interface TipsEvent_TipSlashed {
 }
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export type TechnicalMembershipEvent = TechnicalMembershipEvent_Dummy | TechnicalMembershipEvent_KeyChanged | TechnicalMembershipEvent_MemberAdded | TechnicalMembershipEvent_MemberRemoved | TechnicalMembershipEvent_MembersReset | TechnicalMembershipEvent_MembersSwapped
 
@@ -770,10 +640,7 @@ export interface TechnicalMembershipEvent_MembersSwapped {
 }
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export type TechnicalCommitteeEvent = TechnicalCommitteeEvent_Approved | TechnicalCommitteeEvent_Closed | TechnicalCommitteeEvent_Disapproved | TechnicalCommitteeEvent_Executed | TechnicalCommitteeEvent_MemberExecuted | TechnicalCommitteeEvent_Proposed | TechnicalCommitteeEvent_Voted
 
@@ -930,11 +797,13 @@ export interface DispatchClass_Operational {
     __kind: 'Operational'
 }
 
+export interface Weight {
+    refTime: bigint
+    proofSize: bigint
+}
+
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export type SudoEvent = SudoEvent_KeyChanged | SudoEvent_Sudid | SudoEvent_SudoAsDone
 
@@ -963,12 +832,9 @@ export interface SudoEvent_SudoAsDone {
 }
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
-export type StakingEvent = StakingEvent_Bonded | StakingEvent_Chilled | StakingEvent_EraPaid | StakingEvent_Kicked | StakingEvent_OldSlashingReportDiscarded | StakingEvent_PayoutStarted | StakingEvent_Rewarded | StakingEvent_Slashed | StakingEvent_StakersElected | StakingEvent_StakingElectionFailed | StakingEvent_Unbonded | StakingEvent_ValidatorPrefsSet | StakingEvent_Withdrawn
+export type StakingEvent = StakingEvent_Bonded | StakingEvent_Chilled | StakingEvent_EraPaid | StakingEvent_ForceEra | StakingEvent_Kicked | StakingEvent_OldSlashingReportDiscarded | StakingEvent_PayoutStarted | StakingEvent_Rewarded | StakingEvent_SlashReported | StakingEvent_Slashed | StakingEvent_StakersElected | StakingEvent_StakingElectionFailed | StakingEvent_Unbonded | StakingEvent_ValidatorPrefsSet | StakingEvent_Withdrawn
 
 /**
  * An account has bonded this amount. \[stash, amount\]
@@ -999,6 +865,14 @@ export interface StakingEvent_EraPaid {
     eraIndex: number
     validatorPayout: bigint
     remainder: bigint
+}
+
+/**
+ * A new force era mode was set.
+ */
+export interface StakingEvent_ForceEra {
+    __kind: 'ForceEra'
+    mode: Forcing
 }
 
 /**
@@ -1038,7 +912,18 @@ export interface StakingEvent_Rewarded {
 }
 
 /**
- * One staker (and potentially its nominators) has been slashed by the given amount.
+ * A slash for the given validator, for the given percentage of their stake, at the given
+ * era as been reported.
+ */
+export interface StakingEvent_SlashReported {
+    __kind: 'SlashReported'
+    validator: AccountId32
+    fraction: Perbill
+    slashEra: number
+}
+
+/**
+ * A staker (validator or nominator) has been slashed by the given amount.
  */
 export interface StakingEvent_Slashed {
     __kind: 'Slashed'
@@ -1093,158 +978,28 @@ export interface ValidatorPrefs {
     blocked: boolean
 }
 
-/**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
- */
-export type SocietyEvent = SocietyEvent_AutoUnbid | SocietyEvent_Bid | SocietyEvent_CandidateSuspended | SocietyEvent_Challenged | SocietyEvent_DefenderVote | SocietyEvent_Deposit | SocietyEvent_Founded | SocietyEvent_Inducted | SocietyEvent_MemberSuspended | SocietyEvent_NewMaxMembers | SocietyEvent_SuspendedMemberJudgement | SocietyEvent_Unbid | SocietyEvent_Unfounded | SocietyEvent_Unvouch | SocietyEvent_Vote | SocietyEvent_Vouch
+export type Perbill = number
 
-/**
- * A candidate was dropped (due to an excess of bids in the system).
- */
-export interface SocietyEvent_AutoUnbid {
-    __kind: 'AutoUnbid'
-    candidate: AccountId32
+export type Forcing = Forcing_ForceAlways | Forcing_ForceNew | Forcing_ForceNone | Forcing_NotForcing
+
+export interface Forcing_ForceAlways {
+    __kind: 'ForceAlways'
+}
+
+export interface Forcing_ForceNew {
+    __kind: 'ForceNew'
+}
+
+export interface Forcing_ForceNone {
+    __kind: 'ForceNone'
+}
+
+export interface Forcing_NotForcing {
+    __kind: 'NotForcing'
 }
 
 /**
- * A membership bid just happened. The given account is the candidate's ID and their offer
- * is the second.
- */
-export interface SocietyEvent_Bid {
-    __kind: 'Bid'
-    candidateId: AccountId32
-    offer: bigint
-}
-
-/**
- * A candidate has been suspended
- */
-export interface SocietyEvent_CandidateSuspended {
-    __kind: 'CandidateSuspended'
-    candidate: AccountId32
-}
-
-/**
- * A member has been challenged
- */
-export interface SocietyEvent_Challenged {
-    __kind: 'Challenged'
-    member: AccountId32
-}
-
-/**
- * A vote has been placed for a defending member
- */
-export interface SocietyEvent_DefenderVote {
-    __kind: 'DefenderVote'
-    voter: AccountId32
-    vote: boolean
-}
-
-/**
- * Some funds were deposited into the society account.
- */
-export interface SocietyEvent_Deposit {
-    __kind: 'Deposit'
-    value: bigint
-}
-
-/**
- * The society is founded by the given identity.
- */
-export interface SocietyEvent_Founded {
-    __kind: 'Founded'
-    founder: AccountId32
-}
-
-/**
- * A group of candidates have been inducted. The batch's primary is the first value, the
- * batch in full is the second.
- */
-export interface SocietyEvent_Inducted {
-    __kind: 'Inducted'
-    primary: AccountId32
-    candidates: AccountId32[]
-}
-
-/**
- * A member has been suspended
- */
-export interface SocietyEvent_MemberSuspended {
-    __kind: 'MemberSuspended'
-    member: AccountId32
-}
-
-/**
- * A new \[max\] member count has been set
- */
-export interface SocietyEvent_NewMaxMembers {
-    __kind: 'NewMaxMembers'
-    max: number
-}
-
-/**
- * A suspended member has been judged.
- */
-export interface SocietyEvent_SuspendedMemberJudgement {
-    __kind: 'SuspendedMemberJudgement'
-    who: AccountId32
-    judged: boolean
-}
-
-/**
- * A candidate was dropped (by their request).
- */
-export interface SocietyEvent_Unbid {
-    __kind: 'Unbid'
-    candidate: AccountId32
-}
-
-/**
- * Society is unfounded.
- */
-export interface SocietyEvent_Unfounded {
-    __kind: 'Unfounded'
-    founder: AccountId32
-}
-
-/**
- * A candidate was dropped (by request of who vouched for them).
- */
-export interface SocietyEvent_Unvouch {
-    __kind: 'Unvouch'
-    candidate: AccountId32
-}
-
-/**
- * A vote has been placed
- */
-export interface SocietyEvent_Vote {
-    __kind: 'Vote'
-    candidate: AccountId32
-    voter: AccountId32
-    vote: boolean
-}
-
-/**
- * A membership bid just happened by vouching. The given account is the candidate's ID and
- * their offer is the second. The vouching party is the third.
- */
-export interface SocietyEvent_Vouch {
-    __kind: 'Vouch'
-    candidateId: AccountId32
-    offer: bigint
-    vouching: AccountId32
-}
-
-/**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export type SessionEvent = SessionEvent_NewSession
 
@@ -1376,10 +1131,7 @@ export interface RecoveryEvent_RecoveryVouched {
 }
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export type ProxyEvent = ProxyEvent_Announced | ProxyEvent_ProxyAdded | ProxyEvent_ProxyExecuted | ProxyEvent_ProxyRemoved | ProxyEvent_PureCreated
 
@@ -1454,6 +1206,35 @@ export interface ProxyType_Staking {
 }
 
 /**
+ * The `Event` enum of this pallet
+ */
+export type PreimageEvent = PreimageEvent_Cleared | PreimageEvent_Noted | PreimageEvent_Requested
+
+/**
+ * A preimage has ben cleared.
+ */
+export interface PreimageEvent_Cleared {
+    __kind: 'Cleared'
+    hash: H256
+}
+
+/**
+ * A preimage has been noted.
+ */
+export interface PreimageEvent_Noted {
+    __kind: 'Noted'
+    hash: H256
+}
+
+/**
+ * A preimage has been requested.
+ */
+export interface PreimageEvent_Requested {
+    __kind: 'Requested'
+    hash: H256
+}
+
+/**
  * Events type.
  */
 export type OffencesEvent = OffencesEvent_Offence
@@ -1472,7 +1253,7 @@ export interface OffencesEvent_Offence {
 /**
  * Events of this pallet.
  */
-export type NominationPoolsEvent = NominationPoolsEvent_Bonded | NominationPoolsEvent_Created | NominationPoolsEvent_Destroyed | NominationPoolsEvent_MemberRemoved | NominationPoolsEvent_PaidOut | NominationPoolsEvent_PoolSlashed | NominationPoolsEvent_RolesUpdated | NominationPoolsEvent_StateChanged | NominationPoolsEvent_Unbonded | NominationPoolsEvent_UnbondingPoolSlashed | NominationPoolsEvent_Withdrawn
+export type NominationPoolsEvent = NominationPoolsEvent_Bonded | NominationPoolsEvent_Created | NominationPoolsEvent_Destroyed | NominationPoolsEvent_MemberRemoved | NominationPoolsEvent_PaidOut | NominationPoolsEvent_PoolCommissionChangeRateUpdated | NominationPoolsEvent_PoolCommissionClaimed | NominationPoolsEvent_PoolCommissionUpdated | NominationPoolsEvent_PoolMaxCommissionUpdated | NominationPoolsEvent_PoolSlashed | NominationPoolsEvent_RolesUpdated | NominationPoolsEvent_StateChanged | NominationPoolsEvent_Unbonded | NominationPoolsEvent_UnbondingPoolSlashed | NominationPoolsEvent_Withdrawn
 
 /**
  * A member has became bonded in a pool.
@@ -1524,6 +1305,42 @@ export interface NominationPoolsEvent_PaidOut {
 }
 
 /**
+ * A pool's commission `change_rate` has been changed.
+ */
+export interface NominationPoolsEvent_PoolCommissionChangeRateUpdated {
+    __kind: 'PoolCommissionChangeRateUpdated'
+    poolId: number
+    changeRate: CommissionChangeRate
+}
+
+/**
+ * Pool commission has been claimed.
+ */
+export interface NominationPoolsEvent_PoolCommissionClaimed {
+    __kind: 'PoolCommissionClaimed'
+    poolId: number
+    commission: bigint
+}
+
+/**
+ * A pool's commission setting has been changed.
+ */
+export interface NominationPoolsEvent_PoolCommissionUpdated {
+    __kind: 'PoolCommissionUpdated'
+    poolId: number
+    current?: ([Perbill, AccountId32] | undefined)
+}
+
+/**
+ * A pool's maximum commission setting has been changed.
+ */
+export interface NominationPoolsEvent_PoolMaxCommissionUpdated {
+    __kind: 'PoolMaxCommissionUpdated'
+    poolId: number
+    maxCommission: Perbill
+}
+
+/**
  * The active balance of pool `pool_id` has been slashed to `balance`.
  */
 export interface NominationPoolsEvent_PoolSlashed {
@@ -1539,7 +1356,7 @@ export interface NominationPoolsEvent_PoolSlashed {
 export interface NominationPoolsEvent_RolesUpdated {
     __kind: 'RolesUpdated'
     root?: (AccountId32 | undefined)
-    stateToggler?: (AccountId32 | undefined)
+    bouncer?: (AccountId32 | undefined)
     nominator?: (AccountId32 | undefined)
 }
 
@@ -1614,11 +1431,13 @@ export interface PoolState_Open {
     __kind: 'Open'
 }
 
+export interface CommissionChangeRate {
+    maxIncrease: Perbill
+    minDelay: number
+}
+
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export type MultisigEvent = MultisigEvent_MultisigApproval | MultisigEvent_MultisigCancelled | MultisigEvent_MultisigExecuted | MultisigEvent_NewMultisig
 
@@ -1672,10 +1491,7 @@ export interface Timepoint {
 }
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export type IndicesEvent = IndicesEvent_IndexAssigned | IndicesEvent_IndexFreed | IndicesEvent_IndexFrozen
 
@@ -1706,10 +1522,7 @@ export interface IndicesEvent_IndexFrozen {
 }
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export type ImOnlineEvent = ImOnlineEvent_AllGood | ImOnlineEvent_HeartbeatReceived | ImOnlineEvent_SomeOffline
 
@@ -1748,10 +1561,7 @@ export interface IndividualExposure {
 }
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export type IdentityEvent = IdentityEvent_IdentityCleared | IdentityEvent_IdentityKilled | IdentityEvent_IdentitySet | IdentityEvent_JudgementGiven | IdentityEvent_JudgementRequested | IdentityEvent_JudgementUnrequested | IdentityEvent_RegistrarAdded | IdentityEvent_SubIdentityAdded | IdentityEvent_SubIdentityRemoved | IdentityEvent_SubIdentityRevoked
 
@@ -1848,10 +1658,7 @@ export interface IdentityEvent_SubIdentityRevoked {
 }
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export type GrandpaEvent = GrandpaEvent_NewAuthorities | GrandpaEvent_Paused | GrandpaEvent_Resumed
 
@@ -1880,26 +1687,27 @@ export interface GrandpaEvent_Resumed {
 export type Public = Bytes
 
 /**
- * The events of this pallet.
+ * The `Event` enum of this pallet
  */
-export type FastUnstakeEvent = FastUnstakeEvent_Checking | FastUnstakeEvent_Errored | FastUnstakeEvent_InternalError | FastUnstakeEvent_Slashed | FastUnstakeEvent_Unstaked
+export type FastUnstakeEvent = FastUnstakeEvent_BatchChecked | FastUnstakeEvent_BatchFinished | FastUnstakeEvent_InternalError | FastUnstakeEvent_Slashed | FastUnstakeEvent_Unstaked
 
 /**
- * A staker was partially checked for the given eras, but the process did not finish.
+ * A batch was partially checked for the given eras, but the process did not finish.
  */
-export interface FastUnstakeEvent_Checking {
-    __kind: 'Checking'
-    stash: AccountId32
+export interface FastUnstakeEvent_BatchChecked {
+    __kind: 'BatchChecked'
     eras: number[]
 }
 
 /**
- * Some internal error happened while migrating stash. They are removed as head as a
- * consequence.
+ * A batch of a given size was terminated.
+ * 
+ * This is always follows by a number of `Unstaked` or `Slashed` events, marking the end
+ * of the batch. A new batch will be created upon next block.
  */
-export interface FastUnstakeEvent_Errored {
-    __kind: 'Errored'
-    stash: AccountId32
+export interface FastUnstakeEvent_BatchFinished {
+    __kind: 'BatchFinished'
+    size: number
 }
 
 /**
@@ -1928,8 +1736,7 @@ export interface FastUnstakeEvent_Unstaked {
 }
 
 /**
- * Events for this module.
- * 
+ * The `Event` enum of this pallet
  */
 export type Erc721Event = Erc721Event_Burned | Erc721Event_Minted | Erc721Event_Transferred
 
@@ -1958,8 +1765,7 @@ export interface Erc721Event_Transferred {
 }
 
 /**
- * Events for this module.
- * 
+ * The `Event` enum of this pallet
  */
 export type Erc20Event = Erc20Event_Remark
 
@@ -1969,10 +1775,7 @@ export interface Erc20Event_Remark {
 }
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export type ElectionsEvent = ElectionsEvent_CandidateSlashed | ElectionsEvent_ElectionError | ElectionsEvent_EmptyTerm | ElectionsEvent_MemberKicked | ElectionsEvent_NewTerm | ElectionsEvent_Renounced | ElectionsEvent_SeatHolderSlashed
 
@@ -2042,12 +1845,9 @@ export interface ElectionsEvent_SeatHolderSlashed {
 }
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
-export type ElectionProviderMultiPhaseEvent = ElectionProviderMultiPhaseEvent_ElectionFailed | ElectionProviderMultiPhaseEvent_ElectionFinalized | ElectionProviderMultiPhaseEvent_Rewarded | ElectionProviderMultiPhaseEvent_SignedPhaseStarted | ElectionProviderMultiPhaseEvent_Slashed | ElectionProviderMultiPhaseEvent_SolutionStored | ElectionProviderMultiPhaseEvent_UnsignedPhaseStarted
+export type ElectionProviderMultiPhaseEvent = ElectionProviderMultiPhaseEvent_ElectionFailed | ElectionProviderMultiPhaseEvent_ElectionFinalized | ElectionProviderMultiPhaseEvent_PhaseTransitioned | ElectionProviderMultiPhaseEvent_Rewarded | ElectionProviderMultiPhaseEvent_Slashed | ElectionProviderMultiPhaseEvent_SolutionStored
 
 /**
  * An election failed.
@@ -2068,20 +1868,22 @@ export interface ElectionProviderMultiPhaseEvent_ElectionFinalized {
 }
 
 /**
+ * There was a phase transition in a given round.
+ */
+export interface ElectionProviderMultiPhaseEvent_PhaseTransitioned {
+    __kind: 'PhaseTransitioned'
+    from: Phase
+    to: Phase
+    round: number
+}
+
+/**
  * An account has been rewarded for their signed submission being finalized.
  */
 export interface ElectionProviderMultiPhaseEvent_Rewarded {
     __kind: 'Rewarded'
     account: AccountId32
     value: bigint
-}
-
-/**
- * The signed phase of the given round has started.
- */
-export interface ElectionProviderMultiPhaseEvent_SignedPhaseStarted {
-    __kind: 'SignedPhaseStarted'
-    round: number
 }
 
 /**
@@ -2096,23 +1898,36 @@ export interface ElectionProviderMultiPhaseEvent_Slashed {
 /**
  * A solution was stored with the given compute.
  * 
- * If the solution is signed, this means that it hasn't yet been processed. If the
- * solution is unsigned, this means that it has also been processed.
- * 
- * The `bool` is `true` when a previous solution was ejected to make room for this one.
+ * The `origin` indicates the origin of the solution. If `origin` is `Some(AccountId)`,
+ * the stored solution was submited in the signed phase by a miner with the `AccountId`.
+ * Otherwise, the solution was stored either during the unsigned phase or by
+ * `T::ForceOrigin`. The `bool` is `true` when a previous solution was ejected to make
+ * room for this one.
  */
 export interface ElectionProviderMultiPhaseEvent_SolutionStored {
     __kind: 'SolutionStored'
     compute: ElectionCompute
+    origin?: (AccountId32 | undefined)
     prevEjected: boolean
 }
 
-/**
- * The unsigned phase of the given round has started.
- */
-export interface ElectionProviderMultiPhaseEvent_UnsignedPhaseStarted {
-    __kind: 'UnsignedPhaseStarted'
-    round: number
+export type Phase = Phase_Emergency | Phase_Off | Phase_Signed | Phase_Unsigned
+
+export interface Phase_Emergency {
+    __kind: 'Emergency'
+}
+
+export interface Phase_Off {
+    __kind: 'Off'
+}
+
+export interface Phase_Signed {
+    __kind: 'Signed'
+}
+
+export interface Phase_Unsigned {
+    __kind: 'Unsigned'
+    value: [boolean, number]
 }
 
 export interface ElectionScore {
@@ -2144,12 +1959,9 @@ export interface ElectionCompute_Unsigned {
 }
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
-export type DemocracyEvent = DemocracyEvent_Blacklisted | DemocracyEvent_Cancelled | DemocracyEvent_Delegated | DemocracyEvent_ExternalTabled | DemocracyEvent_NotPassed | DemocracyEvent_Passed | DemocracyEvent_ProposalCanceled | DemocracyEvent_Proposed | DemocracyEvent_Seconded | DemocracyEvent_Started | DemocracyEvent_Tabled | DemocracyEvent_Undelegated | DemocracyEvent_Vetoed | DemocracyEvent_Voted
+export type DemocracyEvent = DemocracyEvent_Blacklisted | DemocracyEvent_Cancelled | DemocracyEvent_Delegated | DemocracyEvent_ExternalTabled | DemocracyEvent_MetadataCleared | DemocracyEvent_MetadataSet | DemocracyEvent_MetadataTransferred | DemocracyEvent_NotPassed | DemocracyEvent_Passed | DemocracyEvent_ProposalCanceled | DemocracyEvent_Proposed | DemocracyEvent_Seconded | DemocracyEvent_Started | DemocracyEvent_Tabled | DemocracyEvent_Undelegated | DemocracyEvent_Vetoed | DemocracyEvent_Voted
 
 /**
  * A proposal_hash has been blacklisted permanently.
@@ -2181,6 +1993,55 @@ export interface DemocracyEvent_Delegated {
  */
 export interface DemocracyEvent_ExternalTabled {
     __kind: 'ExternalTabled'
+}
+
+/**
+ * Metadata for a proposal or a referendum has been cleared.
+ */
+export interface DemocracyEvent_MetadataCleared {
+    __kind: 'MetadataCleared'
+    /**
+     * Metadata owner.
+     */
+    owner: MetadataOwner
+    /**
+     * Preimage hash.
+     */
+    hash: H256
+}
+
+/**
+ * Metadata for a proposal or a referendum has been set.
+ */
+export interface DemocracyEvent_MetadataSet {
+    __kind: 'MetadataSet'
+    /**
+     * Metadata owner.
+     */
+    owner: MetadataOwner
+    /**
+     * Preimage hash.
+     */
+    hash: H256
+}
+
+/**
+ * Metadata has been transferred to new owner.
+ */
+export interface DemocracyEvent_MetadataTransferred {
+    __kind: 'MetadataTransferred'
+    /**
+     * Previous metadata owner.
+     */
+    prevOwner: MetadataOwner
+    /**
+     * New metadata owner.
+     */
+    owner: MetadataOwner
+    /**
+     * Preimage hash.
+     */
+    hash: H256
 }
 
 /**
@@ -2281,9 +2142,11 @@ export interface AccountVote_Split {
 
 export interface AccountVote_Standard {
     __kind: 'Standard'
-    vote: number
+    vote: Vote
     balance: bigint
 }
+
+export type Vote = number
 
 export type VoteThreshold = VoteThreshold_SimpleMajority | VoteThreshold_SuperMajorityAgainst | VoteThreshold_SuperMajorityApprove
 
@@ -2299,16 +2162,29 @@ export interface VoteThreshold_SuperMajorityApprove {
     __kind: 'SuperMajorityApprove'
 }
 
+export type MetadataOwner = MetadataOwner_External | MetadataOwner_Proposal | MetadataOwner_Referendum
+
+export interface MetadataOwner_External {
+    __kind: 'External'
+}
+
+export interface MetadataOwner_Proposal {
+    __kind: 'Proposal'
+    value: number
+}
+
+export interface MetadataOwner_Referendum {
+    __kind: 'Referendum'
+    value: number
+}
+
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export type DdcStakingEvent = DdcStakingEvent_Activated | DdcStakingEvent_Bonded | DdcStakingEvent_ChillSoon | DdcStakingEvent_Chilled | DdcStakingEvent_LeaveSoon | DdcStakingEvent_Left | DdcStakingEvent_Unbonded | DdcStakingEvent_Withdrawn
 
 /**
- * An account that started participating as either a storage network or CDN participant.
+ * An account that started participating as DDC network participant.
  * \[stash\]
  */
 export interface DdcStakingEvent_Activated {
@@ -2328,7 +2204,7 @@ export interface DdcStakingEvent_Bonded {
 }
 
 /**
- * An account has declared desire to stop participating in CDN or storage network soon.
+ * An account has declared desire to stop participating in DDC network soon.
  * \[stash, cluster, block\]
  */
 export interface DdcStakingEvent_ChillSoon {
@@ -2337,7 +2213,7 @@ export interface DdcStakingEvent_ChillSoon {
 }
 
 /**
- * An account has stopped participating as either a storage network or CDN participant.
+ * An account has stopped participating as DDC network participant.
  * \[stash\]
  */
 export interface DdcStakingEvent_Chilled {
@@ -2347,7 +2223,7 @@ export interface DdcStakingEvent_Chilled {
 
 /**
  * An account that started unbonding tokens below the minimum value set for the cluster
- * his CDN or Storage node is assigned to \[stash\]
+ * his DDC node is assigned to \[stash\]
  */
 export interface DdcStakingEvent_LeaveSoon {
     __kind: 'LeaveSoon'
@@ -2356,7 +2232,7 @@ export interface DdcStakingEvent_LeaveSoon {
 
 /**
  * An account that unbonded tokens below the minimum value set for the cluster his
- * CDN or Storage node was assigned to \[stash\]
+ * DDC node was assigned to \[stash\]
  */
 export interface DdcStakingEvent_Left {
     __kind: 'Left'
@@ -2380,13 +2256,12 @@ export interface DdcStakingEvent_Withdrawn {
     value: [AccountId32, bigint]
 }
 
+export type H160 = Bytes
+
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
-export type DdcPayoutsEvent = DdcPayoutsEvent_AuthorisedCaller | DdcPayoutsEvent_BillingReportFinalized | DdcPayoutsEvent_BillingReportInitialized | DdcPayoutsEvent_ChargeFailed | DdcPayoutsEvent_Charged | DdcPayoutsEvent_ChargingFinished | DdcPayoutsEvent_ChargingStarted | DdcPayoutsEvent_ClusterReserveFeesCollected | DdcPayoutsEvent_Indebted | DdcPayoutsEvent_Rewarded | DdcPayoutsEvent_RewardingFinished | DdcPayoutsEvent_RewardingStarted | DdcPayoutsEvent_TreasuryFeesCollected | DdcPayoutsEvent_ValidatorFeesCollected
+export type DdcPayoutsEvent = DdcPayoutsEvent_AuthorisedCaller | DdcPayoutsEvent_BillingReportFinalized | DdcPayoutsEvent_BillingReportInitialized | DdcPayoutsEvent_ChargeError | DdcPayoutsEvent_ChargeFailed | DdcPayoutsEvent_Charged | DdcPayoutsEvent_ChargingFinished | DdcPayoutsEvent_ChargingStarted | DdcPayoutsEvent_ClusterReserveFeesCollected | DdcPayoutsEvent_Indebted | DdcPayoutsEvent_NotDistributedOverallReward | DdcPayoutsEvent_NotDistributedReward | DdcPayoutsEvent_Rewarded | DdcPayoutsEvent_RewardingFinished | DdcPayoutsEvent_RewardingStarted | DdcPayoutsEvent_TreasuryFeesCollected | DdcPayoutsEvent_ValidatorFeesCollected
 
 export interface DdcPayoutsEvent_AuthorisedCaller {
     __kind: 'AuthorisedCaller'
@@ -2405,13 +2280,24 @@ export interface DdcPayoutsEvent_BillingReportInitialized {
     era: number
 }
 
+export interface DdcPayoutsEvent_ChargeError {
+    __kind: 'ChargeError'
+    clusterId: H160
+    era: number
+    batchIndex: number
+    customerId: AccountId32
+    amount: bigint
+    error: DispatchError
+}
+
 export interface DdcPayoutsEvent_ChargeFailed {
     __kind: 'ChargeFailed'
     clusterId: H160
     era: number
     batchIndex: number
     customerId: AccountId32
-    amount: bigint
+    charged: bigint
+    expectedToCharge: bigint
 }
 
 export interface DdcPayoutsEvent_Charged {
@@ -2451,12 +2337,32 @@ export interface DdcPayoutsEvent_Indebted {
     amount: bigint
 }
 
+export interface DdcPayoutsEvent_NotDistributedOverallReward {
+    __kind: 'NotDistributedOverallReward'
+    clusterId: H160
+    era: number
+    expectedReward: bigint
+    totalDistributedReward: bigint
+}
+
+export interface DdcPayoutsEvent_NotDistributedReward {
+    __kind: 'NotDistributedReward'
+    clusterId: H160
+    era: number
+    batchIndex: number
+    nodeProviderId: AccountId32
+    expectedReward: bigint
+    distributedReward: bigint
+}
+
 export interface DdcPayoutsEvent_Rewarded {
     __kind: 'Rewarded'
     clusterId: H160
     era: number
+    batchIndex: number
     nodeProviderId: AccountId32
-    amount: bigint
+    rewarded: bigint
+    expectedToReward: bigint
 }
 
 export interface DdcPayoutsEvent_RewardingFinished {
@@ -2486,10 +2392,7 @@ export interface DdcPayoutsEvent_ValidatorFeesCollected {
 }
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export type DdcNodesEvent = DdcNodesEvent_NodeCreated | DdcNodesEvent_NodeDeleted | DdcNodesEvent_NodeParamsChanged
 
@@ -2508,12 +2411,7 @@ export interface DdcNodesEvent_NodeParamsChanged {
     nodePubKey: NodePubKey
 }
 
-export type NodePubKey = NodePubKey_CDNPubKey | NodePubKey_StoragePubKey
-
-export interface NodePubKey_CDNPubKey {
-    __kind: 'CDNPubKey'
-    value: AccountId32
-}
+export type NodePubKey = NodePubKey_StoragePubKey
 
 export interface NodePubKey_StoragePubKey {
     __kind: 'StoragePubKey'
@@ -2521,31 +2419,32 @@ export interface NodePubKey_StoragePubKey {
 }
 
 /**
- * Events for this module.
- * 
- * Events generated by the module.
+ * The `Event` enum of this pallet
  */
-export type DdcMetricsOffchainWorkerEvent = DdcMetricsOffchainWorkerEvent_NewDdcMetric
-
-export interface DdcMetricsOffchainWorkerEvent_NewDdcMetric {
-    __kind: 'NewDdcMetric'
-    value: [AccountId32, Bytes]
-}
-
-/**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
- */
-export type DdcCustomersEvent = DdcCustomersEvent_BucketCreated | DdcCustomersEvent_Charged | DdcCustomersEvent_Deposited | DdcCustomersEvent_InitialDepositUnlock | DdcCustomersEvent_Withdrawn
+export type DdcCustomersEvent = DdcCustomersEvent_BucketCreated | DdcCustomersEvent_BucketRemoved | DdcCustomersEvent_BucketUpdated | DdcCustomersEvent_Charged | DdcCustomersEvent_Deposited | DdcCustomersEvent_InitialDepositUnlock | DdcCustomersEvent_Withdrawn
 
 /**
  * Bucket with specific id created
  */
 export interface DdcCustomersEvent_BucketCreated {
     __kind: 'BucketCreated'
-    value: bigint
+    bucketId: bigint
+}
+
+/**
+ * Bucket with specific id marked as removed
+ */
+export interface DdcCustomersEvent_BucketRemoved {
+    __kind: 'BucketRemoved'
+    bucketId: bigint
+}
+
+/**
+ * Bucket with specific id updated
+ */
+export interface DdcCustomersEvent_BucketUpdated {
+    __kind: 'BucketUpdated'
+    bucketId: bigint
 }
 
 /**
@@ -2553,7 +2452,9 @@ export interface DdcCustomersEvent_BucketCreated {
  */
 export interface DdcCustomersEvent_Charged {
     __kind: 'Charged'
-    value: [AccountId32, bigint]
+    ownerId: AccountId32
+    charged: bigint
+    expectedToCharge: bigint
 }
 
 /**
@@ -2564,7 +2465,8 @@ export interface DdcCustomersEvent_Charged {
  */
 export interface DdcCustomersEvent_Deposited {
     __kind: 'Deposited'
-    value: [AccountId32, bigint]
+    ownerId: AccountId32
+    amount: bigint
 }
 
 /**
@@ -2572,7 +2474,8 @@ export interface DdcCustomersEvent_Deposited {
  */
 export interface DdcCustomersEvent_InitialDepositUnlock {
     __kind: 'InitialDepositUnlock'
-    value: [AccountId32, bigint]
+    ownerId: AccountId32
+    amount: bigint
 }
 
 /**
@@ -2581,14 +2484,12 @@ export interface DdcCustomersEvent_InitialDepositUnlock {
  */
 export interface DdcCustomersEvent_Withdrawn {
     __kind: 'Withdrawn'
-    value: [AccountId32, bigint]
+    ownerId: AccountId32
+    amount: bigint
 }
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export type DdcClustersEvent = DdcClustersEvent_ClusterCreated | DdcClustersEvent_ClusterGovParamsSet | DdcClustersEvent_ClusterNodeAdded | DdcClustersEvent_ClusterNodeRemoved | DdcClustersEvent_ClusterParamsSet
 
@@ -2620,10 +2521,7 @@ export interface DdcClustersEvent_ClusterParamsSet {
 }
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export type CouncilEvent = CouncilEvent_Approved | CouncilEvent_Closed | CouncilEvent_Disapproved | CouncilEvent_Executed | CouncilEvent_MemberExecuted | CouncilEvent_Proposed | CouncilEvent_Voted
 
@@ -2697,10 +2595,7 @@ export interface CouncilEvent_Voted {
 }
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export type ContractsEvent = ContractsEvent_Called | ContractsEvent_CodeRemoved | ContractsEvent_CodeStored | ContractsEvent_ContractCodeUpdated | ContractsEvent_ContractEmitted | ContractsEvent_DelegateCalled | ContractsEvent_Instantiated | ContractsEvent_Terminated
 
@@ -2716,9 +2611,9 @@ export type ContractsEvent = ContractsEvent_Called | ContractsEvent_CodeRemoved 
 export interface ContractsEvent_Called {
     __kind: 'Called'
     /**
-     * The account that called the `contract`.
+     * The caller of the `contract`.
      */
-    caller: AccountId32
+    caller: Origin
     /**
      * The contract that was called.
      */
@@ -2827,11 +2722,19 @@ export interface ContractsEvent_Terminated {
     beneficiary: AccountId32
 }
 
+export type Origin = Origin_Root | Origin_Signed
+
+export interface Origin_Root {
+    __kind: 'Root'
+}
+
+export interface Origin_Signed {
+    __kind: 'Signed'
+    value: AccountId32
+}
+
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export type ChildBountiesEvent = ChildBountiesEvent_Added | ChildBountiesEvent_Awarded | ChildBountiesEvent_Canceled | ChildBountiesEvent_Claimed
 
@@ -2875,8 +2778,7 @@ export interface ChildBountiesEvent_Claimed {
 }
 
 /**
- * Events for this module.
- * 
+ * The `Event` enum of this pallet
  */
 export type ChainBridgeEvent = ChainBridgeEvent_ChainWhitelisted | ChainBridgeEvent_FungibleTransfer | ChainBridgeEvent_GenericTransfer | ChainBridgeEvent_NonFungibleTransfer | ChainBridgeEvent_ProposalApproved | ChainBridgeEvent_ProposalFailed | ChainBridgeEvent_ProposalRejected | ChainBridgeEvent_ProposalSucceeded | ChainBridgeEvent_RelayerAdded | ChainBridgeEvent_RelayerRemoved | ChainBridgeEvent_RelayerThresholdChanged | ChainBridgeEvent_VoteAgainst | ChainBridgeEvent_VoteFor
 
@@ -2889,7 +2791,8 @@ export interface ChainBridgeEvent_ChainWhitelisted {
 }
 
 /**
- * FunglibleTransfer is for relaying fungibles (dest_id, nonce, resource_id, amount, recipient, metadata)
+ * FunglibleTransfer is for relaying fungibles (dest_id, nonce, resource_id, amount,
+ * recipient, metadata)
  */
 export interface ChainBridgeEvent_FungibleTransfer {
     __kind: 'FungibleTransfer'
@@ -2905,7 +2808,8 @@ export interface ChainBridgeEvent_GenericTransfer {
 }
 
 /**
- * NonFungibleTransfer is for relaying NFTS (dest_id, nonce, resource_id, token_id, recipient, metadata)
+ * NonFungibleTransfer is for relaying NFTS (dest_id, nonce, resource_id, token_id,
+ * recipient, metadata)
  */
 export interface ChainBridgeEvent_NonFungibleTransfer {
     __kind: 'NonFungibleTransfer'
@@ -2985,32 +2889,7 @@ export interface ChainBridgeEvent_VoteFor {
 }
 
 /**
- * Events for this module.
- * 
- */
-export type CereDDCModuleEvent = CereDDCModuleEvent_DataStringChanged | CereDDCModuleEvent_DataStringSet
-
-/**
- * A data string was changed. \[who\]
- */
-export interface CereDDCModuleEvent_DataStringChanged {
-    __kind: 'DataStringChanged'
-    value: AccountId32
-}
-
-/**
- * A data string was set. \[who\]
- */
-export interface CereDDCModuleEvent_DataStringSet {
-    __kind: 'DataStringSet'
-    value: AccountId32
-}
-
-/**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export type BountiesEvent = BountiesEvent_BountyAwarded | BountiesEvent_BountyBecameActive | BountiesEvent_BountyCanceled | BountiesEvent_BountyClaimed | BountiesEvent_BountyExtended | BountiesEvent_BountyProposed | BountiesEvent_BountyRejected
 
@@ -3075,12 +2954,9 @@ export interface BountiesEvent_BountyRejected {
 }
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
-export type BalancesEvent = BalancesEvent_BalanceSet | BalancesEvent_Deposit | BalancesEvent_DustLost | BalancesEvent_Endowed | BalancesEvent_ReserveRepatriated | BalancesEvent_Reserved | BalancesEvent_Slashed | BalancesEvent_Transfer | BalancesEvent_Unreserved | BalancesEvent_Withdraw
+export type BalancesEvent = BalancesEvent_BalanceSet | BalancesEvent_Burned | BalancesEvent_Deposit | BalancesEvent_DustLost | BalancesEvent_Endowed | BalancesEvent_Frozen | BalancesEvent_Issued | BalancesEvent_Locked | BalancesEvent_Minted | BalancesEvent_Rescinded | BalancesEvent_ReserveRepatriated | BalancesEvent_Reserved | BalancesEvent_Restored | BalancesEvent_Slashed | BalancesEvent_Suspended | BalancesEvent_Thawed | BalancesEvent_Transfer | BalancesEvent_Unlocked | BalancesEvent_Unreserved | BalancesEvent_Upgraded | BalancesEvent_Withdraw
 
 /**
  * A balance was set by root.
@@ -3089,7 +2965,15 @@ export interface BalancesEvent_BalanceSet {
     __kind: 'BalanceSet'
     who: AccountId32
     free: bigint
-    reserved: bigint
+}
+
+/**
+ * Some amount was burned from an account.
+ */
+export interface BalancesEvent_Burned {
+    __kind: 'Burned'
+    who: AccountId32
+    amount: bigint
 }
 
 /**
@@ -3121,6 +3005,49 @@ export interface BalancesEvent_Endowed {
 }
 
 /**
+ * Some balance was frozen.
+ */
+export interface BalancesEvent_Frozen {
+    __kind: 'Frozen'
+    who: AccountId32
+    amount: bigint
+}
+
+/**
+ * Total issuance was increased by `amount`, creating a credit to be balanced.
+ */
+export interface BalancesEvent_Issued {
+    __kind: 'Issued'
+    amount: bigint
+}
+
+/**
+ * Some balance was locked.
+ */
+export interface BalancesEvent_Locked {
+    __kind: 'Locked'
+    who: AccountId32
+    amount: bigint
+}
+
+/**
+ * Some amount was minted into an account.
+ */
+export interface BalancesEvent_Minted {
+    __kind: 'Minted'
+    who: AccountId32
+    amount: bigint
+}
+
+/**
+ * Total issuance was decreased by `amount`, creating a debt to be balanced.
+ */
+export interface BalancesEvent_Rescinded {
+    __kind: 'Rescinded'
+    amount: bigint
+}
+
+/**
  * Some balance was moved from the reserve of the first account to the second account.
  * Final argument indicates the destination balance type.
  */
@@ -3142,10 +3069,37 @@ export interface BalancesEvent_Reserved {
 }
 
 /**
+ * Some amount was restored into an account.
+ */
+export interface BalancesEvent_Restored {
+    __kind: 'Restored'
+    who: AccountId32
+    amount: bigint
+}
+
+/**
  * Some amount was removed from the account (e.g. for misbehavior).
  */
 export interface BalancesEvent_Slashed {
     __kind: 'Slashed'
+    who: AccountId32
+    amount: bigint
+}
+
+/**
+ * Some amount was suspended from an account (it can be restored later).
+ */
+export interface BalancesEvent_Suspended {
+    __kind: 'Suspended'
+    who: AccountId32
+    amount: bigint
+}
+
+/**
+ * Some balance was thawed.
+ */
+export interface BalancesEvent_Thawed {
+    __kind: 'Thawed'
     who: AccountId32
     amount: bigint
 }
@@ -3161,12 +3115,29 @@ export interface BalancesEvent_Transfer {
 }
 
 /**
+ * Some balance was unlocked.
+ */
+export interface BalancesEvent_Unlocked {
+    __kind: 'Unlocked'
+    who: AccountId32
+    amount: bigint
+}
+
+/**
  * Some balance was unreserved (moved from reserved to free).
  */
 export interface BalancesEvent_Unreserved {
     __kind: 'Unreserved'
     who: AccountId32
     amount: bigint
+}
+
+/**
+ * An account was upgraded.
+ */
+export interface BalancesEvent_Upgraded {
+    __kind: 'Upgraded'
+    who: AccountId32
 }
 
 /**
@@ -3188,24 +3159,24 @@ export interface BalanceStatus_Reserved {
     __kind: 'Reserved'
 }
 
-export type Phase = Phase_ApplyExtrinsic | Phase_Finalization | Phase_Initialization
+export type Type_118 = Type_118_ApplyExtrinsic | Type_118_Finalization | Type_118_Initialization
 
-export interface Phase_ApplyExtrinsic {
+export interface Type_118_ApplyExtrinsic {
     __kind: 'ApplyExtrinsic'
     value: number
 }
 
-export interface Phase_Finalization {
+export interface Type_118_Finalization {
     __kind: 'Finalization'
 }
 
-export interface Phase_Initialization {
+export interface Type_118_Initialization {
     __kind: 'Initialization'
 }
 
 export const EventRecord: sts.Type<EventRecord> = sts.struct(() => {
     return  {
-        phase: Phase,
+        phase: Type_118,
         event: Event,
         topics: sts.array(() => H256),
     }
@@ -3217,14 +3188,12 @@ export const Event: sts.Type<Event> = sts.closedEnum(() => {
     return  {
         Balances: BalancesEvent,
         Bounties: BountiesEvent,
-        CereDDCModule: CereDDCModuleEvent,
         ChainBridge: ChainBridgeEvent,
         ChildBounties: ChildBountiesEvent,
         Contracts: ContractsEvent,
         Council: CouncilEvent,
         DdcClusters: DdcClustersEvent,
         DdcCustomers: DdcCustomersEvent,
-        DdcMetricsOffchainWorker: DdcMetricsOffchainWorkerEvent,
         DdcNodes: DdcNodesEvent,
         DdcPayouts: DdcPayoutsEvent,
         DdcStaking: DdcStakingEvent,
@@ -3241,11 +3210,11 @@ export const Event: sts.Type<Event> = sts.closedEnum(() => {
         Multisig: MultisigEvent,
         NominationPools: NominationPoolsEvent,
         Offences: OffencesEvent,
+        Preimage: PreimageEvent,
         Proxy: ProxyEvent,
         Recovery: RecoveryEvent,
         Scheduler: SchedulerEvent,
         Session: SessionEvent,
-        Society: SocietyEvent,
         Staking: StakingEvent,
         Sudo: SudoEvent,
         System: SystemEvent,
@@ -3261,10 +3230,7 @@ export const Event: sts.Type<Event> = sts.closedEnum(() => {
 })
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export const VoterListEvent: sts.Type<VoterListEvent> = sts.closedEnum(() => {
     return  {
@@ -3280,11 +3246,10 @@ export const VoterListEvent: sts.Type<VoterListEvent> = sts.closedEnum(() => {
     }
 })
 
+export const AccountId32 = sts.bytes()
+
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export const VestingEvent: sts.Type<VestingEvent> = sts.closedEnum(() => {
     return  {
@@ -3299,10 +3264,7 @@ export const VestingEvent: sts.Type<VestingEvent> = sts.closedEnum(() => {
 })
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export const UtilityEvent: sts.Type<UtilityEvent> = sts.closedEnum(() => {
     return  {
@@ -3333,6 +3295,7 @@ export const DispatchError: sts.Type<DispatchError> = sts.closedEnum(() => {
         Module: ModuleError,
         NoProviders: sts.unit(),
         Other: sts.unit(),
+        RootNotAllowed: sts.unit(),
         Token: TokenError,
         TooManyConsumers: sts.unit(),
         Transactional: TransactionalError,
@@ -3350,12 +3313,15 @@ export const TransactionalError: sts.Type<TransactionalError> = sts.closedEnum((
 export const TokenError: sts.Type<TokenError> = sts.closedEnum(() => {
     return  {
         BelowMinimum: sts.unit(),
+        Blocked: sts.unit(),
         CannotCreate: sts.unit(),
+        CannotCreateHold: sts.unit(),
         Frozen: sts.unit(),
-        NoFunds: sts.unit(),
+        FundsUnavailable: sts.unit(),
+        NotExpendable: sts.unit(),
+        OnlyProvider: sts.unit(),
         UnknownAsset: sts.unit(),
         Unsupported: sts.unit(),
-        WouldDie: sts.unit(),
     }
 })
 
@@ -3375,10 +3341,7 @@ export const ArithmeticError: sts.Type<ArithmeticError> = sts.closedEnum(() => {
 })
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export const TreasuryEvent: sts.Type<TreasuryEvent> = sts.closedEnum(() => {
     return  {
@@ -3411,14 +3374,15 @@ export const TreasuryEvent: sts.Type<TreasuryEvent> = sts.closedEnum(() => {
         Spending: sts.enumStruct({
             budgetRemaining: sts.bigint(),
         }),
+        UpdatedInactive: sts.enumStruct({
+            reactivated: sts.bigint(),
+            deactivated: sts.bigint(),
+        }),
     }
 })
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export const TransactionPaymentEvent: sts.Type<TransactionPaymentEvent> = sts.closedEnum(() => {
     return  {
@@ -3431,10 +3395,7 @@ export const TransactionPaymentEvent: sts.Type<TransactionPaymentEvent> = sts.cl
 })
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export const TipsEvent: sts.Type<TipsEvent> = sts.closedEnum(() => {
     return  {
@@ -3461,10 +3422,7 @@ export const TipsEvent: sts.Type<TipsEvent> = sts.closedEnum(() => {
 })
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export const TechnicalMembershipEvent: sts.Type<TechnicalMembershipEvent> = sts.closedEnum(() => {
     return  {
@@ -3478,10 +3436,7 @@ export const TechnicalMembershipEvent: sts.Type<TechnicalMembershipEvent> = sts.
 })
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export const TechnicalCommitteeEvent: sts.Type<TechnicalCommitteeEvent> = sts.closedEnum(() => {
     return  {
@@ -3569,11 +3524,15 @@ export const DispatchClass: sts.Type<DispatchClass> = sts.closedEnum(() => {
     }
 })
 
+export const Weight: sts.Type<Weight> = sts.struct(() => {
+    return  {
+        refTime: sts.bigint(),
+        proofSize: sts.bigint(),
+    }
+})
+
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export const SudoEvent: sts.Type<SudoEvent> = sts.closedEnum(() => {
     return  {
@@ -3590,10 +3549,7 @@ export const SudoEvent: sts.Type<SudoEvent> = sts.closedEnum(() => {
 })
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export const StakingEvent: sts.Type<StakingEvent> = sts.closedEnum(() => {
     return  {
@@ -3609,6 +3565,9 @@ export const StakingEvent: sts.Type<StakingEvent> = sts.closedEnum(() => {
             validatorPayout: sts.bigint(),
             remainder: sts.bigint(),
         }),
+        ForceEra: sts.enumStruct({
+            mode: Forcing,
+        }),
         Kicked: sts.enumStruct({
             nominator: AccountId32,
             stash: AccountId32,
@@ -3623,6 +3582,11 @@ export const StakingEvent: sts.Type<StakingEvent> = sts.closedEnum(() => {
         Rewarded: sts.enumStruct({
             stash: AccountId32,
             amount: sts.bigint(),
+        }),
+        SlashReported: sts.enumStruct({
+            validator: AccountId32,
+            fraction: Perbill,
+            slashEra: sts.number(),
         }),
         Slashed: sts.enumStruct({
             staker: AccountId32,
@@ -3652,78 +3616,19 @@ export const ValidatorPrefs: sts.Type<ValidatorPrefs> = sts.struct(() => {
     }
 })
 
-/**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
- */
-export const SocietyEvent: sts.Type<SocietyEvent> = sts.closedEnum(() => {
+export const Perbill = sts.number()
+
+export const Forcing: sts.Type<Forcing> = sts.closedEnum(() => {
     return  {
-        AutoUnbid: sts.enumStruct({
-            candidate: AccountId32,
-        }),
-        Bid: sts.enumStruct({
-            candidateId: AccountId32,
-            offer: sts.bigint(),
-        }),
-        CandidateSuspended: sts.enumStruct({
-            candidate: AccountId32,
-        }),
-        Challenged: sts.enumStruct({
-            member: AccountId32,
-        }),
-        DefenderVote: sts.enumStruct({
-            voter: AccountId32,
-            vote: sts.boolean(),
-        }),
-        Deposit: sts.enumStruct({
-            value: sts.bigint(),
-        }),
-        Founded: sts.enumStruct({
-            founder: AccountId32,
-        }),
-        Inducted: sts.enumStruct({
-            primary: AccountId32,
-            candidates: sts.array(() => AccountId32),
-        }),
-        MemberSuspended: sts.enumStruct({
-            member: AccountId32,
-        }),
-        NewMaxMembers: sts.enumStruct({
-            max: sts.number(),
-        }),
-        SuspendedMemberJudgement: sts.enumStruct({
-            who: AccountId32,
-            judged: sts.boolean(),
-        }),
-        Unbid: sts.enumStruct({
-            candidate: AccountId32,
-        }),
-        Unfounded: sts.enumStruct({
-            founder: AccountId32,
-        }),
-        Unvouch: sts.enumStruct({
-            candidate: AccountId32,
-        }),
-        Vote: sts.enumStruct({
-            candidate: AccountId32,
-            voter: AccountId32,
-            vote: sts.boolean(),
-        }),
-        Vouch: sts.enumStruct({
-            candidateId: AccountId32,
-            offer: sts.bigint(),
-            vouching: AccountId32,
-        }),
+        ForceAlways: sts.unit(),
+        ForceNew: sts.unit(),
+        ForceNone: sts.unit(),
+        NotForcing: sts.unit(),
     }
 })
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export const SessionEvent: sts.Type<SessionEvent> = sts.closedEnum(() => {
     return  {
@@ -3798,10 +3703,7 @@ export const RecoveryEvent: sts.Type<RecoveryEvent> = sts.closedEnum(() => {
 })
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export const ProxyEvent: sts.Type<ProxyEvent> = sts.closedEnum(() => {
     return  {
@@ -3844,6 +3746,23 @@ export const ProxyType: sts.Type<ProxyType> = sts.closedEnum(() => {
 })
 
 /**
+ * The `Event` enum of this pallet
+ */
+export const PreimageEvent: sts.Type<PreimageEvent> = sts.closedEnum(() => {
+    return  {
+        Cleared: sts.enumStruct({
+            hash: H256,
+        }),
+        Noted: sts.enumStruct({
+            hash: H256,
+        }),
+        Requested: sts.enumStruct({
+            hash: H256,
+        }),
+    }
+})
+
+/**
  * Events type.
  */
 export const OffencesEvent: sts.Type<OffencesEvent> = sts.closedEnum(() => {
@@ -3882,13 +3801,29 @@ export const NominationPoolsEvent: sts.Type<NominationPoolsEvent> = sts.closedEn
             poolId: sts.number(),
             payout: sts.bigint(),
         }),
+        PoolCommissionChangeRateUpdated: sts.enumStruct({
+            poolId: sts.number(),
+            changeRate: CommissionChangeRate,
+        }),
+        PoolCommissionClaimed: sts.enumStruct({
+            poolId: sts.number(),
+            commission: sts.bigint(),
+        }),
+        PoolCommissionUpdated: sts.enumStruct({
+            poolId: sts.number(),
+            current: sts.option(() => sts.tuple(() => [Perbill, AccountId32])),
+        }),
+        PoolMaxCommissionUpdated: sts.enumStruct({
+            poolId: sts.number(),
+            maxCommission: Perbill,
+        }),
         PoolSlashed: sts.enumStruct({
             poolId: sts.number(),
             balance: sts.bigint(),
         }),
         RolesUpdated: sts.enumStruct({
             root: sts.option(() => AccountId32),
-            stateToggler: sts.option(() => AccountId32),
+            bouncer: sts.option(() => AccountId32),
             nominator: sts.option(() => AccountId32),
         }),
         StateChanged: sts.enumStruct({
@@ -3924,11 +3859,15 @@ export const PoolState: sts.Type<PoolState> = sts.closedEnum(() => {
     }
 })
 
+export const CommissionChangeRate: sts.Type<CommissionChangeRate> = sts.struct(() => {
+    return  {
+        maxIncrease: Perbill,
+        minDelay: sts.number(),
+    }
+})
+
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export const MultisigEvent: sts.Type<MultisigEvent> = sts.closedEnum(() => {
     return  {
@@ -3967,10 +3906,7 @@ export const Timepoint: sts.Type<Timepoint> = sts.struct(() => {
 })
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export const IndicesEvent: sts.Type<IndicesEvent> = sts.closedEnum(() => {
     return  {
@@ -3989,10 +3925,7 @@ export const IndicesEvent: sts.Type<IndicesEvent> = sts.closedEnum(() => {
 })
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export const ImOnlineEvent: sts.Type<ImOnlineEvent> = sts.closedEnum(() => {
     return  {
@@ -4022,10 +3955,7 @@ export const IndividualExposure: sts.Type<IndividualExposure> = sts.struct(() =>
 })
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export const IdentityEvent: sts.Type<IdentityEvent> = sts.closedEnum(() => {
     return  {
@@ -4074,10 +4004,7 @@ export const IdentityEvent: sts.Type<IdentityEvent> = sts.closedEnum(() => {
 })
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export const GrandpaEvent: sts.Type<GrandpaEvent> = sts.closedEnum(() => {
     return  {
@@ -4092,16 +4019,15 @@ export const GrandpaEvent: sts.Type<GrandpaEvent> = sts.closedEnum(() => {
 export const Public = sts.bytes()
 
 /**
- * The events of this pallet.
+ * The `Event` enum of this pallet
  */
 export const FastUnstakeEvent: sts.Type<FastUnstakeEvent> = sts.closedEnum(() => {
     return  {
-        Checking: sts.enumStruct({
-            stash: AccountId32,
+        BatchChecked: sts.enumStruct({
             eras: sts.array(() => sts.number()),
         }),
-        Errored: sts.enumStruct({
-            stash: AccountId32,
+        BatchFinished: sts.enumStruct({
+            size: sts.number(),
         }),
         InternalError: sts.unit(),
         Slashed: sts.enumStruct({
@@ -4116,8 +4042,7 @@ export const FastUnstakeEvent: sts.Type<FastUnstakeEvent> = sts.closedEnum(() =>
 })
 
 /**
- * Events for this module.
- * 
+ * The `Event` enum of this pallet
  */
 export const Erc721Event: sts.Type<Erc721Event> = sts.closedEnum(() => {
     return  {
@@ -4128,8 +4053,7 @@ export const Erc721Event: sts.Type<Erc721Event> = sts.closedEnum(() => {
 })
 
 /**
- * Events for this module.
- * 
+ * The `Event` enum of this pallet
  */
 export const Erc20Event: sts.Type<Erc20Event> = sts.closedEnum(() => {
     return  {
@@ -4138,10 +4062,7 @@ export const Erc20Event: sts.Type<Erc20Event> = sts.closedEnum(() => {
 })
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export const ElectionsEvent: sts.Type<ElectionsEvent> = sts.closedEnum(() => {
     return  {
@@ -4168,10 +4089,7 @@ export const ElectionsEvent: sts.Type<ElectionsEvent> = sts.closedEnum(() => {
 })
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export const ElectionProviderMultiPhaseEvent: sts.Type<ElectionProviderMultiPhaseEvent> = sts.closedEnum(() => {
     return  {
@@ -4180,12 +4098,14 @@ export const ElectionProviderMultiPhaseEvent: sts.Type<ElectionProviderMultiPhas
             compute: ElectionCompute,
             score: ElectionScore,
         }),
+        PhaseTransitioned: sts.enumStruct({
+            from: Phase,
+            to: Phase,
+            round: sts.number(),
+        }),
         Rewarded: sts.enumStruct({
             account: AccountId32,
             value: sts.bigint(),
-        }),
-        SignedPhaseStarted: sts.enumStruct({
-            round: sts.number(),
         }),
         Slashed: sts.enumStruct({
             account: AccountId32,
@@ -4193,11 +4113,18 @@ export const ElectionProviderMultiPhaseEvent: sts.Type<ElectionProviderMultiPhas
         }),
         SolutionStored: sts.enumStruct({
             compute: ElectionCompute,
+            origin: sts.option(() => AccountId32),
             prevEjected: sts.boolean(),
         }),
-        UnsignedPhaseStarted: sts.enumStruct({
-            round: sts.number(),
-        }),
+    }
+})
+
+export const Phase: sts.Type<Phase> = sts.closedEnum(() => {
+    return  {
+        Emergency: sts.unit(),
+        Off: sts.unit(),
+        Signed: sts.unit(),
+        Unsigned: sts.tuple(() => [sts.boolean(), sts.number()]),
     }
 })
 
@@ -4220,10 +4147,7 @@ export const ElectionCompute: sts.Type<ElectionCompute> = sts.closedEnum(() => {
 })
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export const DemocracyEvent: sts.Type<DemocracyEvent> = sts.closedEnum(() => {
     return  {
@@ -4238,6 +4162,19 @@ export const DemocracyEvent: sts.Type<DemocracyEvent> = sts.closedEnum(() => {
             target: AccountId32,
         }),
         ExternalTabled: sts.unit(),
+        MetadataCleared: sts.enumStruct({
+            owner: MetadataOwner,
+            hash: H256,
+        }),
+        MetadataSet: sts.enumStruct({
+            owner: MetadataOwner,
+            hash: H256,
+        }),
+        MetadataTransferred: sts.enumStruct({
+            prevOwner: MetadataOwner,
+            owner: MetadataOwner,
+            hash: H256,
+        }),
         NotPassed: sts.enumStruct({
             refIndex: sts.number(),
         }),
@@ -4286,11 +4223,13 @@ export const AccountVote: sts.Type<AccountVote> = sts.closedEnum(() => {
             nay: sts.bigint(),
         }),
         Standard: sts.enumStruct({
-            vote: sts.number(),
+            vote: Vote,
             balance: sts.bigint(),
         }),
     }
 })
+
+export const Vote = sts.number()
 
 export const VoteThreshold: sts.Type<VoteThreshold> = sts.closedEnum(() => {
     return  {
@@ -4300,11 +4239,16 @@ export const VoteThreshold: sts.Type<VoteThreshold> = sts.closedEnum(() => {
     }
 })
 
+export const MetadataOwner: sts.Type<MetadataOwner> = sts.closedEnum(() => {
+    return  {
+        External: sts.unit(),
+        Proposal: sts.number(),
+        Referendum: sts.number(),
+    }
+})
+
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export const DdcStakingEvent: sts.Type<DdcStakingEvent> = sts.closedEnum(() => {
     return  {
@@ -4319,11 +4263,10 @@ export const DdcStakingEvent: sts.Type<DdcStakingEvent> = sts.closedEnum(() => {
     }
 })
 
+export const H160 = sts.bytes()
+
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export const DdcPayoutsEvent: sts.Type<DdcPayoutsEvent> = sts.closedEnum(() => {
     return  {
@@ -4338,12 +4281,21 @@ export const DdcPayoutsEvent: sts.Type<DdcPayoutsEvent> = sts.closedEnum(() => {
             clusterId: H160,
             era: sts.number(),
         }),
-        ChargeFailed: sts.enumStruct({
+        ChargeError: sts.enumStruct({
             clusterId: H160,
             era: sts.number(),
             batchIndex: sts.number(),
             customerId: AccountId32,
             amount: sts.bigint(),
+            error: DispatchError,
+        }),
+        ChargeFailed: sts.enumStruct({
+            clusterId: H160,
+            era: sts.number(),
+            batchIndex: sts.number(),
+            customerId: AccountId32,
+            charged: sts.bigint(),
+            expectedToCharge: sts.bigint(),
         }),
         Charged: sts.enumStruct({
             clusterId: H160,
@@ -4372,11 +4324,27 @@ export const DdcPayoutsEvent: sts.Type<DdcPayoutsEvent> = sts.closedEnum(() => {
             customerId: AccountId32,
             amount: sts.bigint(),
         }),
+        NotDistributedOverallReward: sts.enumStruct({
+            clusterId: H160,
+            era: sts.number(),
+            expectedReward: sts.bigint(),
+            totalDistributedReward: sts.bigint(),
+        }),
+        NotDistributedReward: sts.enumStruct({
+            clusterId: H160,
+            era: sts.number(),
+            batchIndex: sts.number(),
+            nodeProviderId: AccountId32,
+            expectedReward: sts.bigint(),
+            distributedReward: sts.bigint(),
+        }),
         Rewarded: sts.enumStruct({
             clusterId: H160,
             era: sts.number(),
+            batchIndex: sts.number(),
             nodeProviderId: AccountId32,
-            amount: sts.bigint(),
+            rewarded: sts.bigint(),
+            expectedToReward: sts.bigint(),
         }),
         RewardingFinished: sts.enumStruct({
             clusterId: H160,
@@ -4400,10 +4368,7 @@ export const DdcPayoutsEvent: sts.Type<DdcPayoutsEvent> = sts.closedEnum(() => {
 })
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export const DdcNodesEvent: sts.Type<DdcNodesEvent> = sts.closedEnum(() => {
     return  {
@@ -4421,43 +4386,46 @@ export const DdcNodesEvent: sts.Type<DdcNodesEvent> = sts.closedEnum(() => {
 
 export const NodePubKey: sts.Type<NodePubKey> = sts.closedEnum(() => {
     return  {
-        CDNPubKey: AccountId32,
         StoragePubKey: AccountId32,
     }
 })
 
 /**
- * Events for this module.
- * 
- * Events generated by the module.
- */
-export const DdcMetricsOffchainWorkerEvent: sts.Type<DdcMetricsOffchainWorkerEvent> = sts.closedEnum(() => {
-    return  {
-        NewDdcMetric: sts.tuple(() => [AccountId32, sts.bytes()]),
-    }
-})
-
-/**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export const DdcCustomersEvent: sts.Type<DdcCustomersEvent> = sts.closedEnum(() => {
     return  {
-        BucketCreated: sts.bigint(),
-        Charged: sts.tuple(() => [AccountId32, sts.bigint()]),
-        Deposited: sts.tuple(() => [AccountId32, sts.bigint()]),
-        InitialDepositUnlock: sts.tuple(() => [AccountId32, sts.bigint()]),
-        Withdrawn: sts.tuple(() => [AccountId32, sts.bigint()]),
+        BucketCreated: sts.enumStruct({
+            bucketId: sts.bigint(),
+        }),
+        BucketRemoved: sts.enumStruct({
+            bucketId: sts.bigint(),
+        }),
+        BucketUpdated: sts.enumStruct({
+            bucketId: sts.bigint(),
+        }),
+        Charged: sts.enumStruct({
+            ownerId: AccountId32,
+            charged: sts.bigint(),
+            expectedToCharge: sts.bigint(),
+        }),
+        Deposited: sts.enumStruct({
+            ownerId: AccountId32,
+            amount: sts.bigint(),
+        }),
+        InitialDepositUnlock: sts.enumStruct({
+            ownerId: AccountId32,
+            amount: sts.bigint(),
+        }),
+        Withdrawn: sts.enumStruct({
+            ownerId: AccountId32,
+            amount: sts.bigint(),
+        }),
     }
 })
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export const DdcClustersEvent: sts.Type<DdcClustersEvent> = sts.closedEnum(() => {
     return  {
@@ -4482,10 +4450,7 @@ export const DdcClustersEvent: sts.Type<DdcClustersEvent> = sts.closedEnum(() =>
 })
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export const CouncilEvent: sts.Type<CouncilEvent> = sts.closedEnum(() => {
     return  {
@@ -4525,15 +4490,12 @@ export const CouncilEvent: sts.Type<CouncilEvent> = sts.closedEnum(() => {
 })
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export const ContractsEvent: sts.Type<ContractsEvent> = sts.closedEnum(() => {
     return  {
         Called: sts.enumStruct({
-            caller: AccountId32,
+            caller: Origin,
             contract: AccountId32,
         }),
         CodeRemoved: sts.enumStruct({
@@ -4566,11 +4528,15 @@ export const ContractsEvent: sts.Type<ContractsEvent> = sts.closedEnum(() => {
     }
 })
 
+export const Origin: sts.Type<Origin> = sts.closedEnum(() => {
+    return  {
+        Root: sts.unit(),
+        Signed: AccountId32,
+    }
+})
+
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export const ChildBountiesEvent: sts.Type<ChildBountiesEvent> = sts.closedEnum(() => {
     return  {
@@ -4597,8 +4563,7 @@ export const ChildBountiesEvent: sts.Type<ChildBountiesEvent> = sts.closedEnum((
 })
 
 /**
- * Events for this module.
- * 
+ * The `Event` enum of this pallet
  */
 export const ChainBridgeEvent: sts.Type<ChainBridgeEvent> = sts.closedEnum(() => {
     return  {
@@ -4619,21 +4584,7 @@ export const ChainBridgeEvent: sts.Type<ChainBridgeEvent> = sts.closedEnum(() =>
 })
 
 /**
- * Events for this module.
- * 
- */
-export const CereDDCModuleEvent: sts.Type<CereDDCModuleEvent> = sts.closedEnum(() => {
-    return  {
-        DataStringChanged: AccountId32,
-        DataStringSet: AccountId32,
-    }
-})
-
-/**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export const BountiesEvent: sts.Type<BountiesEvent> = sts.closedEnum(() => {
     return  {
@@ -4666,17 +4617,17 @@ export const BountiesEvent: sts.Type<BountiesEvent> = sts.closedEnum(() => {
 })
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
+ * The `Event` enum of this pallet
  */
 export const BalancesEvent: sts.Type<BalancesEvent> = sts.closedEnum(() => {
     return  {
         BalanceSet: sts.enumStruct({
             who: AccountId32,
             free: sts.bigint(),
-            reserved: sts.bigint(),
+        }),
+        Burned: sts.enumStruct({
+            who: AccountId32,
+            amount: sts.bigint(),
         }),
         Deposit: sts.enumStruct({
             who: AccountId32,
@@ -4690,6 +4641,24 @@ export const BalancesEvent: sts.Type<BalancesEvent> = sts.closedEnum(() => {
             account: AccountId32,
             freeBalance: sts.bigint(),
         }),
+        Frozen: sts.enumStruct({
+            who: AccountId32,
+            amount: sts.bigint(),
+        }),
+        Issued: sts.enumStruct({
+            amount: sts.bigint(),
+        }),
+        Locked: sts.enumStruct({
+            who: AccountId32,
+            amount: sts.bigint(),
+        }),
+        Minted: sts.enumStruct({
+            who: AccountId32,
+            amount: sts.bigint(),
+        }),
+        Rescinded: sts.enumStruct({
+            amount: sts.bigint(),
+        }),
         ReserveRepatriated: sts.enumStruct({
             from: AccountId32,
             to: AccountId32,
@@ -4700,7 +4669,19 @@ export const BalancesEvent: sts.Type<BalancesEvent> = sts.closedEnum(() => {
             who: AccountId32,
             amount: sts.bigint(),
         }),
+        Restored: sts.enumStruct({
+            who: AccountId32,
+            amount: sts.bigint(),
+        }),
         Slashed: sts.enumStruct({
+            who: AccountId32,
+            amount: sts.bigint(),
+        }),
+        Suspended: sts.enumStruct({
+            who: AccountId32,
+            amount: sts.bigint(),
+        }),
+        Thawed: sts.enumStruct({
             who: AccountId32,
             amount: sts.bigint(),
         }),
@@ -4709,9 +4690,16 @@ export const BalancesEvent: sts.Type<BalancesEvent> = sts.closedEnum(() => {
             to: AccountId32,
             amount: sts.bigint(),
         }),
+        Unlocked: sts.enumStruct({
+            who: AccountId32,
+            amount: sts.bigint(),
+        }),
         Unreserved: sts.enumStruct({
             who: AccountId32,
             amount: sts.bigint(),
+        }),
+        Upgraded: sts.enumStruct({
+            who: AccountId32,
         }),
         Withdraw: sts.enumStruct({
             who: AccountId32,
@@ -4727,26 +4715,10 @@ export const BalanceStatus: sts.Type<BalanceStatus> = sts.closedEnum(() => {
     }
 })
 
-export const Phase: sts.Type<Phase> = sts.closedEnum(() => {
+export const Type_118: sts.Type<Type_118> = sts.closedEnum(() => {
     return  {
         ApplyExtrinsic: sts.number(),
         Finalization: sts.unit(),
         Initialization: sts.unit(),
     }
 })
-
-export interface PerDispatchClass {
-    normal: Weight
-    operational: Weight
-    mandatory: Weight
-}
-
-export const PerDispatchClass: sts.Type<PerDispatchClass> = sts.struct(() => {
-    return  {
-        normal: Weight,
-        operational: Weight,
-        mandatory: Weight,
-    }
-})
-
-export const AccountId32 = sts.bytes()

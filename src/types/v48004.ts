@@ -1,131 +1,5 @@
 import {sts, Result, Option, Bytes, BitSequence} from './support'
 
-export const BlockWeights: sts.Type<BlockWeights> = sts.struct(() => {
-    return  {
-        baseBlock: Weight,
-        maxBlock: Weight,
-        perClass: Type_122,
-    }
-})
-
-export const Type_122: sts.Type<Type_122> = sts.struct(() => {
-    return  {
-        normal: WeightsPerClass,
-        operational: WeightsPerClass,
-        mandatory: WeightsPerClass,
-    }
-})
-
-export const WeightsPerClass: sts.Type<WeightsPerClass> = sts.struct(() => {
-    return  {
-        baseExtrinsic: Weight,
-        maxExtrinsic: sts.option(() => Weight),
-        maxTotal: sts.option(() => Weight),
-        reserved: sts.option(() => Weight),
-    }
-})
-
-export interface WeightsPerClass {
-    baseExtrinsic: Weight
-    maxExtrinsic?: (Weight | undefined)
-    maxTotal?: (Weight | undefined)
-    reserved?: (Weight | undefined)
-}
-
-export interface Weight {
-    refTime: bigint
-    proofSize: bigint
-}
-
-export interface Type_122 {
-    normal: WeightsPerClass
-    operational: WeightsPerClass
-    mandatory: WeightsPerClass
-}
-
-export const Weight: sts.Type<Weight> = sts.struct(() => {
-    return  {
-        refTime: sts.bigint(),
-        proofSize: sts.bigint(),
-    }
-})
-
-export interface BlockWeights {
-    baseBlock: Weight
-    maxBlock: Weight
-    perClass: Type_122
-}
-
-export interface ClusterGovParams {
-    treasuryShare: Perbill
-    validatorsShare: Perbill
-    clusterReserveShare: Perbill
-    cdnBondSize: bigint
-    cdnChillDelay: number
-    cdnUnbondingDelay: number
-    storageBondSize: bigint
-    storageChillDelay: number
-    storageUnbondingDelay: number
-    unitPerMbStored: bigint
-    unitPerMbStreamed: bigint
-    unitPerPutRequest: bigint
-    unitPerGetRequest: bigint
-}
-
-export type Perbill = number
-
-export const ClusterGovParams: sts.Type<ClusterGovParams> = sts.struct(() => {
-    return  {
-        treasuryShare: Perbill,
-        validatorsShare: Perbill,
-        clusterReserveShare: Perbill,
-        cdnBondSize: sts.bigint(),
-        cdnChillDelay: sts.number(),
-        cdnUnbondingDelay: sts.number(),
-        storageBondSize: sts.bigint(),
-        storageChillDelay: sts.number(),
-        storageUnbondingDelay: sts.number(),
-        unitPerMbStored: sts.bigint(),
-        unitPerMbStreamed: sts.bigint(),
-        unitPerPutRequest: sts.bigint(),
-        unitPerGetRequest: sts.bigint(),
-    }
-})
-
-export const Perbill = sts.number()
-
-export interface Cluster {
-    clusterId: H160
-    managerId: AccountId32
-    reserveId: AccountId32
-    props: ClusterProps
-}
-
-export interface ClusterProps {
-    nodeProviderAuthContract?: (AccountId32 | undefined)
-}
-
-export const Cluster: sts.Type<Cluster> = sts.struct(() => {
-    return  {
-        clusterId: H160,
-        managerId: AccountId32,
-        reserveId: AccountId32,
-        props: ClusterProps,
-    }
-})
-
-export const ClusterProps: sts.Type<ClusterProps> = sts.struct(() => {
-    return  {
-        nodeProviderAuthContract: sts.option(() => AccountId32),
-    }
-})
-
-export type AccountId32 = Bytes
-
-export type H160 = Bytes
-
-export const H160 = sts.bytes()
-
 export interface EventRecord {
     phase: Phase
     event: Event
@@ -134,7 +8,7 @@ export interface EventRecord {
 
 export type H256 = Bytes
 
-export type Event = Event_Balances | Event_Bounties | Event_CereDDCModule | Event_ChainBridge | Event_ChildBounties | Event_Contracts | Event_Council | Event_DdcClusters | Event_DdcCustomers | Event_DdcMetricsOffchainWorker | Event_DdcNodes | Event_DdcPayouts | Event_DdcStaking | Event_Democracy | Event_ElectionProviderMultiPhase | Event_Elections | Event_Erc20 | Event_Erc721 | Event_FastUnstake | Event_Grandpa | Event_Identity | Event_ImOnline | Event_Indices | Event_Multisig | Event_NominationPools | Event_Offences | Event_Proxy | Event_Recovery | Event_Scheduler | Event_Session | Event_Society | Event_Staking | Event_Sudo | Event_System | Event_TechnicalCommittee | Event_TechnicalMembership | Event_Tips | Event_TransactionPayment | Event_Treasury | Event_Utility | Event_Vesting | Event_VoterList
+export type Event = Event_Balances | Event_Bounties | Event_CereDDCModule | Event_ChainBridge | Event_ChildBounties | Event_Contracts | Event_Council | Event_DdcMetricsOffchainWorker | Event_DdcStaking | Event_Democracy | Event_ElectionProviderMultiPhase | Event_Elections | Event_Erc20 | Event_Erc721 | Event_Grandpa | Event_Identity | Event_ImOnline | Event_Indices | Event_Multisig | Event_NominationPools | Event_Offences | Event_Proxy | Event_Recovery | Event_Scheduler | Event_Session | Event_Society | Event_Staking | Event_Sudo | Event_System | Event_TechnicalCommittee | Event_TechnicalMembership | Event_Tips | Event_TransactionPayment | Event_Treasury | Event_Utility | Event_Vesting | Event_VoterList
 
 export interface Event_Balances {
     __kind: 'Balances'
@@ -171,29 +45,9 @@ export interface Event_Council {
     value: CouncilEvent
 }
 
-export interface Event_DdcClusters {
-    __kind: 'DdcClusters'
-    value: DdcClustersEvent
-}
-
-export interface Event_DdcCustomers {
-    __kind: 'DdcCustomers'
-    value: DdcCustomersEvent
-}
-
 export interface Event_DdcMetricsOffchainWorker {
     __kind: 'DdcMetricsOffchainWorker'
     value: DdcMetricsOffchainWorkerEvent
-}
-
-export interface Event_DdcNodes {
-    __kind: 'DdcNodes'
-    value: DdcNodesEvent
-}
-
-export interface Event_DdcPayouts {
-    __kind: 'DdcPayouts'
-    value: DdcPayoutsEvent
 }
 
 export interface Event_DdcStaking {
@@ -224,11 +78,6 @@ export interface Event_Erc20 {
 export interface Event_Erc721 {
     __kind: 'Erc721'
     value: Erc721Event
-}
-
-export interface Event_FastUnstake {
-    __kind: 'FastUnstake'
-    value: FastUnstakeEvent
 }
 
 export interface Event_Grandpa {
@@ -373,6 +222,8 @@ export interface VoterListEvent_ScoreUpdated {
     newScore: bigint
 }
 
+export type AccountId32 = Bytes
+
 /**
  * 
 			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
@@ -454,7 +305,7 @@ export interface UtilityEvent_ItemFailed {
     error: DispatchError
 }
 
-export type DispatchError = DispatchError_Arithmetic | DispatchError_BadOrigin | DispatchError_CannotLookup | DispatchError_ConsumerRemaining | DispatchError_Corruption | DispatchError_Exhausted | DispatchError_Module | DispatchError_NoProviders | DispatchError_Other | DispatchError_Token | DispatchError_TooManyConsumers | DispatchError_Transactional | DispatchError_Unavailable
+export type DispatchError = DispatchError_Arithmetic | DispatchError_BadOrigin | DispatchError_CannotLookup | DispatchError_ConsumerRemaining | DispatchError_Module | DispatchError_NoProviders | DispatchError_Other | DispatchError_Token | DispatchError_TooManyConsumers | DispatchError_Transactional
 
 export interface DispatchError_Arithmetic {
     __kind: 'Arithmetic'
@@ -471,14 +322,6 @@ export interface DispatchError_CannotLookup {
 
 export interface DispatchError_ConsumerRemaining {
     __kind: 'ConsumerRemaining'
-}
-
-export interface DispatchError_Corruption {
-    __kind: 'Corruption'
-}
-
-export interface DispatchError_Exhausted {
-    __kind: 'Exhausted'
 }
 
 export interface DispatchError_Module {
@@ -506,10 +349,6 @@ export interface DispatchError_TooManyConsumers {
 export interface DispatchError_Transactional {
     __kind: 'Transactional'
     value: TransactionalError
-}
-
-export interface DispatchError_Unavailable {
-    __kind: 'Unavailable'
 }
 
 export type TransactionalError = TransactionalError_LimitReached | TransactionalError_NoLayer
@@ -930,6 +769,10 @@ export interface DispatchClass_Operational {
     __kind: 'Operational'
 }
 
+export interface Weight {
+    refTime: bigint
+}
+
 /**
  * 
 			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
@@ -978,72 +821,68 @@ export type StakingEvent = StakingEvent_Bonded | StakingEvent_Chilled | StakingE
  */
 export interface StakingEvent_Bonded {
     __kind: 'Bonded'
-    stash: AccountId32
-    amount: bigint
+    value: [AccountId32, bigint]
 }
 
 /**
  * An account has stopped participating as either a validator or nominator.
+ * \[stash\]
  */
 export interface StakingEvent_Chilled {
     __kind: 'Chilled'
-    stash: AccountId32
+    value: AccountId32
 }
 
 /**
  * The era payout has been set; the first balance is the validator-payout; the second is
  * the remainder from the maximum amount of reward.
+ * \[era_index, validator_payout, remainder\]
  */
 export interface StakingEvent_EraPaid {
     __kind: 'EraPaid'
-    eraIndex: number
-    validatorPayout: bigint
-    remainder: bigint
+    value: [number, bigint, bigint]
 }
 
 /**
- * A nominator has been kicked from a validator.
+ * A nominator has been kicked from a validator. \[nominator, stash\]
  */
 export interface StakingEvent_Kicked {
     __kind: 'Kicked'
-    nominator: AccountId32
-    stash: AccountId32
+    value: [AccountId32, AccountId32]
 }
 
 /**
  * An old slashing report from a prior era was discarded because it could
- * not be processed.
+ * not be processed. \[session_index\]
  */
 export interface StakingEvent_OldSlashingReportDiscarded {
     __kind: 'OldSlashingReportDiscarded'
-    sessionIndex: number
+    value: number
 }
 
 /**
- * The stakers' rewards are getting paid.
+ * The stakers' rewards are getting paid. \[era_index, validator_stash\]
  */
 export interface StakingEvent_PayoutStarted {
     __kind: 'PayoutStarted'
-    eraIndex: number
-    validatorStash: AccountId32
+    value: [number, AccountId32]
 }
 
 /**
- * The nominator has been rewarded by this amount.
+ * The nominator has been rewarded by this amount. \[stash, amount\]
  */
 export interface StakingEvent_Rewarded {
     __kind: 'Rewarded'
-    stash: AccountId32
-    amount: bigint
+    value: [AccountId32, bigint]
 }
 
 /**
- * One staker (and potentially its nominators) has been slashed by the given amount.
+ * One validator (and its nominators) has been slashed by the given amount.
+ * \[validator, amount\]
  */
 export interface StakingEvent_Slashed {
     __kind: 'Slashed'
-    staker: AccountId32
-    amount: bigint
+    value: [AccountId32, bigint]
 }
 
 /**
@@ -1061,12 +900,11 @@ export interface StakingEvent_StakingElectionFailed {
 }
 
 /**
- * An account has unbonded this amount.
+ * An account has unbonded this amount. \[stash, amount\]
  */
 export interface StakingEvent_Unbonded {
     __kind: 'Unbonded'
-    stash: AccountId32
-    amount: bigint
+    value: [AccountId32, bigint]
 }
 
 /**
@@ -1074,18 +912,16 @@ export interface StakingEvent_Unbonded {
  */
 export interface StakingEvent_ValidatorPrefsSet {
     __kind: 'ValidatorPrefsSet'
-    stash: AccountId32
-    prefs: ValidatorPrefs
+    value: [AccountId32, ValidatorPrefs]
 }
 
 /**
  * An account has called `withdraw_unbonded` and removed unbonding chunks worth `Balance`
- * from the unlocking queue.
+ * from the unlocking queue. \[stash, amount\]
  */
 export interface StakingEvent_Withdrawn {
     __kind: 'Withdrawn'
-    stash: AccountId32
-    amount: bigint
+    value: [AccountId32, bigint]
 }
 
 export interface ValidatorPrefs {
@@ -1260,15 +1096,16 @@ export interface SessionEvent_NewSession {
 /**
  * Events type.
  */
-export type SchedulerEvent = SchedulerEvent_CallUnavailable | SchedulerEvent_Canceled | SchedulerEvent_Dispatched | SchedulerEvent_PeriodicFailed | SchedulerEvent_PermanentlyOverweight | SchedulerEvent_Scheduled
+export type SchedulerEvent = SchedulerEvent_CallLookupFailed | SchedulerEvent_Canceled | SchedulerEvent_Dispatched | SchedulerEvent_Scheduled
 
 /**
  * The call for the provided hash was not found so the task has been aborted.
  */
-export interface SchedulerEvent_CallUnavailable {
-    __kind: 'CallUnavailable'
+export interface SchedulerEvent_CallLookupFailed {
+    __kind: 'CallLookupFailed'
     task: [number, number]
     id?: (Bytes | undefined)
+    error: LookupError
 }
 
 /**
@@ -1291,30 +1128,22 @@ export interface SchedulerEvent_Dispatched {
 }
 
 /**
- * The given task was unable to be renewed since the agenda is full at that block.
- */
-export interface SchedulerEvent_PeriodicFailed {
-    __kind: 'PeriodicFailed'
-    task: [number, number]
-    id?: (Bytes | undefined)
-}
-
-/**
- * The given task can never be executed since it is overweight.
- */
-export interface SchedulerEvent_PermanentlyOverweight {
-    __kind: 'PermanentlyOverweight'
-    task: [number, number]
-    id?: (Bytes | undefined)
-}
-
-/**
  * Scheduled some task.
  */
 export interface SchedulerEvent_Scheduled {
     __kind: 'Scheduled'
     when: number
     index: number
+}
+
+export type LookupError = LookupError_BadFormat | LookupError_Unknown
+
+export interface LookupError_BadFormat {
+    __kind: 'BadFormat'
+}
+
+export interface LookupError_Unknown {
+    __kind: 'Unknown'
 }
 
 /**
@@ -1381,7 +1210,7 @@ export interface RecoveryEvent_RecoveryVouched {
 			by this pallet.
 			
  */
-export type ProxyEvent = ProxyEvent_Announced | ProxyEvent_ProxyAdded | ProxyEvent_ProxyExecuted | ProxyEvent_ProxyRemoved | ProxyEvent_PureCreated
+export type ProxyEvent = ProxyEvent_Announced | ProxyEvent_AnonymousCreated | ProxyEvent_ProxyAdded | ProxyEvent_ProxyExecuted | ProxyEvent_ProxyRemoved
 
 /**
  * An announcement was placed to make a call in the future.
@@ -1391,6 +1220,18 @@ export interface ProxyEvent_Announced {
     real: AccountId32
     proxy: AccountId32
     callHash: H256
+}
+
+/**
+ * Anonymous account has been created by new proxy with given
+ * disambiguation index and proxy type.
+ */
+export interface ProxyEvent_AnonymousCreated {
+    __kind: 'AnonymousCreated'
+    anonymous: AccountId32
+    who: AccountId32
+    proxyType: ProxyType
+    disambiguationIndex: number
 }
 
 /**
@@ -1421,18 +1262,6 @@ export interface ProxyEvent_ProxyRemoved {
     delegatee: AccountId32
     proxyType: ProxyType
     delay: number
-}
-
-/**
- * A pure account has been created by new proxy with given
- * disambiguation index and proxy type.
- */
-export interface ProxyEvent_PureCreated {
-    __kind: 'PureCreated'
-    pure: AccountId32
-    who: AccountId32
-    proxyType: ProxyType
-    disambiguationIndex: number
 }
 
 export type ProxyType = ProxyType_Any | ProxyType_Governance | ProxyType_NonTransfer | ProxyType_Staking
@@ -1880,54 +1709,6 @@ export interface GrandpaEvent_Resumed {
 export type Public = Bytes
 
 /**
- * The events of this pallet.
- */
-export type FastUnstakeEvent = FastUnstakeEvent_Checking | FastUnstakeEvent_Errored | FastUnstakeEvent_InternalError | FastUnstakeEvent_Slashed | FastUnstakeEvent_Unstaked
-
-/**
- * A staker was partially checked for the given eras, but the process did not finish.
- */
-export interface FastUnstakeEvent_Checking {
-    __kind: 'Checking'
-    stash: AccountId32
-    eras: number[]
-}
-
-/**
- * Some internal error happened while migrating stash. They are removed as head as a
- * consequence.
- */
-export interface FastUnstakeEvent_Errored {
-    __kind: 'Errored'
-    stash: AccountId32
-}
-
-/**
- * An internal error happened. Operations will be paused now.
- */
-export interface FastUnstakeEvent_InternalError {
-    __kind: 'InternalError'
-}
-
-/**
- * A staker was slashed for requesting fast-unstake whilst being exposed.
- */
-export interface FastUnstakeEvent_Slashed {
-    __kind: 'Slashed'
-    stash: AccountId32
-    amount: bigint
-}
-
-/**
- * A staker was unstaked.
- */
-export interface FastUnstakeEvent_Unstaked {
-    __kind: 'Unstaked'
-    stash: AccountId32
-    result: Result<null, DispatchError>
-}
-
-/**
  * Events for this module.
  * 
  */
@@ -2149,7 +1930,7 @@ export interface ElectionCompute_Unsigned {
 			by this pallet.
 			
  */
-export type DemocracyEvent = DemocracyEvent_Blacklisted | DemocracyEvent_Cancelled | DemocracyEvent_Delegated | DemocracyEvent_ExternalTabled | DemocracyEvent_NotPassed | DemocracyEvent_Passed | DemocracyEvent_ProposalCanceled | DemocracyEvent_Proposed | DemocracyEvent_Seconded | DemocracyEvent_Started | DemocracyEvent_Tabled | DemocracyEvent_Undelegated | DemocracyEvent_Vetoed | DemocracyEvent_Voted
+export type DemocracyEvent = DemocracyEvent_Blacklisted | DemocracyEvent_Cancelled | DemocracyEvent_Delegated | DemocracyEvent_Executed | DemocracyEvent_ExternalTabled | DemocracyEvent_NotPassed | DemocracyEvent_Passed | DemocracyEvent_PreimageInvalid | DemocracyEvent_PreimageMissing | DemocracyEvent_PreimageNoted | DemocracyEvent_PreimageReaped | DemocracyEvent_PreimageUsed | DemocracyEvent_ProposalCanceled | DemocracyEvent_Proposed | DemocracyEvent_Seconded | DemocracyEvent_Started | DemocracyEvent_Tabled | DemocracyEvent_Undelegated | DemocracyEvent_Vetoed | DemocracyEvent_Voted
 
 /**
  * A proposal_hash has been blacklisted permanently.
@@ -2177,6 +1958,15 @@ export interface DemocracyEvent_Delegated {
 }
 
 /**
+ * A proposal has been enacted.
+ */
+export interface DemocracyEvent_Executed {
+    __kind: 'Executed'
+    refIndex: number
+    result: Result<null, DispatchError>
+}
+
+/**
  * An external proposal has been tabled.
  */
 export interface DemocracyEvent_ExternalTabled {
@@ -2197,6 +1987,55 @@ export interface DemocracyEvent_NotPassed {
 export interface DemocracyEvent_Passed {
     __kind: 'Passed'
     refIndex: number
+}
+
+/**
+ * A proposal could not be executed because its preimage was invalid.
+ */
+export interface DemocracyEvent_PreimageInvalid {
+    __kind: 'PreimageInvalid'
+    proposalHash: H256
+    refIndex: number
+}
+
+/**
+ * A proposal could not be executed because its preimage was missing.
+ */
+export interface DemocracyEvent_PreimageMissing {
+    __kind: 'PreimageMissing'
+    proposalHash: H256
+    refIndex: number
+}
+
+/**
+ * A proposal's preimage was noted, and the deposit taken.
+ */
+export interface DemocracyEvent_PreimageNoted {
+    __kind: 'PreimageNoted'
+    proposalHash: H256
+    who: AccountId32
+    deposit: bigint
+}
+
+/**
+ * A registered preimage was removed and the deposit collected by the reaper.
+ */
+export interface DemocracyEvent_PreimageReaped {
+    __kind: 'PreimageReaped'
+    proposalHash: H256
+    provider: AccountId32
+    deposit: bigint
+    reaper: AccountId32
+}
+
+/**
+ * A proposal preimage was removed and used (the deposit was returned).
+ */
+export interface DemocracyEvent_PreimageUsed {
+    __kind: 'PreimageUsed'
+    proposalHash: H256
+    provider: AccountId32
+    deposit: bigint
 }
 
 /**
@@ -2241,6 +2080,7 @@ export interface DemocracyEvent_Tabled {
     __kind: 'Tabled'
     proposalIndex: number
     deposit: bigint
+    depositors: AccountId32[]
 }
 
 /**
@@ -2305,16 +2145,7 @@ export interface VoteThreshold_SuperMajorityApprove {
 			by this pallet.
 			
  */
-export type DdcStakingEvent = DdcStakingEvent_Activated | DdcStakingEvent_Bonded | DdcStakingEvent_ChillSoon | DdcStakingEvent_Chilled | DdcStakingEvent_LeaveSoon | DdcStakingEvent_Left | DdcStakingEvent_Unbonded | DdcStakingEvent_Withdrawn
-
-/**
- * An account that started participating as either a storage network or CDN participant.
- * \[stash\]
- */
-export interface DdcStakingEvent_Activated {
-    __kind: 'Activated'
-    value: AccountId32
-}
+export type DdcStakingEvent = DdcStakingEvent_Bonded | DdcStakingEvent_ChillSoon | DdcStakingEvent_Chilled | DdcStakingEvent_Unbonded | DdcStakingEvent_Withdrawn
 
 /**
  * An account has bonded this amount. \[stash, amount\]
@@ -2329,11 +2160,11 @@ export interface DdcStakingEvent_Bonded {
 
 /**
  * An account has declared desire to stop participating in CDN or storage network soon.
- * \[stash, cluster, block\]
+ * \[stash, cluster, era\]
  */
 export interface DdcStakingEvent_ChillSoon {
     __kind: 'ChillSoon'
-    value: [AccountId32, H160, number]
+    value: [AccountId32, number, number]
 }
 
 /**
@@ -2342,24 +2173,6 @@ export interface DdcStakingEvent_ChillSoon {
  */
 export interface DdcStakingEvent_Chilled {
     __kind: 'Chilled'
-    value: AccountId32
-}
-
-/**
- * An account that started unbonding tokens below the minimum value set for the cluster
- * his CDN or Storage node is assigned to \[stash\]
- */
-export interface DdcStakingEvent_LeaveSoon {
-    __kind: 'LeaveSoon'
-    value: AccountId32
-}
-
-/**
- * An account that unbonded tokens below the minimum value set for the cluster his
- * CDN or Storage node was assigned to \[stash\]
- */
-export interface DdcStakingEvent_Left {
-    __kind: 'Left'
     value: AccountId32
 }
 
@@ -2381,146 +2194,6 @@ export interface DdcStakingEvent_Withdrawn {
 }
 
 /**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
- */
-export type DdcPayoutsEvent = DdcPayoutsEvent_AuthorisedCaller | DdcPayoutsEvent_BillingReportFinalized | DdcPayoutsEvent_BillingReportInitialized | DdcPayoutsEvent_ChargeFailed | DdcPayoutsEvent_Charged | DdcPayoutsEvent_ChargingFinished | DdcPayoutsEvent_ChargingStarted | DdcPayoutsEvent_ClusterReserveFeesCollected | DdcPayoutsEvent_Indebted | DdcPayoutsEvent_Rewarded | DdcPayoutsEvent_RewardingFinished | DdcPayoutsEvent_RewardingStarted | DdcPayoutsEvent_TreasuryFeesCollected | DdcPayoutsEvent_ValidatorFeesCollected
-
-export interface DdcPayoutsEvent_AuthorisedCaller {
-    __kind: 'AuthorisedCaller'
-    authorisedCaller: AccountId32
-}
-
-export interface DdcPayoutsEvent_BillingReportFinalized {
-    __kind: 'BillingReportFinalized'
-    clusterId: H160
-    era: number
-}
-
-export interface DdcPayoutsEvent_BillingReportInitialized {
-    __kind: 'BillingReportInitialized'
-    clusterId: H160
-    era: number
-}
-
-export interface DdcPayoutsEvent_ChargeFailed {
-    __kind: 'ChargeFailed'
-    clusterId: H160
-    era: number
-    batchIndex: number
-    customerId: AccountId32
-    amount: bigint
-}
-
-export interface DdcPayoutsEvent_Charged {
-    __kind: 'Charged'
-    clusterId: H160
-    era: number
-    batchIndex: number
-    customerId: AccountId32
-    amount: bigint
-}
-
-export interface DdcPayoutsEvent_ChargingFinished {
-    __kind: 'ChargingFinished'
-    clusterId: H160
-    era: number
-}
-
-export interface DdcPayoutsEvent_ChargingStarted {
-    __kind: 'ChargingStarted'
-    clusterId: H160
-    era: number
-}
-
-export interface DdcPayoutsEvent_ClusterReserveFeesCollected {
-    __kind: 'ClusterReserveFeesCollected'
-    clusterId: H160
-    era: number
-    amount: bigint
-}
-
-export interface DdcPayoutsEvent_Indebted {
-    __kind: 'Indebted'
-    clusterId: H160
-    era: number
-    batchIndex: number
-    customerId: AccountId32
-    amount: bigint
-}
-
-export interface DdcPayoutsEvent_Rewarded {
-    __kind: 'Rewarded'
-    clusterId: H160
-    era: number
-    nodeProviderId: AccountId32
-    amount: bigint
-}
-
-export interface DdcPayoutsEvent_RewardingFinished {
-    __kind: 'RewardingFinished'
-    clusterId: H160
-    era: number
-}
-
-export interface DdcPayoutsEvent_RewardingStarted {
-    __kind: 'RewardingStarted'
-    clusterId: H160
-    era: number
-}
-
-export interface DdcPayoutsEvent_TreasuryFeesCollected {
-    __kind: 'TreasuryFeesCollected'
-    clusterId: H160
-    era: number
-    amount: bigint
-}
-
-export interface DdcPayoutsEvent_ValidatorFeesCollected {
-    __kind: 'ValidatorFeesCollected'
-    clusterId: H160
-    era: number
-    amount: bigint
-}
-
-/**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
- */
-export type DdcNodesEvent = DdcNodesEvent_NodeCreated | DdcNodesEvent_NodeDeleted | DdcNodesEvent_NodeParamsChanged
-
-export interface DdcNodesEvent_NodeCreated {
-    __kind: 'NodeCreated'
-    nodePubKey: NodePubKey
-}
-
-export interface DdcNodesEvent_NodeDeleted {
-    __kind: 'NodeDeleted'
-    nodePubKey: NodePubKey
-}
-
-export interface DdcNodesEvent_NodeParamsChanged {
-    __kind: 'NodeParamsChanged'
-    nodePubKey: NodePubKey
-}
-
-export type NodePubKey = NodePubKey_CDNPubKey | NodePubKey_StoragePubKey
-
-export interface NodePubKey_CDNPubKey {
-    __kind: 'CDNPubKey'
-    value: AccountId32
-}
-
-export interface NodePubKey_StoragePubKey {
-    __kind: 'StoragePubKey'
-    value: AccountId32
-}
-
-/**
  * Events for this module.
  * 
  * Events generated by the module.
@@ -2530,93 +2203,6 @@ export type DdcMetricsOffchainWorkerEvent = DdcMetricsOffchainWorkerEvent_NewDdc
 export interface DdcMetricsOffchainWorkerEvent_NewDdcMetric {
     __kind: 'NewDdcMetric'
     value: [AccountId32, Bytes]
-}
-
-/**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
- */
-export type DdcCustomersEvent = DdcCustomersEvent_BucketCreated | DdcCustomersEvent_Charged | DdcCustomersEvent_Deposited | DdcCustomersEvent_InitialDepositUnlock | DdcCustomersEvent_Withdrawn
-
-/**
- * Bucket with specific id created
- */
-export interface DdcCustomersEvent_BucketCreated {
-    __kind: 'BucketCreated'
-    value: bigint
-}
-
-/**
- * The account has been charged for the usage
- */
-export interface DdcCustomersEvent_Charged {
-    __kind: 'Charged'
-    value: [AccountId32, bigint]
-}
-
-/**
- * An account has deposited this amount. \[owner, amount\]
- * 
- * NOTE: This event is only emitted when funds are deposited via a dispatchable. Notably,
- * it will not be emitted for staking rewards when they are added to stake.
- */
-export interface DdcCustomersEvent_Deposited {
-    __kind: 'Deposited'
-    value: [AccountId32, bigint]
-}
-
-/**
- * An account has initiated unlock for amount. \[owner, amount\]
- */
-export interface DdcCustomersEvent_InitialDepositUnlock {
-    __kind: 'InitialDepositUnlock'
-    value: [AccountId32, bigint]
-}
-
-/**
- * An account has called `withdraw_unlocked_deposit` and removed unlocking chunks worth
- * `Balance` from the unlocking queue. \[owner, amount\]
- */
-export interface DdcCustomersEvent_Withdrawn {
-    __kind: 'Withdrawn'
-    value: [AccountId32, bigint]
-}
-
-/**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
- */
-export type DdcClustersEvent = DdcClustersEvent_ClusterCreated | DdcClustersEvent_ClusterGovParamsSet | DdcClustersEvent_ClusterNodeAdded | DdcClustersEvent_ClusterNodeRemoved | DdcClustersEvent_ClusterParamsSet
-
-export interface DdcClustersEvent_ClusterCreated {
-    __kind: 'ClusterCreated'
-    clusterId: H160
-}
-
-export interface DdcClustersEvent_ClusterGovParamsSet {
-    __kind: 'ClusterGovParamsSet'
-    clusterId: H160
-}
-
-export interface DdcClustersEvent_ClusterNodeAdded {
-    __kind: 'ClusterNodeAdded'
-    clusterId: H160
-    nodePubKey: NodePubKey
-}
-
-export interface DdcClustersEvent_ClusterNodeRemoved {
-    __kind: 'ClusterNodeRemoved'
-    clusterId: H160
-    nodePubKey: NodePubKey
-}
-
-export interface DdcClustersEvent_ClusterParamsSet {
-    __kind: 'ClusterParamsSet'
-    clusterId: H160
 }
 
 /**
@@ -3222,18 +2808,13 @@ export const Event: sts.Type<Event> = sts.closedEnum(() => {
         ChildBounties: ChildBountiesEvent,
         Contracts: ContractsEvent,
         Council: CouncilEvent,
-        DdcClusters: DdcClustersEvent,
-        DdcCustomers: DdcCustomersEvent,
         DdcMetricsOffchainWorker: DdcMetricsOffchainWorkerEvent,
-        DdcNodes: DdcNodesEvent,
-        DdcPayouts: DdcPayoutsEvent,
         DdcStaking: DdcStakingEvent,
         Democracy: DemocracyEvent,
         ElectionProviderMultiPhase: ElectionProviderMultiPhaseEvent,
         Elections: ElectionsEvent,
         Erc20: Erc20Event,
         Erc721: Erc721Event,
-        FastUnstake: FastUnstakeEvent,
         Grandpa: GrandpaEvent,
         Identity: IdentityEvent,
         ImOnline: ImOnlineEvent,
@@ -3279,6 +2860,8 @@ export const VoterListEvent: sts.Type<VoterListEvent> = sts.closedEnum(() => {
         }),
     }
 })
+
+export const AccountId32 = sts.bytes()
 
 /**
  * 
@@ -3328,15 +2911,12 @@ export const DispatchError: sts.Type<DispatchError> = sts.closedEnum(() => {
         BadOrigin: sts.unit(),
         CannotLookup: sts.unit(),
         ConsumerRemaining: sts.unit(),
-        Corruption: sts.unit(),
-        Exhausted: sts.unit(),
         Module: ModuleError,
         NoProviders: sts.unit(),
         Other: sts.unit(),
         Token: TokenError,
         TooManyConsumers: sts.unit(),
         Transactional: TransactionalError,
-        Unavailable: sts.unit(),
     }
 })
 
@@ -3569,6 +3149,12 @@ export const DispatchClass: sts.Type<DispatchClass> = sts.closedEnum(() => {
     }
 })
 
+export const Weight: sts.Type<Weight> = sts.struct(() => {
+    return  {
+        refTime: sts.bigint(),
+    }
+})
+
 /**
  * 
 			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
@@ -3597,51 +3183,19 @@ export const SudoEvent: sts.Type<SudoEvent> = sts.closedEnum(() => {
  */
 export const StakingEvent: sts.Type<StakingEvent> = sts.closedEnum(() => {
     return  {
-        Bonded: sts.enumStruct({
-            stash: AccountId32,
-            amount: sts.bigint(),
-        }),
-        Chilled: sts.enumStruct({
-            stash: AccountId32,
-        }),
-        EraPaid: sts.enumStruct({
-            eraIndex: sts.number(),
-            validatorPayout: sts.bigint(),
-            remainder: sts.bigint(),
-        }),
-        Kicked: sts.enumStruct({
-            nominator: AccountId32,
-            stash: AccountId32,
-        }),
-        OldSlashingReportDiscarded: sts.enumStruct({
-            sessionIndex: sts.number(),
-        }),
-        PayoutStarted: sts.enumStruct({
-            eraIndex: sts.number(),
-            validatorStash: AccountId32,
-        }),
-        Rewarded: sts.enumStruct({
-            stash: AccountId32,
-            amount: sts.bigint(),
-        }),
-        Slashed: sts.enumStruct({
-            staker: AccountId32,
-            amount: sts.bigint(),
-        }),
+        Bonded: sts.tuple(() => [AccountId32, sts.bigint()]),
+        Chilled: AccountId32,
+        EraPaid: sts.tuple(() => [sts.number(), sts.bigint(), sts.bigint()]),
+        Kicked: sts.tuple(() => [AccountId32, AccountId32]),
+        OldSlashingReportDiscarded: sts.number(),
+        PayoutStarted: sts.tuple(() => [sts.number(), AccountId32]),
+        Rewarded: sts.tuple(() => [AccountId32, sts.bigint()]),
+        Slashed: sts.tuple(() => [AccountId32, sts.bigint()]),
         StakersElected: sts.unit(),
         StakingElectionFailed: sts.unit(),
-        Unbonded: sts.enumStruct({
-            stash: AccountId32,
-            amount: sts.bigint(),
-        }),
-        ValidatorPrefsSet: sts.enumStruct({
-            stash: AccountId32,
-            prefs: ValidatorPrefs,
-        }),
-        Withdrawn: sts.enumStruct({
-            stash: AccountId32,
-            amount: sts.bigint(),
-        }),
+        Unbonded: sts.tuple(() => [AccountId32, sts.bigint()]),
+        ValidatorPrefsSet: sts.tuple(() => [AccountId32, ValidatorPrefs]),
+        Withdrawn: sts.tuple(() => [AccountId32, sts.bigint()]),
     }
 })
 
@@ -3738,9 +3292,10 @@ export const SessionEvent: sts.Type<SessionEvent> = sts.closedEnum(() => {
  */
 export const SchedulerEvent: sts.Type<SchedulerEvent> = sts.closedEnum(() => {
     return  {
-        CallUnavailable: sts.enumStruct({
+        CallLookupFailed: sts.enumStruct({
             task: sts.tuple(() => [sts.number(), sts.number()]),
             id: sts.option(() => sts.bytes()),
+            error: LookupError,
         }),
         Canceled: sts.enumStruct({
             when: sts.number(),
@@ -3751,18 +3306,17 @@ export const SchedulerEvent: sts.Type<SchedulerEvent> = sts.closedEnum(() => {
             id: sts.option(() => sts.bytes()),
             result: sts.result(() => sts.unit(), () => DispatchError),
         }),
-        PeriodicFailed: sts.enumStruct({
-            task: sts.tuple(() => [sts.number(), sts.number()]),
-            id: sts.option(() => sts.bytes()),
-        }),
-        PermanentlyOverweight: sts.enumStruct({
-            task: sts.tuple(() => [sts.number(), sts.number()]),
-            id: sts.option(() => sts.bytes()),
-        }),
         Scheduled: sts.enumStruct({
             when: sts.number(),
             index: sts.number(),
         }),
+    }
+})
+
+export const LookupError: sts.Type<LookupError> = sts.closedEnum(() => {
+    return  {
+        BadFormat: sts.unit(),
+        Unknown: sts.unit(),
     }
 })
 
@@ -3810,6 +3364,12 @@ export const ProxyEvent: sts.Type<ProxyEvent> = sts.closedEnum(() => {
             proxy: AccountId32,
             callHash: H256,
         }),
+        AnonymousCreated: sts.enumStruct({
+            anonymous: AccountId32,
+            who: AccountId32,
+            proxyType: ProxyType,
+            disambiguationIndex: sts.number(),
+        }),
         ProxyAdded: sts.enumStruct({
             delegator: AccountId32,
             delegatee: AccountId32,
@@ -3824,12 +3384,6 @@ export const ProxyEvent: sts.Type<ProxyEvent> = sts.closedEnum(() => {
             delegatee: AccountId32,
             proxyType: ProxyType,
             delay: sts.number(),
-        }),
-        PureCreated: sts.enumStruct({
-            pure: AccountId32,
-            who: AccountId32,
-            proxyType: ProxyType,
-            disambiguationIndex: sts.number(),
         }),
     }
 })
@@ -4092,30 +3646,6 @@ export const GrandpaEvent: sts.Type<GrandpaEvent> = sts.closedEnum(() => {
 export const Public = sts.bytes()
 
 /**
- * The events of this pallet.
- */
-export const FastUnstakeEvent: sts.Type<FastUnstakeEvent> = sts.closedEnum(() => {
-    return  {
-        Checking: sts.enumStruct({
-            stash: AccountId32,
-            eras: sts.array(() => sts.number()),
-        }),
-        Errored: sts.enumStruct({
-            stash: AccountId32,
-        }),
-        InternalError: sts.unit(),
-        Slashed: sts.enumStruct({
-            stash: AccountId32,
-            amount: sts.bigint(),
-        }),
-        Unstaked: sts.enumStruct({
-            stash: AccountId32,
-            result: sts.result(() => sts.unit(), () => DispatchError),
-        }),
-    }
-})
-
-/**
  * Events for this module.
  * 
  */
@@ -4237,12 +3767,40 @@ export const DemocracyEvent: sts.Type<DemocracyEvent> = sts.closedEnum(() => {
             who: AccountId32,
             target: AccountId32,
         }),
+        Executed: sts.enumStruct({
+            refIndex: sts.number(),
+            result: sts.result(() => sts.unit(), () => DispatchError),
+        }),
         ExternalTabled: sts.unit(),
         NotPassed: sts.enumStruct({
             refIndex: sts.number(),
         }),
         Passed: sts.enumStruct({
             refIndex: sts.number(),
+        }),
+        PreimageInvalid: sts.enumStruct({
+            proposalHash: H256,
+            refIndex: sts.number(),
+        }),
+        PreimageMissing: sts.enumStruct({
+            proposalHash: H256,
+            refIndex: sts.number(),
+        }),
+        PreimageNoted: sts.enumStruct({
+            proposalHash: H256,
+            who: AccountId32,
+            deposit: sts.bigint(),
+        }),
+        PreimageReaped: sts.enumStruct({
+            proposalHash: H256,
+            provider: AccountId32,
+            deposit: sts.bigint(),
+            reaper: AccountId32,
+        }),
+        PreimageUsed: sts.enumStruct({
+            proposalHash: H256,
+            provider: AccountId32,
+            deposit: sts.bigint(),
         }),
         ProposalCanceled: sts.enumStruct({
             propIndex: sts.number(),
@@ -4262,6 +3820,7 @@ export const DemocracyEvent: sts.Type<DemocracyEvent> = sts.closedEnum(() => {
         Tabled: sts.enumStruct({
             proposalIndex: sts.number(),
             deposit: sts.bigint(),
+            depositors: sts.array(() => AccountId32),
         }),
         Undelegated: sts.enumStruct({
             account: AccountId32,
@@ -4308,121 +3867,11 @@ export const VoteThreshold: sts.Type<VoteThreshold> = sts.closedEnum(() => {
  */
 export const DdcStakingEvent: sts.Type<DdcStakingEvent> = sts.closedEnum(() => {
     return  {
-        Activated: AccountId32,
         Bonded: sts.tuple(() => [AccountId32, sts.bigint()]),
-        ChillSoon: sts.tuple(() => [AccountId32, H160, sts.number()]),
+        ChillSoon: sts.tuple(() => [AccountId32, sts.number(), sts.number()]),
         Chilled: AccountId32,
-        LeaveSoon: AccountId32,
-        Left: AccountId32,
         Unbonded: sts.tuple(() => [AccountId32, sts.bigint()]),
         Withdrawn: sts.tuple(() => [AccountId32, sts.bigint()]),
-    }
-})
-
-/**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
- */
-export const DdcPayoutsEvent: sts.Type<DdcPayoutsEvent> = sts.closedEnum(() => {
-    return  {
-        AuthorisedCaller: sts.enumStruct({
-            authorisedCaller: AccountId32,
-        }),
-        BillingReportFinalized: sts.enumStruct({
-            clusterId: H160,
-            era: sts.number(),
-        }),
-        BillingReportInitialized: sts.enumStruct({
-            clusterId: H160,
-            era: sts.number(),
-        }),
-        ChargeFailed: sts.enumStruct({
-            clusterId: H160,
-            era: sts.number(),
-            batchIndex: sts.number(),
-            customerId: AccountId32,
-            amount: sts.bigint(),
-        }),
-        Charged: sts.enumStruct({
-            clusterId: H160,
-            era: sts.number(),
-            batchIndex: sts.number(),
-            customerId: AccountId32,
-            amount: sts.bigint(),
-        }),
-        ChargingFinished: sts.enumStruct({
-            clusterId: H160,
-            era: sts.number(),
-        }),
-        ChargingStarted: sts.enumStruct({
-            clusterId: H160,
-            era: sts.number(),
-        }),
-        ClusterReserveFeesCollected: sts.enumStruct({
-            clusterId: H160,
-            era: sts.number(),
-            amount: sts.bigint(),
-        }),
-        Indebted: sts.enumStruct({
-            clusterId: H160,
-            era: sts.number(),
-            batchIndex: sts.number(),
-            customerId: AccountId32,
-            amount: sts.bigint(),
-        }),
-        Rewarded: sts.enumStruct({
-            clusterId: H160,
-            era: sts.number(),
-            nodeProviderId: AccountId32,
-            amount: sts.bigint(),
-        }),
-        RewardingFinished: sts.enumStruct({
-            clusterId: H160,
-            era: sts.number(),
-        }),
-        RewardingStarted: sts.enumStruct({
-            clusterId: H160,
-            era: sts.number(),
-        }),
-        TreasuryFeesCollected: sts.enumStruct({
-            clusterId: H160,
-            era: sts.number(),
-            amount: sts.bigint(),
-        }),
-        ValidatorFeesCollected: sts.enumStruct({
-            clusterId: H160,
-            era: sts.number(),
-            amount: sts.bigint(),
-        }),
-    }
-})
-
-/**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
- */
-export const DdcNodesEvent: sts.Type<DdcNodesEvent> = sts.closedEnum(() => {
-    return  {
-        NodeCreated: sts.enumStruct({
-            nodePubKey: NodePubKey,
-        }),
-        NodeDeleted: sts.enumStruct({
-            nodePubKey: NodePubKey,
-        }),
-        NodeParamsChanged: sts.enumStruct({
-            nodePubKey: NodePubKey,
-        }),
-    }
-})
-
-export const NodePubKey: sts.Type<NodePubKey> = sts.closedEnum(() => {
-    return  {
-        CDNPubKey: AccountId32,
-        StoragePubKey: AccountId32,
     }
 })
 
@@ -4434,50 +3883,6 @@ export const NodePubKey: sts.Type<NodePubKey> = sts.closedEnum(() => {
 export const DdcMetricsOffchainWorkerEvent: sts.Type<DdcMetricsOffchainWorkerEvent> = sts.closedEnum(() => {
     return  {
         NewDdcMetric: sts.tuple(() => [AccountId32, sts.bytes()]),
-    }
-})
-
-/**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
- */
-export const DdcCustomersEvent: sts.Type<DdcCustomersEvent> = sts.closedEnum(() => {
-    return  {
-        BucketCreated: sts.bigint(),
-        Charged: sts.tuple(() => [AccountId32, sts.bigint()]),
-        Deposited: sts.tuple(() => [AccountId32, sts.bigint()]),
-        InitialDepositUnlock: sts.tuple(() => [AccountId32, sts.bigint()]),
-        Withdrawn: sts.tuple(() => [AccountId32, sts.bigint()]),
-    }
-})
-
-/**
- * 
-			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
-			by this pallet.
-			
- */
-export const DdcClustersEvent: sts.Type<DdcClustersEvent> = sts.closedEnum(() => {
-    return  {
-        ClusterCreated: sts.enumStruct({
-            clusterId: H160,
-        }),
-        ClusterGovParamsSet: sts.enumStruct({
-            clusterId: H160,
-        }),
-        ClusterNodeAdded: sts.enumStruct({
-            clusterId: H160,
-            nodePubKey: NodePubKey,
-        }),
-        ClusterNodeRemoved: sts.enumStruct({
-            clusterId: H160,
-            nodePubKey: NodePubKey,
-        }),
-        ClusterParamsSet: sts.enumStruct({
-            clusterId: H160,
-        }),
     }
 })
 
@@ -4734,19 +4139,3 @@ export const Phase: sts.Type<Phase> = sts.closedEnum(() => {
         Initialization: sts.unit(),
     }
 })
-
-export interface PerDispatchClass {
-    normal: Weight
-    operational: Weight
-    mandatory: Weight
-}
-
-export const PerDispatchClass: sts.Type<PerDispatchClass> = sts.struct(() => {
-    return  {
-        normal: Weight,
-        operational: Weight,
-        mandatory: Weight,
-    }
-})
-
-export const AccountId32 = sts.bytes()

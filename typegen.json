@@ -41,6 +41,12 @@
       "calls": [],
       "storage": true,
       "constants": true
+    },
+    "System": {
+      "events": false,
+      "calls": [],
+      "storage": true,
+      "constants": true
     }
   }
 }

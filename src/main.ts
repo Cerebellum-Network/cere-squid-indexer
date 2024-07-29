@@ -9,6 +9,13 @@ processor.run(new TypeormDatabase({supportHotBlocks: true}), async (ctx) => {
 
     const accounts = new Map<string, Account>
 
+    const emptyAccount = (accountId: string) => new Account({
+        id: accountId,
+        cereFreeBalance: 0n,
+        ddcActiveBalance: 0n,
+        ddcBuckets: [],
+    })
+
     // process events
     for (let b of ctx.blocks) {
         const block = b.header
@@ -17,22 +24,28 @@ processor.run(new TypeormDatabase({supportHotBlocks: true}), async (ctx) => {
             const processBalancesEvent = async (accountId: string) => {
                 try {
                     let accountInStorage
-                    if (storage.balances.account.v266.is(block)) {
-                        accountInStorage = await storage.balances.account.v266.get(block, accountId)
-                    } else if (storage.balances.account.v48900.is(block)) {
-                        accountInStorage = await storage.balances.account.v48900.get(block, accountId)
+                    if (storage.system.account.v266.is(block)) {
+                        accountInStorage = await storage.system.account.v266.get(block, accountId)
+                    } else if (storage.system.account.v295.is(block)) {
+                        accountInStorage = await storage.system.account.v295.get(block, accountId)
+                    } else if (storage.system.account.v48900.is(block)) {
+                        accountInStorage = await storage.system.account.v48900.get(block, accountId)
                     } else {
                         throwUnsupportedSpec()
                     }
                     if (accountInStorage) {
-                        const accountEntity = accounts.get(accountId) ?? new Account({id: accountId})
-                        accountEntity.cereFreeBalance = accountInStorage.free
+                        const accountEntity = accounts.get(accountId) ?? emptyAccount(accountId)
+                        accountEntity.cereFreeBalance = accountInStorage.data.free
                         accounts.set(accountId, accountEntity)
                     } else {
                         logStorageError("account", accountId)
                     }
                 } catch (error) {
-                    logAndThrowProcessingError(error)
+                    if (error?.toString() === 'Error: Unexpected EOF') {
+                        console.log("EOF")
+                    } else {
+                        logAndThrowProcessingError(error)
+                    }
                 }
             }
 
@@ -46,7 +59,7 @@ processor.run(new TypeormDatabase({supportHotBlocks: true}), async (ctx) => {
                         throwUnsupportedSpec()
                     }
                     if (accountInStorage) {
-                        const accountEntity = accounts.get(accountId) ?? new Account({id: accountId})
+                        const accountEntity = accounts.get(accountId) ?? emptyAccount(accountId)
                         accountEntity.ddcActiveBalance = accountInStorage.active
                         accounts.set(accountId, accountEntity)
                     } else {
@@ -135,10 +148,7 @@ processor.run(new TypeormDatabase({supportHotBlocks: true}), async (ctx) => {
                     }
                     if (bucketEntity) {
                         if (accountId) {
-                            const accountEntity = accounts.get(accountId) ?? new Account({
-                                id: accountId,
-                                ddcBuckets: []
-                            })
+                            const accountEntity = accounts.get(accountId) ?? emptyAccount(accountId)
                             accountEntity.ddcBuckets.push(bucketEntity)
                             accounts.set(accountId, accountEntity)
                         }
@@ -504,6 +514,9 @@ processor.run(new TypeormDatabase({supportHotBlocks: true}), async (ctx) => {
         // convert address to cere address
         accounts.forEach((account, id) => {
             account.id = ss58.codec("cere").encode(id)
+            account.ddcBuckets.forEach(bucket => {
+                bucket.ownerId = account
+            })
         })
 
         // save to db

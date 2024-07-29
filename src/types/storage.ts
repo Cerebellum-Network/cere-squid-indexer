@@ -1,3 +1,4 @@
+export * as system from './system/storage'
 export * as balances from './balances/storage'
 export * as ddcStaking from './ddc-staking/storage'
 export * as ddcNodes from './ddc-nodes/storage'

@@ -177,7 +177,7 @@ export interface Event_Vesting {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -201,11 +201,9 @@ export interface VestingEvent_VestingUpdated {
     value: [AccountId32, bigint]
 }
 
-export type AccountId32 = Bytes
-
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -318,7 +316,7 @@ export interface ArithmeticError_Underflow {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -383,7 +381,7 @@ export interface TreasuryEvent_Spending {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -431,7 +429,7 @@ export interface TipsEvent_TipSlashed {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -481,7 +479,7 @@ export interface TechnicalMembershipEvent_MembersSwapped {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -636,7 +634,7 @@ export interface DispatchClass_Operational {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -668,7 +666,7 @@ export interface SudoEvent_SudoAsDone {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -779,7 +777,7 @@ export interface StakingEvent_Withdrawn {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -919,7 +917,7 @@ export interface SocietyEvent_Vouch {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -1022,7 +1020,7 @@ export interface RecoveryEvent_RecoveryVouched {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -1097,7 +1095,7 @@ export interface OffencesEvent_Offence {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -1143,7 +1141,7 @@ export interface Timepoint {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -1175,7 +1173,7 @@ export interface IndicesEvent_IndexFrozen {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -1217,7 +1215,7 @@ export interface IndividualExposure {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -1307,7 +1305,7 @@ export interface IdentityEvent_SubIdentityRevoked {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -1380,7 +1378,7 @@ export interface Erc20Event_Remark {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -1451,7 +1449,7 @@ export interface ElectionsEvent_SeatHolderSlashed {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -1535,7 +1533,7 @@ export interface ElectionCompute_Unsigned {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -1709,7 +1707,7 @@ export interface DdcMetricsOffchainWorkerEvent_NewDdcMetric {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -1782,7 +1780,7 @@ export interface CouncilEvent_Voted {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -1996,7 +1994,7 @@ export interface CereDDCModuleEvent_DataStringSet {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -2060,11 +2058,11 @@ export interface BountiesEvent_BountyRejected {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
-export type BalancesEvent = BalancesEvent_BalanceSet | BalancesEvent_Deposit | BalancesEvent_DustLost | BalancesEvent_Endowed | BalancesEvent_ReserveRepatriated | BalancesEvent_Reserved | BalancesEvent_Slashed | BalancesEvent_Transfer | BalancesEvent_Unreserved | BalancesEvent_Withdraw
+export type BalancesEvent = BalancesEvent_BalanceSet | BalancesEvent_Deposit | BalancesEvent_DustLost | BalancesEvent_Endowed | BalancesEvent_ReserveRepatriated | BalancesEvent_Reserved | BalancesEvent_Transfer | BalancesEvent_Unreserved
 
 /**
  * A balance was set by root. \[who, free, reserved\]
@@ -2075,8 +2073,7 @@ export interface BalancesEvent_BalanceSet {
 }
 
 /**
- * Some amount was deposited into the account (e.g. for transaction fees). \[who,
- * deposit\]
+ * Some amount was deposited (e.g. for transaction fees). \[who, deposit\]
  */
 export interface BalancesEvent_Deposit {
     __kind: 'Deposit'
@@ -2119,15 +2116,6 @@ export interface BalancesEvent_Reserved {
 }
 
 /**
- * Some amount was removed from the account (e.g. for misbehavior). \[who,
- * amount_slashed\]
- */
-export interface BalancesEvent_Slashed {
-    __kind: 'Slashed'
-    value: [AccountId32, bigint]
-}
-
-/**
  * Transfer succeeded. \[from, to, value\]
  */
 export interface BalancesEvent_Transfer {
@@ -2143,14 +2131,6 @@ export interface BalancesEvent_Unreserved {
     value: [AccountId32, bigint]
 }
 
-/**
- * Some amount was withdrawn from the account (e.g. for transaction fees). \[who, value\]
- */
-export interface BalancesEvent_Withdraw {
-    __kind: 'Withdraw'
-    value: [AccountId32, bigint]
-}
-
 export type BalanceStatus = BalanceStatus_Free | BalanceStatus_Reserved
 
 export interface BalanceStatus_Free {
@@ -2163,7 +2143,7 @@ export interface BalanceStatus_Reserved {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -2242,7 +2222,7 @@ export const Event: sts.Type<Event> = sts.closedEnum(() => {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -2255,7 +2235,7 @@ export const VestingEvent: sts.Type<VestingEvent> = sts.closedEnum(() => {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -2305,7 +2285,7 @@ export const ArithmeticError: sts.Type<ArithmeticError> = sts.closedEnum(() => {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -2323,7 +2303,7 @@ export const TreasuryEvent: sts.Type<TreasuryEvent> = sts.closedEnum(() => {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -2339,7 +2319,7 @@ export const TipsEvent: sts.Type<TipsEvent> = sts.closedEnum(() => {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -2356,7 +2336,7 @@ export const TechnicalMembershipEvent: sts.Type<TechnicalMembershipEvent> = sts.
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -2411,7 +2391,7 @@ export const DispatchClass: sts.Type<DispatchClass> = sts.closedEnum(() => {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -2425,7 +2405,7 @@ export const SudoEvent: sts.Type<SudoEvent> = sts.closedEnum(() => {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -2448,7 +2428,7 @@ export const StakingEvent: sts.Type<StakingEvent> = sts.closedEnum(() => {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -2475,7 +2455,7 @@ export const SocietyEvent: sts.Type<SocietyEvent> = sts.closedEnum(() => {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -2512,7 +2492,7 @@ export const RecoveryEvent: sts.Type<RecoveryEvent> = sts.closedEnum(() => {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -2545,7 +2525,7 @@ export const OffencesEvent: sts.Type<OffencesEvent> = sts.closedEnum(() => {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -2567,7 +2547,7 @@ export const Timepoint: sts.Type<Timepoint> = sts.struct(() => {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -2581,7 +2561,7 @@ export const IndicesEvent: sts.Type<IndicesEvent> = sts.closedEnum(() => {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -2610,7 +2590,7 @@ export const IndividualExposure: sts.Type<IndividualExposure> = sts.struct(() =>
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -2631,7 +2611,7 @@ export const IdentityEvent: sts.Type<IdentityEvent> = sts.closedEnum(() => {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -2669,7 +2649,7 @@ export const Erc20Event: sts.Type<Erc20Event> = sts.closedEnum(() => {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -2687,7 +2667,7 @@ export const ElectionsEvent: sts.Type<ElectionsEvent> = sts.closedEnum(() => {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -2714,7 +2694,7 @@ export const ElectionCompute: sts.Type<ElectionCompute> = sts.closedEnum(() => {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -2761,7 +2741,7 @@ export const DdcMetricsOffchainWorkerEvent: sts.Type<DdcMetricsOffchainWorkerEve
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -2779,7 +2759,7 @@ export const CouncilEvent: sts.Type<CouncilEvent> = sts.closedEnum(() => {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -2844,7 +2824,7 @@ export const CereDDCModuleEvent: sts.Type<CereDDCModuleEvent> = sts.closedEnum((
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -2862,7 +2842,7 @@ export const BountiesEvent: sts.Type<BountiesEvent> = sts.closedEnum(() => {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -2874,10 +2854,8 @@ export const BalancesEvent: sts.Type<BalancesEvent> = sts.closedEnum(() => {
         Endowed: sts.tuple(() => [AccountId32, sts.bigint()]),
         ReserveRepatriated: sts.tuple(() => [AccountId32, AccountId32, sts.bigint(), BalanceStatus]),
         Reserved: sts.tuple(() => [AccountId32, sts.bigint()]),
-        Slashed: sts.tuple(() => [AccountId32, sts.bigint()]),
         Transfer: sts.tuple(() => [AccountId32, AccountId32, sts.bigint()]),
         Unreserved: sts.tuple(() => [AccountId32, sts.bigint()]),
-        Withdraw: sts.tuple(() => [AccountId32, sts.bigint()]),
     }
 })
 
@@ -2890,7 +2868,7 @@ export const BalanceStatus: sts.Type<BalanceStatus> = sts.closedEnum(() => {
 
 /**
  * 
-			The [event](https://docs.substrate.io/v3/runtime/events-and-errors) emitted
+			The [event](https://substrate.dev/docs/en/knowledgebase/runtime/events) emitted
 			by this pallet.
 			
  */
@@ -2905,6 +2883,125 @@ export const Phase: sts.Type<Phase> = sts.closedEnum(() => {
         ApplyExtrinsic: sts.number(),
         Finalization: sts.unit(),
         Initialization: sts.unit(),
+    }
+})
+
+export interface Digest {
+    logs: DigestItem[]
+}
+
+export type DigestItem = DigestItem_ChangesTrieRoot | DigestItem_ChangesTrieSignal | DigestItem_Consensus | DigestItem_Other | DigestItem_PreRuntime | DigestItem_RuntimeEnvironmentUpdated | DigestItem_Seal
+
+export interface DigestItem_ChangesTrieRoot {
+    __kind: 'ChangesTrieRoot'
+    value: H256
+}
+
+export interface DigestItem_ChangesTrieSignal {
+    __kind: 'ChangesTrieSignal'
+    value: ChangesTrieSignal
+}
+
+export interface DigestItem_Consensus {
+    __kind: 'Consensus'
+    value: [Bytes, Bytes]
+}
+
+export interface DigestItem_Other {
+    __kind: 'Other'
+    value: Bytes
+}
+
+export interface DigestItem_PreRuntime {
+    __kind: 'PreRuntime'
+    value: [Bytes, Bytes]
+}
+
+export interface DigestItem_RuntimeEnvironmentUpdated {
+    __kind: 'RuntimeEnvironmentUpdated'
+}
+
+export interface DigestItem_Seal {
+    __kind: 'Seal'
+    value: [Bytes, Bytes]
+}
+
+export type ChangesTrieSignal = ChangesTrieSignal_NewConfiguration
+
+export interface ChangesTrieSignal_NewConfiguration {
+    __kind: 'NewConfiguration'
+    value?: (ChangesTrieConfiguration | undefined)
+}
+
+export interface ChangesTrieConfiguration {
+    digestInterval: number
+    digestLevels: number
+}
+
+export const Digest: sts.Type<Digest> = sts.struct(() => {
+    return  {
+        logs: sts.array(() => DigestItem),
+    }
+})
+
+export const DigestItem: sts.Type<DigestItem> = sts.closedEnum(() => {
+    return  {
+        ChangesTrieRoot: H256,
+        ChangesTrieSignal: ChangesTrieSignal,
+        Consensus: sts.tuple(() => [sts.bytes(), sts.bytes()]),
+        Other: sts.bytes(),
+        PreRuntime: sts.tuple(() => [sts.bytes(), sts.bytes()]),
+        RuntimeEnvironmentUpdated: sts.unit(),
+        Seal: sts.tuple(() => [sts.bytes(), sts.bytes()]),
+    }
+})
+
+export const ChangesTrieSignal: sts.Type<ChangesTrieSignal> = sts.closedEnum(() => {
+    return  {
+        NewConfiguration: sts.option(() => ChangesTrieConfiguration),
+    }
+})
+
+export const ChangesTrieConfiguration: sts.Type<ChangesTrieConfiguration> = sts.struct(() => {
+    return  {
+        digestInterval: sts.number(),
+        digestLevels: sts.number(),
+    }
+})
+
+export type AccountId32 = Bytes
+
+export interface AccountInfo {
+    nonce: number
+    consumers: number
+    providers: number
+    sufficients: number
+    data: AccountData
+}
+
+export interface AccountData {
+    free: bigint
+    reserved: bigint
+    miscFrozen: bigint
+    feeFrozen: bigint
+}
+
+export const AccountInfo: sts.Type<AccountInfo> = sts.struct(() => {
+    return  {
+        nonce: sts.number(),
+        consumers: sts.number(),
+        providers: sts.number(),
+        sufficients: sts.number(),
+        data: AccountData,
+    }
+})
+
+export const AccountData: sts.Type<AccountData> = sts.struct(() => {
+    return  {
+        free: sts.bigint(),
+        reserved: sts.bigint(),
+        miscFrozen: sts.bigint(),
+        feeFrozen: sts.bigint(),
     }
 })
 

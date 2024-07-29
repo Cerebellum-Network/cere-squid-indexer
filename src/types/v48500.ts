@@ -1,131 +1,5 @@
 import {sts, Result, Option, Bytes, BitSequence} from './support'
 
-export const BlockWeights: sts.Type<BlockWeights> = sts.struct(() => {
-    return  {
-        baseBlock: Weight,
-        maxBlock: Weight,
-        perClass: Type_122,
-    }
-})
-
-export const Type_122: sts.Type<Type_122> = sts.struct(() => {
-    return  {
-        normal: WeightsPerClass,
-        operational: WeightsPerClass,
-        mandatory: WeightsPerClass,
-    }
-})
-
-export const WeightsPerClass: sts.Type<WeightsPerClass> = sts.struct(() => {
-    return  {
-        baseExtrinsic: Weight,
-        maxExtrinsic: sts.option(() => Weight),
-        maxTotal: sts.option(() => Weight),
-        reserved: sts.option(() => Weight),
-    }
-})
-
-export interface WeightsPerClass {
-    baseExtrinsic: Weight
-    maxExtrinsic?: (Weight | undefined)
-    maxTotal?: (Weight | undefined)
-    reserved?: (Weight | undefined)
-}
-
-export interface Weight {
-    refTime: bigint
-    proofSize: bigint
-}
-
-export interface Type_122 {
-    normal: WeightsPerClass
-    operational: WeightsPerClass
-    mandatory: WeightsPerClass
-}
-
-export const Weight: sts.Type<Weight> = sts.struct(() => {
-    return  {
-        refTime: sts.bigint(),
-        proofSize: sts.bigint(),
-    }
-})
-
-export interface BlockWeights {
-    baseBlock: Weight
-    maxBlock: Weight
-    perClass: Type_122
-}
-
-export interface ClusterGovParams {
-    treasuryShare: Perbill
-    validatorsShare: Perbill
-    clusterReserveShare: Perbill
-    cdnBondSize: bigint
-    cdnChillDelay: number
-    cdnUnbondingDelay: number
-    storageBondSize: bigint
-    storageChillDelay: number
-    storageUnbondingDelay: number
-    unitPerMbStored: bigint
-    unitPerMbStreamed: bigint
-    unitPerPutRequest: bigint
-    unitPerGetRequest: bigint
-}
-
-export type Perbill = number
-
-export const ClusterGovParams: sts.Type<ClusterGovParams> = sts.struct(() => {
-    return  {
-        treasuryShare: Perbill,
-        validatorsShare: Perbill,
-        clusterReserveShare: Perbill,
-        cdnBondSize: sts.bigint(),
-        cdnChillDelay: sts.number(),
-        cdnUnbondingDelay: sts.number(),
-        storageBondSize: sts.bigint(),
-        storageChillDelay: sts.number(),
-        storageUnbondingDelay: sts.number(),
-        unitPerMbStored: sts.bigint(),
-        unitPerMbStreamed: sts.bigint(),
-        unitPerPutRequest: sts.bigint(),
-        unitPerGetRequest: sts.bigint(),
-    }
-})
-
-export const Perbill = sts.number()
-
-export interface Cluster {
-    clusterId: H160
-    managerId: AccountId32
-    reserveId: AccountId32
-    props: ClusterProps
-}
-
-export interface ClusterProps {
-    nodeProviderAuthContract?: (AccountId32 | undefined)
-}
-
-export const Cluster: sts.Type<Cluster> = sts.struct(() => {
-    return  {
-        clusterId: H160,
-        managerId: AccountId32,
-        reserveId: AccountId32,
-        props: ClusterProps,
-    }
-})
-
-export const ClusterProps: sts.Type<ClusterProps> = sts.struct(() => {
-    return  {
-        nodeProviderAuthContract: sts.option(() => AccountId32),
-    }
-})
-
-export type AccountId32 = Bytes
-
-export type H160 = Bytes
-
-export const H160 = sts.bytes()
-
 export interface EventRecord {
     phase: Phase
     event: Event
@@ -134,7 +8,7 @@ export interface EventRecord {
 
 export type H256 = Bytes
 
-export type Event = Event_Balances | Event_Bounties | Event_CereDDCModule | Event_ChainBridge | Event_ChildBounties | Event_Contracts | Event_Council | Event_DdcClusters | Event_DdcCustomers | Event_DdcMetricsOffchainWorker | Event_DdcNodes | Event_DdcPayouts | Event_DdcStaking | Event_Democracy | Event_ElectionProviderMultiPhase | Event_Elections | Event_Erc20 | Event_Erc721 | Event_FastUnstake | Event_Grandpa | Event_Identity | Event_ImOnline | Event_Indices | Event_Multisig | Event_NominationPools | Event_Offences | Event_Proxy | Event_Recovery | Event_Scheduler | Event_Session | Event_Society | Event_Staking | Event_Sudo | Event_System | Event_TechnicalCommittee | Event_TechnicalMembership | Event_Tips | Event_TransactionPayment | Event_Treasury | Event_Utility | Event_Vesting | Event_VoterList
+export type Event = Event_Balances | Event_Bounties | Event_ChainBridge | Event_ChildBounties | Event_Contracts | Event_Council | Event_DdcClusters | Event_DdcCustomers | Event_DdcNodes | Event_DdcPayouts | Event_DdcStaking | Event_Democracy | Event_ElectionProviderMultiPhase | Event_Elections | Event_Erc20 | Event_Erc721 | Event_FastUnstake | Event_Grandpa | Event_Identity | Event_ImOnline | Event_Indices | Event_Multisig | Event_NominationPools | Event_Offences | Event_Proxy | Event_Recovery | Event_Scheduler | Event_Session | Event_Society | Event_Staking | Event_Sudo | Event_System | Event_TechnicalCommittee | Event_TechnicalMembership | Event_Tips | Event_TransactionPayment | Event_Treasury | Event_Utility | Event_Vesting | Event_VoterList
 
 export interface Event_Balances {
     __kind: 'Balances'
@@ -144,11 +18,6 @@ export interface Event_Balances {
 export interface Event_Bounties {
     __kind: 'Bounties'
     value: BountiesEvent
-}
-
-export interface Event_CereDDCModule {
-    __kind: 'CereDDCModule'
-    value: CereDDCModuleEvent
 }
 
 export interface Event_ChainBridge {
@@ -179,11 +48,6 @@ export interface Event_DdcClusters {
 export interface Event_DdcCustomers {
     __kind: 'DdcCustomers'
     value: DdcCustomersEvent
-}
-
-export interface Event_DdcMetricsOffchainWorker {
-    __kind: 'DdcMetricsOffchainWorker'
-    value: DdcMetricsOffchainWorkerEvent
 }
 
 export interface Event_DdcNodes {
@@ -372,6 +236,8 @@ export interface VoterListEvent_ScoreUpdated {
     who: AccountId32
     newScore: bigint
 }
+
+export type AccountId32 = Bytes
 
 /**
  * 
@@ -930,6 +796,11 @@ export interface DispatchClass_Operational {
     __kind: 'Operational'
 }
 
+export interface Weight {
+    refTime: bigint
+    proofSize: bigint
+}
+
 /**
  * 
 			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
@@ -968,7 +839,7 @@ export interface SudoEvent_SudoAsDone {
 			by this pallet.
 			
  */
-export type StakingEvent = StakingEvent_Bonded | StakingEvent_Chilled | StakingEvent_EraPaid | StakingEvent_Kicked | StakingEvent_OldSlashingReportDiscarded | StakingEvent_PayoutStarted | StakingEvent_Rewarded | StakingEvent_Slashed | StakingEvent_StakersElected | StakingEvent_StakingElectionFailed | StakingEvent_Unbonded | StakingEvent_ValidatorPrefsSet | StakingEvent_Withdrawn
+export type StakingEvent = StakingEvent_Bonded | StakingEvent_Chilled | StakingEvent_EraPaid | StakingEvent_Kicked | StakingEvent_OldSlashingReportDiscarded | StakingEvent_PayoutStarted | StakingEvent_Rewarded | StakingEvent_SlashReported | StakingEvent_Slashed | StakingEvent_StakersElected | StakingEvent_StakingElectionFailed | StakingEvent_Unbonded | StakingEvent_ValidatorPrefsSet | StakingEvent_Withdrawn
 
 /**
  * An account has bonded this amount. \[stash, amount\]
@@ -1038,7 +909,18 @@ export interface StakingEvent_Rewarded {
 }
 
 /**
- * One staker (and potentially its nominators) has been slashed by the given amount.
+ * A slash for the given validator, for the given percentage of their stake, at the given
+ * era as been reported.
+ */
+export interface StakingEvent_SlashReported {
+    __kind: 'SlashReported'
+    validator: AccountId32
+    fraction: Perbill
+    slashEra: number
+}
+
+/**
+ * A staker (validator or nominator) has been slashed by the given amount.
  */
 export interface StakingEvent_Slashed {
     __kind: 'Slashed'
@@ -1092,6 +974,8 @@ export interface ValidatorPrefs {
     commission: number
     blocked: boolean
 }
+
+export type Perbill = number
 
 /**
  * 
@@ -1882,24 +1766,24 @@ export type Public = Bytes
 /**
  * The events of this pallet.
  */
-export type FastUnstakeEvent = FastUnstakeEvent_Checking | FastUnstakeEvent_Errored | FastUnstakeEvent_InternalError | FastUnstakeEvent_Slashed | FastUnstakeEvent_Unstaked
+export type FastUnstakeEvent = FastUnstakeEvent_BatchChecked | FastUnstakeEvent_BatchFinished | FastUnstakeEvent_InternalError | FastUnstakeEvent_Slashed | FastUnstakeEvent_Unstaked
 
 /**
- * A staker was partially checked for the given eras, but the process did not finish.
+ * A batch was partially checked for the given eras, but the process did not finish.
  */
-export interface FastUnstakeEvent_Checking {
-    __kind: 'Checking'
-    stash: AccountId32
+export interface FastUnstakeEvent_BatchChecked {
+    __kind: 'BatchChecked'
     eras: number[]
 }
 
 /**
- * Some internal error happened while migrating stash. They are removed as head as a
- * consequence.
+ * A batch was terminated.
+ * 
+ * This is always follows by a number of `Unstaked` or `Slashed` events, marking the end
+ * of the batch. A new batch will be created upon next block.
  */
-export interface FastUnstakeEvent_Errored {
-    __kind: 'Errored'
-    stash: AccountId32
+export interface FastUnstakeEvent_BatchFinished {
+    __kind: 'BatchFinished'
 }
 
 /**
@@ -1928,8 +1812,10 @@ export interface FastUnstakeEvent_Unstaked {
 }
 
 /**
- * Events for this module.
  * 
+			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
+			by this pallet.
+			
  */
 export type Erc721Event = Erc721Event_Burned | Erc721Event_Minted | Erc721Event_Transferred
 
@@ -1958,8 +1844,10 @@ export interface Erc721Event_Transferred {
 }
 
 /**
- * Events for this module.
  * 
+			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
+			by this pallet.
+			
  */
 export type Erc20Event = Erc20Event_Remark
 
@@ -2308,7 +2196,7 @@ export interface VoteThreshold_SuperMajorityApprove {
 export type DdcStakingEvent = DdcStakingEvent_Activated | DdcStakingEvent_Bonded | DdcStakingEvent_ChillSoon | DdcStakingEvent_Chilled | DdcStakingEvent_LeaveSoon | DdcStakingEvent_Left | DdcStakingEvent_Unbonded | DdcStakingEvent_Withdrawn
 
 /**
- * An account that started participating as either a storage network or CDN participant.
+ * An account that started participating as DDC network participant.
  * \[stash\]
  */
 export interface DdcStakingEvent_Activated {
@@ -2328,7 +2216,7 @@ export interface DdcStakingEvent_Bonded {
 }
 
 /**
- * An account has declared desire to stop participating in CDN or storage network soon.
+ * An account has declared desire to stop participating in DDC network soon.
  * \[stash, cluster, block\]
  */
 export interface DdcStakingEvent_ChillSoon {
@@ -2337,7 +2225,7 @@ export interface DdcStakingEvent_ChillSoon {
 }
 
 /**
- * An account has stopped participating as either a storage network or CDN participant.
+ * An account has stopped participating as DDC network participant.
  * \[stash\]
  */
 export interface DdcStakingEvent_Chilled {
@@ -2347,7 +2235,7 @@ export interface DdcStakingEvent_Chilled {
 
 /**
  * An account that started unbonding tokens below the minimum value set for the cluster
- * his CDN or Storage node is assigned to \[stash\]
+ * his DDC node is assigned to \[stash\]
  */
 export interface DdcStakingEvent_LeaveSoon {
     __kind: 'LeaveSoon'
@@ -2356,7 +2244,7 @@ export interface DdcStakingEvent_LeaveSoon {
 
 /**
  * An account that unbonded tokens below the minimum value set for the cluster his
- * CDN or Storage node was assigned to \[stash\]
+ * DDC node was assigned to \[stash\]
  */
 export interface DdcStakingEvent_Left {
     __kind: 'Left'
@@ -2380,13 +2268,15 @@ export interface DdcStakingEvent_Withdrawn {
     value: [AccountId32, bigint]
 }
 
+export type H160 = Bytes
+
 /**
  * 
 			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
 			by this pallet.
 			
  */
-export type DdcPayoutsEvent = DdcPayoutsEvent_AuthorisedCaller | DdcPayoutsEvent_BillingReportFinalized | DdcPayoutsEvent_BillingReportInitialized | DdcPayoutsEvent_ChargeFailed | DdcPayoutsEvent_Charged | DdcPayoutsEvent_ChargingFinished | DdcPayoutsEvent_ChargingStarted | DdcPayoutsEvent_ClusterReserveFeesCollected | DdcPayoutsEvent_Indebted | DdcPayoutsEvent_Rewarded | DdcPayoutsEvent_RewardingFinished | DdcPayoutsEvent_RewardingStarted | DdcPayoutsEvent_TreasuryFeesCollected | DdcPayoutsEvent_ValidatorFeesCollected
+export type DdcPayoutsEvent = DdcPayoutsEvent_AuthorisedCaller | DdcPayoutsEvent_BillingReportFinalized | DdcPayoutsEvent_BillingReportInitialized | DdcPayoutsEvent_ChargeFailed | DdcPayoutsEvent_Charged | DdcPayoutsEvent_ChargingFinished | DdcPayoutsEvent_ChargingStarted | DdcPayoutsEvent_ClusterReserveFeesCollected | DdcPayoutsEvent_Indebted | DdcPayoutsEvent_NotDistributedOverallReward | DdcPayoutsEvent_NotDistributedReward | DdcPayoutsEvent_Rewarded | DdcPayoutsEvent_RewardingFinished | DdcPayoutsEvent_RewardingStarted | DdcPayoutsEvent_TreasuryFeesCollected | DdcPayoutsEvent_ValidatorFeesCollected
 
 export interface DdcPayoutsEvent_AuthorisedCaller {
     __kind: 'AuthorisedCaller'
@@ -2451,6 +2341,23 @@ export interface DdcPayoutsEvent_Indebted {
     amount: bigint
 }
 
+export interface DdcPayoutsEvent_NotDistributedOverallReward {
+    __kind: 'NotDistributedOverallReward'
+    clusterId: H160
+    era: number
+    expectedReward: bigint
+    totalDistributedReward: bigint
+}
+
+export interface DdcPayoutsEvent_NotDistributedReward {
+    __kind: 'NotDistributedReward'
+    clusterId: H160
+    era: number
+    nodeProviderId: AccountId32
+    expectedReward: bigint
+    distributedReward: bigint
+}
+
 export interface DdcPayoutsEvent_Rewarded {
     __kind: 'Rewarded'
     clusterId: H160
@@ -2508,28 +2415,11 @@ export interface DdcNodesEvent_NodeParamsChanged {
     nodePubKey: NodePubKey
 }
 
-export type NodePubKey = NodePubKey_CDNPubKey | NodePubKey_StoragePubKey
-
-export interface NodePubKey_CDNPubKey {
-    __kind: 'CDNPubKey'
-    value: AccountId32
-}
+export type NodePubKey = NodePubKey_StoragePubKey
 
 export interface NodePubKey_StoragePubKey {
     __kind: 'StoragePubKey'
     value: AccountId32
-}
-
-/**
- * Events for this module.
- * 
- * Events generated by the module.
- */
-export type DdcMetricsOffchainWorkerEvent = DdcMetricsOffchainWorkerEvent_NewDdcMetric
-
-export interface DdcMetricsOffchainWorkerEvent_NewDdcMetric {
-    __kind: 'NewDdcMetric'
-    value: [AccountId32, Bytes]
 }
 
 /**
@@ -2538,13 +2428,21 @@ export interface DdcMetricsOffchainWorkerEvent_NewDdcMetric {
 			by this pallet.
 			
  */
-export type DdcCustomersEvent = DdcCustomersEvent_BucketCreated | DdcCustomersEvent_Charged | DdcCustomersEvent_Deposited | DdcCustomersEvent_InitialDepositUnlock | DdcCustomersEvent_Withdrawn
+export type DdcCustomersEvent = DdcCustomersEvent_BucketCreated | DdcCustomersEvent_BucketUpdated | DdcCustomersEvent_Charged | DdcCustomersEvent_Deposited | DdcCustomersEvent_InitialDepositUnlock | DdcCustomersEvent_Withdrawn
 
 /**
  * Bucket with specific id created
  */
 export interface DdcCustomersEvent_BucketCreated {
     __kind: 'BucketCreated'
+    value: bigint
+}
+
+/**
+ * Bucket with specific id updated
+ */
+export interface DdcCustomersEvent_BucketUpdated {
+    __kind: 'BucketUpdated'
     value: bigint
 }
 
@@ -2875,8 +2773,10 @@ export interface ChildBountiesEvent_Claimed {
 }
 
 /**
- * Events for this module.
  * 
+			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
+			by this pallet.
+			
  */
 export type ChainBridgeEvent = ChainBridgeEvent_ChainWhitelisted | ChainBridgeEvent_FungibleTransfer | ChainBridgeEvent_GenericTransfer | ChainBridgeEvent_NonFungibleTransfer | ChainBridgeEvent_ProposalApproved | ChainBridgeEvent_ProposalFailed | ChainBridgeEvent_ProposalRejected | ChainBridgeEvent_ProposalSucceeded | ChainBridgeEvent_RelayerAdded | ChainBridgeEvent_RelayerRemoved | ChainBridgeEvent_RelayerThresholdChanged | ChainBridgeEvent_VoteAgainst | ChainBridgeEvent_VoteFor
 
@@ -2889,7 +2789,8 @@ export interface ChainBridgeEvent_ChainWhitelisted {
 }
 
 /**
- * FunglibleTransfer is for relaying fungibles (dest_id, nonce, resource_id, amount, recipient, metadata)
+ * FunglibleTransfer is for relaying fungibles (dest_id, nonce, resource_id, amount,
+ * recipient, metadata)
  */
 export interface ChainBridgeEvent_FungibleTransfer {
     __kind: 'FungibleTransfer'
@@ -2905,7 +2806,8 @@ export interface ChainBridgeEvent_GenericTransfer {
 }
 
 /**
- * NonFungibleTransfer is for relaying NFTS (dest_id, nonce, resource_id, token_id, recipient, metadata)
+ * NonFungibleTransfer is for relaying NFTS (dest_id, nonce, resource_id, token_id,
+ * recipient, metadata)
  */
 export interface ChainBridgeEvent_NonFungibleTransfer {
     __kind: 'NonFungibleTransfer'
@@ -2982,28 +2884,6 @@ export interface ChainBridgeEvent_VoteAgainst {
 export interface ChainBridgeEvent_VoteFor {
     __kind: 'VoteFor'
     value: [number, bigint, AccountId32]
-}
-
-/**
- * Events for this module.
- * 
- */
-export type CereDDCModuleEvent = CereDDCModuleEvent_DataStringChanged | CereDDCModuleEvent_DataStringSet
-
-/**
- * A data string was changed. \[who\]
- */
-export interface CereDDCModuleEvent_DataStringChanged {
-    __kind: 'DataStringChanged'
-    value: AccountId32
-}
-
-/**
- * A data string was set. \[who\]
- */
-export interface CereDDCModuleEvent_DataStringSet {
-    __kind: 'DataStringSet'
-    value: AccountId32
 }
 
 /**
@@ -3217,14 +3097,12 @@ export const Event: sts.Type<Event> = sts.closedEnum(() => {
     return  {
         Balances: BalancesEvent,
         Bounties: BountiesEvent,
-        CereDDCModule: CereDDCModuleEvent,
         ChainBridge: ChainBridgeEvent,
         ChildBounties: ChildBountiesEvent,
         Contracts: ContractsEvent,
         Council: CouncilEvent,
         DdcClusters: DdcClustersEvent,
         DdcCustomers: DdcCustomersEvent,
-        DdcMetricsOffchainWorker: DdcMetricsOffchainWorkerEvent,
         DdcNodes: DdcNodesEvent,
         DdcPayouts: DdcPayoutsEvent,
         DdcStaking: DdcStakingEvent,
@@ -3279,6 +3157,8 @@ export const VoterListEvent: sts.Type<VoterListEvent> = sts.closedEnum(() => {
         }),
     }
 })
+
+export const AccountId32 = sts.bytes()
 
 /**
  * 
@@ -3569,6 +3449,13 @@ export const DispatchClass: sts.Type<DispatchClass> = sts.closedEnum(() => {
     }
 })
 
+export const Weight: sts.Type<Weight> = sts.struct(() => {
+    return  {
+        refTime: sts.bigint(),
+        proofSize: sts.bigint(),
+    }
+})
+
 /**
  * 
 			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
@@ -3624,6 +3511,11 @@ export const StakingEvent: sts.Type<StakingEvent> = sts.closedEnum(() => {
             stash: AccountId32,
             amount: sts.bigint(),
         }),
+        SlashReported: sts.enumStruct({
+            validator: AccountId32,
+            fraction: Perbill,
+            slashEra: sts.number(),
+        }),
         Slashed: sts.enumStruct({
             staker: AccountId32,
             amount: sts.bigint(),
@@ -3651,6 +3543,8 @@ export const ValidatorPrefs: sts.Type<ValidatorPrefs> = sts.struct(() => {
         blocked: sts.boolean(),
     }
 })
+
+export const Perbill = sts.number()
 
 /**
  * 
@@ -4096,13 +3990,10 @@ export const Public = sts.bytes()
  */
 export const FastUnstakeEvent: sts.Type<FastUnstakeEvent> = sts.closedEnum(() => {
     return  {
-        Checking: sts.enumStruct({
-            stash: AccountId32,
+        BatchChecked: sts.enumStruct({
             eras: sts.array(() => sts.number()),
         }),
-        Errored: sts.enumStruct({
-            stash: AccountId32,
-        }),
+        BatchFinished: sts.unit(),
         InternalError: sts.unit(),
         Slashed: sts.enumStruct({
             stash: AccountId32,
@@ -4116,8 +4007,10 @@ export const FastUnstakeEvent: sts.Type<FastUnstakeEvent> = sts.closedEnum(() =>
 })
 
 /**
- * Events for this module.
  * 
+			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
+			by this pallet.
+			
  */
 export const Erc721Event: sts.Type<Erc721Event> = sts.closedEnum(() => {
     return  {
@@ -4128,8 +4021,10 @@ export const Erc721Event: sts.Type<Erc721Event> = sts.closedEnum(() => {
 })
 
 /**
- * Events for this module.
  * 
+			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
+			by this pallet.
+			
  */
 export const Erc20Event: sts.Type<Erc20Event> = sts.closedEnum(() => {
     return  {
@@ -4319,6 +4214,8 @@ export const DdcStakingEvent: sts.Type<DdcStakingEvent> = sts.closedEnum(() => {
     }
 })
 
+export const H160 = sts.bytes()
+
 /**
  * 
 			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
@@ -4372,6 +4269,19 @@ export const DdcPayoutsEvent: sts.Type<DdcPayoutsEvent> = sts.closedEnum(() => {
             customerId: AccountId32,
             amount: sts.bigint(),
         }),
+        NotDistributedOverallReward: sts.enumStruct({
+            clusterId: H160,
+            era: sts.number(),
+            expectedReward: sts.bigint(),
+            totalDistributedReward: sts.bigint(),
+        }),
+        NotDistributedReward: sts.enumStruct({
+            clusterId: H160,
+            era: sts.number(),
+            nodeProviderId: AccountId32,
+            expectedReward: sts.bigint(),
+            distributedReward: sts.bigint(),
+        }),
         Rewarded: sts.enumStruct({
             clusterId: H160,
             era: sts.number(),
@@ -4421,19 +4331,7 @@ export const DdcNodesEvent: sts.Type<DdcNodesEvent> = sts.closedEnum(() => {
 
 export const NodePubKey: sts.Type<NodePubKey> = sts.closedEnum(() => {
     return  {
-        CDNPubKey: AccountId32,
         StoragePubKey: AccountId32,
-    }
-})
-
-/**
- * Events for this module.
- * 
- * Events generated by the module.
- */
-export const DdcMetricsOffchainWorkerEvent: sts.Type<DdcMetricsOffchainWorkerEvent> = sts.closedEnum(() => {
-    return  {
-        NewDdcMetric: sts.tuple(() => [AccountId32, sts.bytes()]),
     }
 })
 
@@ -4446,6 +4344,7 @@ export const DdcMetricsOffchainWorkerEvent: sts.Type<DdcMetricsOffchainWorkerEve
 export const DdcCustomersEvent: sts.Type<DdcCustomersEvent> = sts.closedEnum(() => {
     return  {
         BucketCreated: sts.bigint(),
+        BucketUpdated: sts.bigint(),
         Charged: sts.tuple(() => [AccountId32, sts.bigint()]),
         Deposited: sts.tuple(() => [AccountId32, sts.bigint()]),
         InitialDepositUnlock: sts.tuple(() => [AccountId32, sts.bigint()]),
@@ -4597,8 +4496,10 @@ export const ChildBountiesEvent: sts.Type<ChildBountiesEvent> = sts.closedEnum((
 })
 
 /**
- * Events for this module.
  * 
+			The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted
+			by this pallet.
+			
  */
 export const ChainBridgeEvent: sts.Type<ChainBridgeEvent> = sts.closedEnum(() => {
     return  {
@@ -4615,17 +4516,6 @@ export const ChainBridgeEvent: sts.Type<ChainBridgeEvent> = sts.closedEnum(() =>
         RelayerThresholdChanged: sts.number(),
         VoteAgainst: sts.tuple(() => [sts.number(), sts.bigint(), AccountId32]),
         VoteFor: sts.tuple(() => [sts.number(), sts.bigint(), AccountId32]),
-    }
-})
-
-/**
- * Events for this module.
- * 
- */
-export const CereDDCModuleEvent: sts.Type<CereDDCModuleEvent> = sts.closedEnum(() => {
-    return  {
-        DataStringChanged: AccountId32,
-        DataStringSet: AccountId32,
     }
 })
 
@@ -4734,19 +4624,3 @@ export const Phase: sts.Type<Phase> = sts.closedEnum(() => {
         Initialization: sts.unit(),
     }
 })
-
-export interface PerDispatchClass {
-    normal: Weight
-    operational: Weight
-    mandatory: Weight
-}
-
-export const PerDispatchClass: sts.Type<PerDispatchClass> = sts.struct(() => {
-    return  {
-        normal: Weight,
-        operational: Weight,
-        mandatory: Weight,
-    }
-})
-
-export const AccountId32 = sts.bytes()

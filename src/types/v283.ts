@@ -1,227 +1,220 @@
 import {sts, Result, Option, Bytes, BitSequence} from './support'
 
-export const RuntimeDbWeight: sts.Type<RuntimeDbWeight> = sts.struct(() => {
+export const RuntimeVersion: sts.Type<RuntimeVersion> = sts.struct(() => {
     return  {
-        read: Weight,
-        write: Weight,
-    }
-})
-
-export interface RuntimeDbWeight {
-    read: Weight
-    write: Weight
-}
-
-export type Weight = bigint
-
-export const Weight = sts.bigint()
-
-export interface AccountData {
-    free: Balance
-    reserved: Balance
-    miscFrozen: Balance
-    feeFrozen: Balance
-}
-
-export const AccountData: sts.Type<AccountData> = sts.struct(() => {
-    return  {
-        free: Balance,
-        reserved: Balance,
-        miscFrozen: Balance,
-        feeFrozen: Balance,
-    }
-})
-
-export type Balance = bigint
-
-export type Phase = Phase_ApplyExtrinsic | Phase_Finalization | Phase_Initialization
-
-export interface Phase_ApplyExtrinsic {
-    __kind: 'ApplyExtrinsic'
-    value: number
-}
-
-export interface Phase_Finalization {
-    __kind: 'Finalization'
-}
-
-export interface Phase_Initialization {
-    __kind: 'Initialization'
-}
-
-export const Phase: sts.Type<Phase> = sts.closedEnum(() => {
-    return  {
-        ApplyExtrinsic: sts.number(),
-        Finalization: sts.unit(),
-        Initialization: sts.unit(),
-    }
-})
-
-export interface LastRuntimeUpgradeInfo {
-    specVersion: number
-    specName: string
-}
-
-export const LastRuntimeUpgradeInfo: sts.Type<LastRuntimeUpgradeInfo> = sts.struct(() => {
-    return  {
-        specVersion: sts.number(),
         specName: sts.string(),
+        implName: sts.string(),
+        authoringVersion: sts.number(),
+        specVersion: sts.number(),
+        implVersion: sts.number(),
+        apis: sts.array(() => RuntimeVersionApi),
+        transactionVersion: sts.number(),
     }
 })
 
-export type EventIndex = number
+export const RuntimeVersionApi = sts.tuple(() => [ApiId, sts.number()])
 
-export const EventIndex = sts.number()
+export const ApiId = sts.bytes()
+
+export interface RuntimeVersion {
+    specName: string
+    implName: string
+    authoringVersion: number
+    specVersion: number
+    implVersion: number
+    apis: RuntimeVersionApi[]
+    transactionVersion: number
+}
+
+export type RuntimeVersionApi = [ApiId, number]
+
+export type ApiId = Bytes
+
+export const BlockLength: sts.Type<BlockLength> = sts.struct(() => {
+    return  {
+        max: PerDispatchClassU32,
+    }
+})
+
+export const PerDispatchClassU32: sts.Type<PerDispatchClassU32> = sts.struct(() => {
+    return  {
+        normal: sts.number(),
+        operational: sts.number(),
+        mandatory: sts.number(),
+    }
+})
+
+export interface PerDispatchClassU32 {
+    normal: number
+    operational: number
+    mandatory: number
+}
+
+export interface BlockLength {
+    max: PerDispatchClassU32
+}
 
 export interface EventRecord {
     phase: Phase
-    event: Type_360
+    event: Type_365
     topics: Hash[]
 }
 
-export type Type_360 = Type_360_Balances | Type_360_CereDDCModule | Type_360_ChainBridge | Type_360_Contracts | Type_360_Council | Type_360_DdcMetricsOffchainWorker | Type_360_Democracy | Type_360_Elections | Type_360_Erc20 | Type_360_Erc721 | Type_360_Grandpa | Type_360_Identity | Type_360_ImOnline | Type_360_Indices | Type_360_Multisig | Type_360_Offences | Type_360_Proxy | Type_360_Recovery | Type_360_Scheduler | Type_360_Session | Type_360_Society | Type_360_Staking | Type_360_Sudo | Type_360_System | Type_360_TechnicalCommittee | Type_360_TechnicalMembership | Type_360_Treasury | Type_360_Utility | Type_360_Vesting
+export type Hash = Bytes
 
-export interface Type_360_Balances {
+export type Type_365 = Type_365_Balances | Type_365_Bounties | Type_365_CereDDCModule | Type_365_ChainBridge | Type_365_Contracts | Type_365_Council | Type_365_DdcMetricsOffchainWorker | Type_365_Democracy | Type_365_Elections | Type_365_Erc20 | Type_365_Erc721 | Type_365_Grandpa | Type_365_Identity | Type_365_ImOnline | Type_365_Indices | Type_365_Multisig | Type_365_Offences | Type_365_Proxy | Type_365_Recovery | Type_365_Scheduler | Type_365_Session | Type_365_Society | Type_365_Staking | Type_365_Sudo | Type_365_System | Type_365_TechnicalCommittee | Type_365_TechnicalMembership | Type_365_Tips | Type_365_Treasury | Type_365_Utility | Type_365_Vesting
+
+export interface Type_365_Balances {
     __kind: 'Balances'
     value: BalancesEvent
 }
 
-export interface Type_360_CereDDCModule {
+export interface Type_365_Bounties {
+    __kind: 'Bounties'
+    value: BountiesEvent
+}
+
+export interface Type_365_CereDDCModule {
     __kind: 'CereDDCModule'
     value: CereDDCModuleEvent
 }
 
-export interface Type_360_ChainBridge {
+export interface Type_365_ChainBridge {
     __kind: 'ChainBridge'
     value: ChainBridgeEvent
 }
 
-export interface Type_360_Contracts {
+export interface Type_365_Contracts {
     __kind: 'Contracts'
     value: ContractsEvent
 }
 
-export interface Type_360_Council {
+export interface Type_365_Council {
     __kind: 'Council'
     value: CouncilEvent
 }
 
-export interface Type_360_DdcMetricsOffchainWorker {
+export interface Type_365_DdcMetricsOffchainWorker {
     __kind: 'DdcMetricsOffchainWorker'
     value: DdcMetricsOffchainWorkerEvent
 }
 
-export interface Type_360_Democracy {
+export interface Type_365_Democracy {
     __kind: 'Democracy'
     value: DemocracyEvent
 }
 
-export interface Type_360_Elections {
+export interface Type_365_Elections {
     __kind: 'Elections'
     value: ElectionsEvent
 }
 
-export interface Type_360_Erc20 {
+export interface Type_365_Erc20 {
     __kind: 'Erc20'
     value: Erc20Event
 }
 
-export interface Type_360_Erc721 {
+export interface Type_365_Erc721 {
     __kind: 'Erc721'
     value: Erc721Event
 }
 
-export interface Type_360_Grandpa {
+export interface Type_365_Grandpa {
     __kind: 'Grandpa'
     value: GrandpaEvent
 }
 
-export interface Type_360_Identity {
+export interface Type_365_Identity {
     __kind: 'Identity'
     value: IdentityEvent
 }
 
-export interface Type_360_ImOnline {
+export interface Type_365_ImOnline {
     __kind: 'ImOnline'
     value: ImOnlineEvent
 }
 
-export interface Type_360_Indices {
+export interface Type_365_Indices {
     __kind: 'Indices'
     value: IndicesEvent
 }
 
-export interface Type_360_Multisig {
+export interface Type_365_Multisig {
     __kind: 'Multisig'
     value: MultisigEvent
 }
 
-export interface Type_360_Offences {
+export interface Type_365_Offences {
     __kind: 'Offences'
     value: OffencesEvent
 }
 
-export interface Type_360_Proxy {
+export interface Type_365_Proxy {
     __kind: 'Proxy'
     value: ProxyEvent
 }
 
-export interface Type_360_Recovery {
+export interface Type_365_Recovery {
     __kind: 'Recovery'
     value: RecoveryEvent
 }
 
-export interface Type_360_Scheduler {
+export interface Type_365_Scheduler {
     __kind: 'Scheduler'
     value: SchedulerEvent
 }
 
-export interface Type_360_Session {
+export interface Type_365_Session {
     __kind: 'Session'
     value: SessionEvent
 }
 
-export interface Type_360_Society {
+export interface Type_365_Society {
     __kind: 'Society'
     value: SocietyEvent
 }
 
-export interface Type_360_Staking {
+export interface Type_365_Staking {
     __kind: 'Staking'
     value: StakingEvent
 }
 
-export interface Type_360_Sudo {
+export interface Type_365_Sudo {
     __kind: 'Sudo'
     value: SudoEvent
 }
 
-export interface Type_360_System {
+export interface Type_365_System {
     __kind: 'System'
     value: SystemEvent
 }
 
-export interface Type_360_TechnicalCommittee {
+export interface Type_365_TechnicalCommittee {
     __kind: 'TechnicalCommittee'
     value: TechnicalCommitteeEvent
 }
 
-export interface Type_360_TechnicalMembership {
+export interface Type_365_TechnicalMembership {
     __kind: 'TechnicalMembership'
     value: TechnicalMembershipEvent
 }
 
-export interface Type_360_Treasury {
+export interface Type_365_Tips {
+    __kind: 'Tips'
+    value: TipsEvent
+}
+
+export interface Type_365_Treasury {
     __kind: 'Treasury'
     value: TreasuryEvent
 }
 
-export interface Type_360_Utility {
+export interface Type_365_Utility {
     __kind: 'Utility'
     value: UtilityEvent
 }
 
-export interface Type_360_Vesting {
+export interface Type_365_Vesting {
     __kind: 'Vesting'
     value: VestingEvent
 }
@@ -245,6 +238,10 @@ export interface VestingEvent_VestingUpdated {
     __kind: 'VestingUpdated'
     value: [AccountId, Balance]
 }
+
+export type Balance = bigint
+
+export type AccountId = Bytes
 
 export type UtilityEvent = UtilityEvent_BatchCompleted | UtilityEvent_BatchInterrupted
 
@@ -354,7 +351,7 @@ export interface ArithmeticError_Underflow {
     __kind: 'Underflow'
 }
 
-export type TreasuryEvent = TreasuryEvent_Awarded | TreasuryEvent_BountyAwarded | TreasuryEvent_BountyBecameActive | TreasuryEvent_BountyCanceled | TreasuryEvent_BountyClaimed | TreasuryEvent_BountyExtended | TreasuryEvent_BountyProposed | TreasuryEvent_BountyRejected | TreasuryEvent_Burnt | TreasuryEvent_Deposit | TreasuryEvent_NewTip | TreasuryEvent_Proposed | TreasuryEvent_Rejected | TreasuryEvent_Rollover | TreasuryEvent_Spending | TreasuryEvent_TipClosed | TreasuryEvent_TipClosing | TreasuryEvent_TipRetracted
+export type TreasuryEvent = TreasuryEvent_Awarded | TreasuryEvent_Burnt | TreasuryEvent_Deposit | TreasuryEvent_Proposed | TreasuryEvent_Rejected | TreasuryEvent_Rollover | TreasuryEvent_Spending
 
 /**
  *  Some funds have been allocated. \[proposal_index, award, beneficiary\]
@@ -362,62 +359,6 @@ export type TreasuryEvent = TreasuryEvent_Awarded | TreasuryEvent_BountyAwarded 
 export interface TreasuryEvent_Awarded {
     __kind: 'Awarded'
     value: [ProposalIndex, Balance, AccountId]
-}
-
-/**
- *  A bounty is awarded to a beneficiary. [index, beneficiary]
- */
-export interface TreasuryEvent_BountyAwarded {
-    __kind: 'BountyAwarded'
-    value: [BountyIndex, AccountId]
-}
-
-/**
- *  A bounty proposal is funded and became active. [index]
- */
-export interface TreasuryEvent_BountyBecameActive {
-    __kind: 'BountyBecameActive'
-    value: BountyIndex
-}
-
-/**
- *  A bounty is cancelled. [index]
- */
-export interface TreasuryEvent_BountyCanceled {
-    __kind: 'BountyCanceled'
-    value: BountyIndex
-}
-
-/**
- *  A bounty is claimed by beneficiary. [index, payout, beneficiary]
- */
-export interface TreasuryEvent_BountyClaimed {
-    __kind: 'BountyClaimed'
-    value: [BountyIndex, Balance, AccountId]
-}
-
-/**
- *  A bounty expiry is extended. [index]
- */
-export interface TreasuryEvent_BountyExtended {
-    __kind: 'BountyExtended'
-    value: BountyIndex
-}
-
-/**
- *  New bounty proposal. [index]
- */
-export interface TreasuryEvent_BountyProposed {
-    __kind: 'BountyProposed'
-    value: BountyIndex
-}
-
-/**
- *  A bounty proposal was rejected; funds were slashed. [index, bond]
- */
-export interface TreasuryEvent_BountyRejected {
-    __kind: 'BountyRejected'
-    value: [BountyIndex, Balance]
 }
 
 /**
@@ -434,14 +375,6 @@ export interface TreasuryEvent_Burnt {
 export interface TreasuryEvent_Deposit {
     __kind: 'Deposit'
     value: Balance
-}
-
-/**
- *  A new tip suggestion has been opened. \[tip_hash\]
- */
-export interface TreasuryEvent_NewTip {
-    __kind: 'NewTip'
-    value: Hash
 }
 
 /**
@@ -477,10 +410,22 @@ export interface TreasuryEvent_Spending {
     value: Balance
 }
 
+export type ProposalIndex = number
+
+export type TipsEvent = TipsEvent_NewTip | TipsEvent_TipClosed | TipsEvent_TipClosing | TipsEvent_TipRetracted | TipsEvent_TipSlashed
+
+/**
+ *  A new tip suggestion has been opened. \[tip_hash\]
+ */
+export interface TipsEvent_NewTip {
+    __kind: 'NewTip'
+    value: Hash
+}
+
 /**
  *  A tip suggestion has been closed. \[tip_hash, who, payout\]
  */
-export interface TreasuryEvent_TipClosed {
+export interface TipsEvent_TipClosed {
     __kind: 'TipClosed'
     value: [Hash, AccountId, Balance]
 }
@@ -488,7 +433,7 @@ export interface TreasuryEvent_TipClosed {
 /**
  *  A tip suggestion has reached threshold and is closing. \[tip_hash\]
  */
-export interface TreasuryEvent_TipClosing {
+export interface TipsEvent_TipClosing {
     __kind: 'TipClosing'
     value: Hash
 }
@@ -496,14 +441,18 @@ export interface TreasuryEvent_TipClosing {
 /**
  *  A tip suggestion has been retracted. \[tip_hash\]
  */
-export interface TreasuryEvent_TipRetracted {
+export interface TipsEvent_TipRetracted {
     __kind: 'TipRetracted'
     value: Hash
 }
 
-export type BountyIndex = number
-
-export type ProposalIndex = number
+/**
+ *  A tip suggestion has been slashed. \[tip_hash, finder, deposit\]
+ */
+export interface TipsEvent_TipSlashed {
+    __kind: 'TipSlashed'
+    value: [Hash, AccountId, Balance]
+}
 
 export type TechnicalMembershipEvent = TechnicalMembershipEvent_Dummy | TechnicalMembershipEvent_KeyChanged | TechnicalMembershipEvent_MemberAdded | TechnicalMembershipEvent_MemberRemoved | TechnicalMembershipEvent_MembersReset | TechnicalMembershipEvent_MembersSwapped
 
@@ -691,6 +640,8 @@ export interface DispatchClass_Operational {
     __kind: 'Operational'
 }
 
+export type Weight = bigint
+
 export type SudoEvent = SudoEvent_KeyChanged | SudoEvent_Sudid | SudoEvent_SudoAsDone
 
 /**
@@ -714,10 +665,10 @@ export interface SudoEvent_Sudid {
  */
 export interface SudoEvent_SudoAsDone {
     __kind: 'SudoAsDone'
-    value: boolean
+    value: DispatchResult
 }
 
-export type StakingEvent = StakingEvent_Bonded | StakingEvent_EraPayout | StakingEvent_OldSlashingReportDiscarded | StakingEvent_Reward | StakingEvent_Slash | StakingEvent_SolutionStored | StakingEvent_StakingElection | StakingEvent_Unbonded | StakingEvent_Withdrawn
+export type StakingEvent = StakingEvent_Bonded | StakingEvent_EraPayout | StakingEvent_Kicked | StakingEvent_OldSlashingReportDiscarded | StakingEvent_Reward | StakingEvent_Slash | StakingEvent_SolutionStored | StakingEvent_StakingElection | StakingEvent_Unbonded | StakingEvent_Withdrawn
 
 /**
  *  An account has bonded this amount. \[stash, amount\]
@@ -738,6 +689,14 @@ export interface StakingEvent_Bonded {
 export interface StakingEvent_EraPayout {
     __kind: 'EraPayout'
     value: [EraIndex, Balance, Balance]
+}
+
+/**
+ *  A nominator has been kicked from a validator. \[nominator, stash\]
+ */
+export interface StakingEvent_Kicked {
+    __kind: 'Kicked'
+    value: [AccountId, AccountId]
 }
 
 /**
@@ -989,6 +948,8 @@ export interface SchedulerEvent_Scheduled {
 
 export type TaskAddress = [BlockNumber, number]
 
+export type BlockNumber = number
+
 export type RecoveryEvent = RecoveryEvent_AccountRecovered | RecoveryEvent_RecoveryClosed | RecoveryEvent_RecoveryCreated | RecoveryEvent_RecoveryInitiated | RecoveryEvent_RecoveryRemoved | RecoveryEvent_RecoveryVouched
 
 /**
@@ -1150,7 +1111,7 @@ export interface Timepoint {
 export type IndicesEvent = IndicesEvent_IndexAssigned | IndicesEvent_IndexFreed | IndicesEvent_IndexFrozen
 
 /**
- *  A account index was assigned. \[who, index\]
+ *  A account index was assigned. \[index, who\]
  */
 export interface IndicesEvent_IndexAssigned {
     __kind: 'IndexAssigned'
@@ -1166,7 +1127,7 @@ export interface IndicesEvent_IndexFreed {
 }
 
 /**
- *  A account index has been frozen to its current account ID. \[who, index\]
+ *  A account index has been frozen to its current account ID. \[index, who\]
  */
 export interface IndicesEvent_IndexFrozen {
     __kind: 'IndexFrozen'
@@ -1366,7 +1327,25 @@ export interface Erc20Event_Remark {
     value: Hash
 }
 
-export type ElectionsEvent = ElectionsEvent_EmptyTerm | ElectionsEvent_MemberKicked | ElectionsEvent_MemberRenounced | ElectionsEvent_NewTerm | ElectionsEvent_VoterReported
+export type ElectionsEvent = ElectionsEvent_CandidateSlashed | ElectionsEvent_ElectionError | ElectionsEvent_EmptyTerm | ElectionsEvent_MemberKicked | ElectionsEvent_NewTerm | ElectionsEvent_Renounced | ElectionsEvent_SeatHolderSlashed
+
+/**
+ *  A \[candidate\] was slashed by \[amount\] due to failing to obtain a seat as member or
+ *  runner-up.
+ * 
+ *  Note that old members and runners-up are also candidates.
+ */
+export interface ElectionsEvent_CandidateSlashed {
+    __kind: 'CandidateSlashed'
+    value: [AccountId, Balance]
+}
+
+/**
+ *  Internal error happened while trying to perform election.
+ */
+export interface ElectionsEvent_ElectionError {
+    __kind: 'ElectionError'
+}
 
 /**
  *  No (or not enough) candidates existed for this round. This is different from
@@ -1377,19 +1356,11 @@ export interface ElectionsEvent_EmptyTerm {
 }
 
 /**
- *  A \[member\] has been removed. This should always be followed by either `NewTerm` ot
+ *  A \[member\] has been removed. This should always be followed by either `NewTerm` or
  *  `EmptyTerm`.
  */
 export interface ElectionsEvent_MemberKicked {
     __kind: 'MemberKicked'
-    value: AccountId
-}
-
-/**
- *  A \[member\] has renounced their candidacy.
- */
-export interface ElectionsEvent_MemberRenounced {
-    __kind: 'MemberRenounced'
     value: AccountId
 }
 
@@ -1405,15 +1376,30 @@ export interface ElectionsEvent_NewTerm {
 }
 
 /**
- *  A voter was reported with the the report being successful or not.
- *  \[voter, reporter, success\]
+ *  Someone has renounced their candidacy.
  */
-export interface ElectionsEvent_VoterReported {
-    __kind: 'VoterReported'
-    value: [AccountId, AccountId, boolean]
+export interface ElectionsEvent_Renounced {
+    __kind: 'Renounced'
+    value: AccountId
 }
 
-export type DemocracyEvent = DemocracyEvent_Cancelled | DemocracyEvent_Delegated | DemocracyEvent_Executed | DemocracyEvent_ExternalTabled | DemocracyEvent_NotPassed | DemocracyEvent_Passed | DemocracyEvent_PreimageInvalid | DemocracyEvent_PreimageMissing | DemocracyEvent_PreimageNoted | DemocracyEvent_PreimageReaped | DemocracyEvent_PreimageUsed | DemocracyEvent_Proposed | DemocracyEvent_Started | DemocracyEvent_Tabled | DemocracyEvent_Undelegated | DemocracyEvent_Unlocked | DemocracyEvent_Vetoed
+/**
+ *  A \[seat holder\] was slashed by \[amount\] by being forcefully removed from the set.
+ */
+export interface ElectionsEvent_SeatHolderSlashed {
+    __kind: 'SeatHolderSlashed'
+    value: [AccountId, Balance]
+}
+
+export type DemocracyEvent = DemocracyEvent_Blacklisted | DemocracyEvent_Cancelled | DemocracyEvent_Delegated | DemocracyEvent_Executed | DemocracyEvent_ExternalTabled | DemocracyEvent_NotPassed | DemocracyEvent_Passed | DemocracyEvent_PreimageInvalid | DemocracyEvent_PreimageMissing | DemocracyEvent_PreimageNoted | DemocracyEvent_PreimageReaped | DemocracyEvent_PreimageUsed | DemocracyEvent_Proposed | DemocracyEvent_Started | DemocracyEvent_Tabled | DemocracyEvent_Undelegated | DemocracyEvent_Unlocked | DemocracyEvent_Vetoed
+
+/**
+ *  A proposal \[hash\] has been blacklisted permanently.
+ */
+export interface DemocracyEvent_Blacklisted {
+    __kind: 'Blacklisted'
+    value: Hash
+}
 
 /**
  *  A referendum has been cancelled. \[ref_index\]
@@ -1669,7 +1655,7 @@ export interface ContractsEvent_ContractExecution {
 /**
  *  Contract has been evicted and is now in tombstone state.
  *  \[contract, tombstone\]
- *  
+ * 
  *  # Params
  * 
  *  - `contract`: `AccountId`: The account ID of the evicted contract.
@@ -1691,7 +1677,7 @@ export interface ContractsEvent_Instantiated {
 /**
  *  Restoration for a contract has been successful.
  *  \[donor, dest, code_hash, rent_allowance\]
- *  
+ * 
  *  # Params
  * 
  *  - `donor`: `AccountId`: Account ID of the restoring contract
@@ -1842,6 +1828,66 @@ export interface CereDDCModuleEvent_DataStringSet {
     value: AccountId
 }
 
+export type BountiesEvent = BountiesEvent_BountyAwarded | BountiesEvent_BountyBecameActive | BountiesEvent_BountyCanceled | BountiesEvent_BountyClaimed | BountiesEvent_BountyExtended | BountiesEvent_BountyProposed | BountiesEvent_BountyRejected
+
+/**
+ *  A bounty is awarded to a beneficiary. \[index, beneficiary\]
+ */
+export interface BountiesEvent_BountyAwarded {
+    __kind: 'BountyAwarded'
+    value: [BountyIndex, AccountId]
+}
+
+/**
+ *  A bounty proposal is funded and became active. \[index\]
+ */
+export interface BountiesEvent_BountyBecameActive {
+    __kind: 'BountyBecameActive'
+    value: BountyIndex
+}
+
+/**
+ *  A bounty is cancelled. \[index\]
+ */
+export interface BountiesEvent_BountyCanceled {
+    __kind: 'BountyCanceled'
+    value: BountyIndex
+}
+
+/**
+ *  A bounty is claimed by beneficiary. \[index, payout, beneficiary\]
+ */
+export interface BountiesEvent_BountyClaimed {
+    __kind: 'BountyClaimed'
+    value: [BountyIndex, Balance, AccountId]
+}
+
+/**
+ *  A bounty expiry is extended. \[index\]
+ */
+export interface BountiesEvent_BountyExtended {
+    __kind: 'BountyExtended'
+    value: BountyIndex
+}
+
+/**
+ *  New bounty proposal. \[index\]
+ */
+export interface BountiesEvent_BountyProposed {
+    __kind: 'BountyProposed'
+    value: BountyIndex
+}
+
+/**
+ *  A bounty proposal was rejected; funds were slashed. \[index, bond\]
+ */
+export interface BountiesEvent_BountyRejected {
+    __kind: 'BountyRejected'
+    value: [BountyIndex, Balance]
+}
+
+export type BountyIndex = number
+
 export type BalancesEvent = BalancesEvent_BalanceSet | BalancesEvent_Deposit | BalancesEvent_DustLost | BalancesEvent_Endowed | BalancesEvent_ReserveRepatriated | BalancesEvent_Reserved | BalancesEvent_Transfer | BalancesEvent_Unreserved
 
 /**
@@ -1921,17 +1967,35 @@ export interface BalanceStatus_Reserved {
     __kind: 'Reserved'
 }
 
+export type Phase = Phase_ApplyExtrinsic | Phase_Finalization | Phase_Initialization
+
+export interface Phase_ApplyExtrinsic {
+    __kind: 'ApplyExtrinsic'
+    value: number
+}
+
+export interface Phase_Finalization {
+    __kind: 'Finalization'
+}
+
+export interface Phase_Initialization {
+    __kind: 'Initialization'
+}
+
 export const EventRecord: sts.Type<EventRecord> = sts.struct(() => {
     return  {
         phase: Phase,
-        event: Type_360,
+        event: Type_365,
         topics: sts.array(() => Hash),
     }
 })
 
-export const Type_360: sts.Type<Type_360> = sts.closedEnum(() => {
+export const Hash = sts.bytes()
+
+export const Type_365: sts.Type<Type_365> = sts.closedEnum(() => {
     return  {
         Balances: BalancesEvent,
+        Bounties: BountiesEvent,
         CereDDCModule: CereDDCModuleEvent,
         ChainBridge: ChainBridgeEvent,
         Contracts: ContractsEvent,
@@ -1957,6 +2021,7 @@ export const Type_360: sts.Type<Type_360> = sts.closedEnum(() => {
         System: SystemEvent,
         TechnicalCommittee: TechnicalCommitteeEvent,
         TechnicalMembership: TechnicalMembershipEvent,
+        Tips: TipsEvent,
         Treasury: TreasuryEvent,
         Utility: UtilityEvent,
         Vesting: VestingEvent,
@@ -1969,6 +2034,10 @@ export const VestingEvent: sts.Type<VestingEvent> = sts.closedEnum(() => {
         VestingUpdated: sts.tuple(() => [AccountId, Balance]),
     }
 })
+
+export const Balance = sts.bigint()
+
+export const AccountId = sts.bytes()
 
 export const UtilityEvent: sts.Type<UtilityEvent> = sts.closedEnum(() => {
     return  {
@@ -2021,29 +2090,26 @@ export const ArithmeticError: sts.Type<ArithmeticError> = sts.closedEnum(() => {
 export const TreasuryEvent: sts.Type<TreasuryEvent> = sts.closedEnum(() => {
     return  {
         Awarded: sts.tuple(() => [ProposalIndex, Balance, AccountId]),
-        BountyAwarded: sts.tuple(() => [BountyIndex, AccountId]),
-        BountyBecameActive: BountyIndex,
-        BountyCanceled: BountyIndex,
-        BountyClaimed: sts.tuple(() => [BountyIndex, Balance, AccountId]),
-        BountyExtended: BountyIndex,
-        BountyProposed: BountyIndex,
-        BountyRejected: sts.tuple(() => [BountyIndex, Balance]),
         Burnt: Balance,
         Deposit: Balance,
-        NewTip: Hash,
         Proposed: ProposalIndex,
         Rejected: sts.tuple(() => [ProposalIndex, Balance]),
         Rollover: Balance,
         Spending: Balance,
-        TipClosed: sts.tuple(() => [Hash, AccountId, Balance]),
-        TipClosing: Hash,
-        TipRetracted: Hash,
     }
 })
 
-export const BountyIndex = sts.number()
-
 export const ProposalIndex = sts.number()
+
+export const TipsEvent: sts.Type<TipsEvent> = sts.closedEnum(() => {
+    return  {
+        NewTip: Hash,
+        TipClosed: sts.tuple(() => [Hash, AccountId, Balance]),
+        TipClosing: Hash,
+        TipRetracted: Hash,
+        TipSlashed: sts.tuple(() => [Hash, AccountId, Balance]),
+    }
+})
 
 export const TechnicalMembershipEvent: sts.Type<TechnicalMembershipEvent> = sts.closedEnum(() => {
     return  {
@@ -2105,11 +2171,13 @@ export const DispatchClass: sts.Type<DispatchClass> = sts.closedEnum(() => {
     }
 })
 
+export const Weight = sts.bigint()
+
 export const SudoEvent: sts.Type<SudoEvent> = sts.closedEnum(() => {
     return  {
         KeyChanged: AccountId,
         Sudid: DispatchResult,
-        SudoAsDone: sts.boolean(),
+        SudoAsDone: DispatchResult,
     }
 })
 
@@ -2117,6 +2185,7 @@ export const StakingEvent: sts.Type<StakingEvent> = sts.closedEnum(() => {
     return  {
         Bonded: sts.tuple(() => [AccountId, Balance]),
         EraPayout: sts.tuple(() => [EraIndex, Balance, Balance]),
+        Kicked: sts.tuple(() => [AccountId, AccountId]),
         OldSlashingReportDiscarded: SessionIndex,
         Reward: sts.tuple(() => [AccountId, Balance]),
         Slash: sts.tuple(() => [AccountId, Balance]),
@@ -2175,6 +2244,8 @@ export const SchedulerEvent: sts.Type<SchedulerEvent> = sts.closedEnum(() => {
 })
 
 export const TaskAddress = sts.tuple(() => [BlockNumber, sts.number()])
+
+export const BlockNumber = sts.number()
 
 export const RecoveryEvent: sts.Type<RecoveryEvent> = sts.closedEnum(() => {
     return  {
@@ -2318,16 +2389,19 @@ export const Erc20Event: sts.Type<Erc20Event> = sts.closedEnum(() => {
 
 export const ElectionsEvent: sts.Type<ElectionsEvent> = sts.closedEnum(() => {
     return  {
+        CandidateSlashed: sts.tuple(() => [AccountId, Balance]),
+        ElectionError: sts.unit(),
         EmptyTerm: sts.unit(),
         MemberKicked: AccountId,
-        MemberRenounced: AccountId,
         NewTerm: sts.array(() => sts.tuple(() => [AccountId, Balance])),
-        VoterReported: sts.tuple(() => [AccountId, AccountId, sts.boolean()]),
+        Renounced: AccountId,
+        SeatHolderSlashed: sts.tuple(() => [AccountId, Balance]),
     }
 })
 
 export const DemocracyEvent: sts.Type<DemocracyEvent> = sts.closedEnum(() => {
     return  {
+        Blacklisted: Hash,
         Cancelled: ReferendumIndex,
         Delegated: sts.tuple(() => [AccountId, AccountId]),
         Executed: sts.tuple(() => [ReferendumIndex, sts.boolean()]),
@@ -2420,6 +2494,20 @@ export const CereDDCModuleEvent: sts.Type<CereDDCModuleEvent> = sts.closedEnum((
     }
 })
 
+export const BountiesEvent: sts.Type<BountiesEvent> = sts.closedEnum(() => {
+    return  {
+        BountyAwarded: sts.tuple(() => [BountyIndex, AccountId]),
+        BountyBecameActive: BountyIndex,
+        BountyCanceled: BountyIndex,
+        BountyClaimed: sts.tuple(() => [BountyIndex, Balance, AccountId]),
+        BountyExtended: BountyIndex,
+        BountyProposed: BountyIndex,
+        BountyRejected: sts.tuple(() => [BountyIndex, Balance]),
+    }
+})
+
+export const BountyIndex = sts.number()
+
 export const BalancesEvent: sts.Type<BalancesEvent> = sts.closedEnum(() => {
     return  {
         BalanceSet: sts.tuple(() => [AccountId, Balance, Balance]),
@@ -2433,171 +2521,6 @@ export const BalancesEvent: sts.Type<BalancesEvent> = sts.closedEnum(() => {
     }
 })
 
-export interface DigestOf {
-    logs: DigestItem[]
-}
-
-export type DigestItem = DigestItem_AuthoritiesChange | DigestItem_ChangesTrieRoot | DigestItem_ChangesTrieSignal | DigestItem_Consensus | DigestItem_Other | DigestItem_PreRuntime | DigestItem_RuntimeEnvironmentUpdated | DigestItem_Seal | DigestItem_SealV0
-
-export interface DigestItem_AuthoritiesChange {
-    __kind: 'AuthoritiesChange'
-    value: AuthorityId[]
-}
-
-export interface DigestItem_ChangesTrieRoot {
-    __kind: 'ChangesTrieRoot'
-    value: Hash
-}
-
-export interface DigestItem_ChangesTrieSignal {
-    __kind: 'ChangesTrieSignal'
-    value: ChangesTrieSignal
-}
-
-export interface DigestItem_Consensus {
-    __kind: 'Consensus'
-    value: Consensus
-}
-
-export interface DigestItem_Other {
-    __kind: 'Other'
-    value: Bytes
-}
-
-export interface DigestItem_PreRuntime {
-    __kind: 'PreRuntime'
-    value: PreRuntime
-}
-
-export interface DigestItem_RuntimeEnvironmentUpdated {
-    __kind: 'RuntimeEnvironmentUpdated'
-}
-
-export interface DigestItem_Seal {
-    __kind: 'Seal'
-    value: Seal
-}
-
-export interface DigestItem_SealV0 {
-    __kind: 'SealV0'
-    value: SealV0
-}
-
-export type SealV0 = [bigint, Signature]
-
-export type Signature = Bytes
-
-export type Seal = [ConsensusEngineId, Bytes]
-
-export type PreRuntime = [ConsensusEngineId, Bytes]
-
-export type Consensus = [ConsensusEngineId, Bytes]
-
-export type ConsensusEngineId = Bytes
-
-export type ChangesTrieSignal = ChangesTrieSignal_NewConfiguration
-
-export interface ChangesTrieSignal_NewConfiguration {
-    __kind: 'NewConfiguration'
-    value?: (ChangesTrieConfiguration | undefined)
-}
-
-export interface ChangesTrieConfiguration {
-    digestInterval: number
-    digestLevels: number
-}
-
-export const DigestOf: sts.Type<DigestOf> = sts.struct(() => {
-    return  {
-        logs: sts.array(() => DigestItem),
-    }
-})
-
-export const DigestItem: sts.Type<DigestItem> = sts.closedEnum(() => {
-    return  {
-        AuthoritiesChange: sts.array(() => AuthorityId),
-        ChangesTrieRoot: Hash,
-        ChangesTrieSignal: ChangesTrieSignal,
-        Consensus: Consensus,
-        Other: sts.bytes(),
-        PreRuntime: PreRuntime,
-        RuntimeEnvironmentUpdated: sts.unit(),
-        Seal: Seal,
-        SealV0: SealV0,
-    }
-})
-
-export const SealV0 = sts.tuple(() => [sts.bigint(), Signature])
-
-export const Signature = sts.bytes()
-
-export const Seal = sts.tuple(() => [ConsensusEngineId, sts.bytes()])
-
-export const PreRuntime = sts.tuple(() => [ConsensusEngineId, sts.bytes()])
-
-export const Consensus = sts.tuple(() => [ConsensusEngineId, sts.bytes()])
-
-export const ConsensusEngineId = sts.bytes()
-
-export const ChangesTrieSignal: sts.Type<ChangesTrieSignal> = sts.closedEnum(() => {
-    return  {
-        NewConfiguration: sts.option(() => ChangesTrieConfiguration),
-    }
-})
-
-export const ChangesTrieConfiguration: sts.Type<ChangesTrieConfiguration> = sts.struct(() => {
-    return  {
-        digestInterval: sts.number(),
-        digestLevels: sts.number(),
-    }
-})
-
-export type BlockNumber = number
-
-export type Hash = Bytes
-
-export const Hash = sts.bytes()
-
-export const BlockNumber = sts.number()
-
-export interface ExtrinsicsWeight {
-    normal: Weight
-    operational: Weight
-}
-
-export const ExtrinsicsWeight: sts.Type<ExtrinsicsWeight> = sts.struct(() => {
-    return  {
-        normal: Weight,
-        operational: Weight,
-    }
-})
-
-export type AccountId = Bytes
-
-export interface AccountInfo {
-    nonce: Index
-    consumers: RefCount
-    providers: RefCount
-    data: AccountData
-}
-
-export type RefCount = number
-
-export type Index = number
-
-export const AccountInfo: sts.Type<AccountInfo> = sts.struct(() => {
-    return  {
-        nonce: Index,
-        consumers: RefCount,
-        providers: RefCount,
-        data: AccountData,
-    }
-})
-
-export const RefCount = sts.number()
-
-export const Index = sts.number()
-
 export const BalanceStatus: sts.Type<BalanceStatus> = sts.closedEnum(() => {
     return  {
         Free: sts.unit(),
@@ -2605,6 +2528,10 @@ export const BalanceStatus: sts.Type<BalanceStatus> = sts.closedEnum(() => {
     }
 })
 
-export const Balance = sts.bigint()
-
-export const AccountId = sts.bytes()
+export const Phase: sts.Type<Phase> = sts.closedEnum(() => {
+    return  {
+        ApplyExtrinsic: sts.number(),
+        Finalization: sts.unit(),
+        Initialization: sts.unit(),
+    }
+})

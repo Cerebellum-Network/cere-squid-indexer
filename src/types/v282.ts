@@ -1,227 +1,204 @@
 import {sts, Result, Option, Bytes, BitSequence} from './support'
 
-export const RuntimeDbWeight: sts.Type<RuntimeDbWeight> = sts.struct(() => {
+export const BlockWeights: sts.Type<BlockWeights> = sts.struct(() => {
     return  {
-        read: Weight,
-        write: Weight,
+        baseBlock: Weight,
+        maxBlock: Weight,
+        perClass: PerDispatchClassWeightsPerClass,
     }
 })
 
-export interface RuntimeDbWeight {
-    read: Weight
-    write: Weight
+export const PerDispatchClassWeightsPerClass: sts.Type<PerDispatchClassWeightsPerClass> = sts.struct(() => {
+    return  {
+        normal: WeightPerClass,
+        operational: WeightPerClass,
+        mandatory: WeightPerClass,
+    }
+})
+
+export const WeightPerClass: sts.Type<WeightPerClass> = sts.struct(() => {
+    return  {
+        baseExtrinsic: Weight,
+        maxExtrinsic: sts.option(() => Weight),
+        maxTotal: sts.option(() => Weight),
+        reserved: sts.option(() => Weight),
+    }
+})
+
+export interface WeightPerClass {
+    baseExtrinsic: Weight
+    maxExtrinsic?: (Weight | undefined)
+    maxTotal?: (Weight | undefined)
+    reserved?: (Weight | undefined)
 }
 
 export type Weight = bigint
 
+export interface PerDispatchClassWeightsPerClass {
+    normal: WeightPerClass
+    operational: WeightPerClass
+    mandatory: WeightPerClass
+}
+
 export const Weight = sts.bigint()
 
-export interface AccountData {
-    free: Balance
-    reserved: Balance
-    miscFrozen: Balance
-    feeFrozen: Balance
+export interface BlockWeights {
+    baseBlock: Weight
+    maxBlock: Weight
+    perClass: PerDispatchClassWeightsPerClass
 }
-
-export const AccountData: sts.Type<AccountData> = sts.struct(() => {
-    return  {
-        free: Balance,
-        reserved: Balance,
-        miscFrozen: Balance,
-        feeFrozen: Balance,
-    }
-})
-
-export type Balance = bigint
-
-export type Phase = Phase_ApplyExtrinsic | Phase_Finalization | Phase_Initialization
-
-export interface Phase_ApplyExtrinsic {
-    __kind: 'ApplyExtrinsic'
-    value: number
-}
-
-export interface Phase_Finalization {
-    __kind: 'Finalization'
-}
-
-export interface Phase_Initialization {
-    __kind: 'Initialization'
-}
-
-export const Phase: sts.Type<Phase> = sts.closedEnum(() => {
-    return  {
-        ApplyExtrinsic: sts.number(),
-        Finalization: sts.unit(),
-        Initialization: sts.unit(),
-    }
-})
-
-export interface LastRuntimeUpgradeInfo {
-    specVersion: number
-    specName: string
-}
-
-export const LastRuntimeUpgradeInfo: sts.Type<LastRuntimeUpgradeInfo> = sts.struct(() => {
-    return  {
-        specVersion: sts.number(),
-        specName: sts.string(),
-    }
-})
-
-export type EventIndex = number
-
-export const EventIndex = sts.number()
 
 export interface EventRecord {
     phase: Phase
-    event: Type_360
+    event: Type_362
     topics: Hash[]
 }
 
-export type Type_360 = Type_360_Balances | Type_360_CereDDCModule | Type_360_ChainBridge | Type_360_Contracts | Type_360_Council | Type_360_DdcMetricsOffchainWorker | Type_360_Democracy | Type_360_Elections | Type_360_Erc20 | Type_360_Erc721 | Type_360_Grandpa | Type_360_Identity | Type_360_ImOnline | Type_360_Indices | Type_360_Multisig | Type_360_Offences | Type_360_Proxy | Type_360_Recovery | Type_360_Scheduler | Type_360_Session | Type_360_Society | Type_360_Staking | Type_360_Sudo | Type_360_System | Type_360_TechnicalCommittee | Type_360_TechnicalMembership | Type_360_Treasury | Type_360_Utility | Type_360_Vesting
+export type Hash = Bytes
 
-export interface Type_360_Balances {
+export type Type_362 = Type_362_Balances | Type_362_CereDDCModule | Type_362_ChainBridge | Type_362_Contracts | Type_362_Council | Type_362_DdcMetricsOffchainWorker | Type_362_Democracy | Type_362_Elections | Type_362_Erc20 | Type_362_Erc721 | Type_362_Grandpa | Type_362_Identity | Type_362_ImOnline | Type_362_Indices | Type_362_Multisig | Type_362_Offences | Type_362_Proxy | Type_362_Recovery | Type_362_Scheduler | Type_362_Session | Type_362_Society | Type_362_Staking | Type_362_Sudo | Type_362_System | Type_362_TechnicalCommittee | Type_362_TechnicalMembership | Type_362_Treasury | Type_362_Utility | Type_362_Vesting
+
+export interface Type_362_Balances {
     __kind: 'Balances'
     value: BalancesEvent
 }
 
-export interface Type_360_CereDDCModule {
+export interface Type_362_CereDDCModule {
     __kind: 'CereDDCModule'
     value: CereDDCModuleEvent
 }
 
-export interface Type_360_ChainBridge {
+export interface Type_362_ChainBridge {
     __kind: 'ChainBridge'
     value: ChainBridgeEvent
 }
 
-export interface Type_360_Contracts {
+export interface Type_362_Contracts {
     __kind: 'Contracts'
     value: ContractsEvent
 }
 
-export interface Type_360_Council {
+export interface Type_362_Council {
     __kind: 'Council'
     value: CouncilEvent
 }
 
-export interface Type_360_DdcMetricsOffchainWorker {
+export interface Type_362_DdcMetricsOffchainWorker {
     __kind: 'DdcMetricsOffchainWorker'
     value: DdcMetricsOffchainWorkerEvent
 }
 
-export interface Type_360_Democracy {
+export interface Type_362_Democracy {
     __kind: 'Democracy'
     value: DemocracyEvent
 }
 
-export interface Type_360_Elections {
+export interface Type_362_Elections {
     __kind: 'Elections'
     value: ElectionsEvent
 }
 
-export interface Type_360_Erc20 {
+export interface Type_362_Erc20 {
     __kind: 'Erc20'
     value: Erc20Event
 }
 
-export interface Type_360_Erc721 {
+export interface Type_362_Erc721 {
     __kind: 'Erc721'
     value: Erc721Event
 }
 
-export interface Type_360_Grandpa {
+export interface Type_362_Grandpa {
     __kind: 'Grandpa'
     value: GrandpaEvent
 }
 
-export interface Type_360_Identity {
+export interface Type_362_Identity {
     __kind: 'Identity'
     value: IdentityEvent
 }
 
-export interface Type_360_ImOnline {
+export interface Type_362_ImOnline {
     __kind: 'ImOnline'
     value: ImOnlineEvent
 }
 
-export interface Type_360_Indices {
+export interface Type_362_Indices {
     __kind: 'Indices'
     value: IndicesEvent
 }
 
-export interface Type_360_Multisig {
+export interface Type_362_Multisig {
     __kind: 'Multisig'
     value: MultisigEvent
 }
 
-export interface Type_360_Offences {
+export interface Type_362_Offences {
     __kind: 'Offences'
     value: OffencesEvent
 }
 
-export interface Type_360_Proxy {
+export interface Type_362_Proxy {
     __kind: 'Proxy'
     value: ProxyEvent
 }
 
-export interface Type_360_Recovery {
+export interface Type_362_Recovery {
     __kind: 'Recovery'
     value: RecoveryEvent
 }
 
-export interface Type_360_Scheduler {
+export interface Type_362_Scheduler {
     __kind: 'Scheduler'
     value: SchedulerEvent
 }
 
-export interface Type_360_Session {
+export interface Type_362_Session {
     __kind: 'Session'
     value: SessionEvent
 }
 
-export interface Type_360_Society {
+export interface Type_362_Society {
     __kind: 'Society'
     value: SocietyEvent
 }
 
-export interface Type_360_Staking {
+export interface Type_362_Staking {
     __kind: 'Staking'
     value: StakingEvent
 }
 
-export interface Type_360_Sudo {
+export interface Type_362_Sudo {
     __kind: 'Sudo'
     value: SudoEvent
 }
 
-export interface Type_360_System {
+export interface Type_362_System {
     __kind: 'System'
     value: SystemEvent
 }
 
-export interface Type_360_TechnicalCommittee {
+export interface Type_362_TechnicalCommittee {
     __kind: 'TechnicalCommittee'
     value: TechnicalCommitteeEvent
 }
 
-export interface Type_360_TechnicalMembership {
+export interface Type_362_TechnicalMembership {
     __kind: 'TechnicalMembership'
     value: TechnicalMembershipEvent
 }
 
-export interface Type_360_Treasury {
+export interface Type_362_Treasury {
     __kind: 'Treasury'
     value: TreasuryEvent
 }
 
-export interface Type_360_Utility {
+export interface Type_362_Utility {
     __kind: 'Utility'
     value: UtilityEvent
 }
 
-export interface Type_360_Vesting {
+export interface Type_362_Vesting {
     __kind: 'Vesting'
     value: VestingEvent
 }
@@ -245,6 +222,10 @@ export interface VestingEvent_VestingUpdated {
     __kind: 'VestingUpdated'
     value: [AccountId, Balance]
 }
+
+export type Balance = bigint
+
+export type AccountId = Bytes
 
 export type UtilityEvent = UtilityEvent_BatchCompleted | UtilityEvent_BatchInterrupted
 
@@ -714,7 +695,7 @@ export interface SudoEvent_Sudid {
  */
 export interface SudoEvent_SudoAsDone {
     __kind: 'SudoAsDone'
-    value: boolean
+    value: DispatchResult
 }
 
 export type StakingEvent = StakingEvent_Bonded | StakingEvent_EraPayout | StakingEvent_OldSlashingReportDiscarded | StakingEvent_Reward | StakingEvent_Slash | StakingEvent_SolutionStored | StakingEvent_StakingElection | StakingEvent_Unbonded | StakingEvent_Withdrawn
@@ -989,6 +970,8 @@ export interface SchedulerEvent_Scheduled {
 
 export type TaskAddress = [BlockNumber, number]
 
+export type BlockNumber = number
+
 export type RecoveryEvent = RecoveryEvent_AccountRecovered | RecoveryEvent_RecoveryClosed | RecoveryEvent_RecoveryCreated | RecoveryEvent_RecoveryInitiated | RecoveryEvent_RecoveryRemoved | RecoveryEvent_RecoveryVouched
 
 /**
@@ -1150,7 +1133,7 @@ export interface Timepoint {
 export type IndicesEvent = IndicesEvent_IndexAssigned | IndicesEvent_IndexFreed | IndicesEvent_IndexFrozen
 
 /**
- *  A account index was assigned. \[who, index\]
+ *  A account index was assigned. \[index, who\]
  */
 export interface IndicesEvent_IndexAssigned {
     __kind: 'IndexAssigned'
@@ -1166,7 +1149,7 @@ export interface IndicesEvent_IndexFreed {
 }
 
 /**
- *  A account index has been frozen to its current account ID. \[who, index\]
+ *  A account index has been frozen to its current account ID. \[index, who\]
  */
 export interface IndicesEvent_IndexFrozen {
     __kind: 'IndexFrozen'
@@ -1366,7 +1349,22 @@ export interface Erc20Event_Remark {
     value: Hash
 }
 
-export type ElectionsEvent = ElectionsEvent_EmptyTerm | ElectionsEvent_MemberKicked | ElectionsEvent_MemberRenounced | ElectionsEvent_NewTerm | ElectionsEvent_VoterReported
+export type ElectionsEvent = ElectionsEvent_CandidateSlashed | ElectionsEvent_ElectionError | ElectionsEvent_EmptyTerm | ElectionsEvent_MemberKicked | ElectionsEvent_MemberRenounced | ElectionsEvent_NewTerm | ElectionsEvent_SeatHolderSlashed | ElectionsEvent_VoterReported
+
+/**
+ *  A candidate was slashed due to failing to obtain a seat as member or runner-up
+ */
+export interface ElectionsEvent_CandidateSlashed {
+    __kind: 'CandidateSlashed'
+    value: [AccountId, Balance]
+}
+
+/**
+ *  Internal error happened while trying to perform election.
+ */
+export interface ElectionsEvent_ElectionError {
+    __kind: 'ElectionError'
+}
 
 /**
  *  No (or not enough) candidates existed for this round. This is different from
@@ -1377,7 +1375,7 @@ export interface ElectionsEvent_EmptyTerm {
 }
 
 /**
- *  A \[member\] has been removed. This should always be followed by either `NewTerm` ot
+ *  A \[member\] has been removed. This should always be followed by either `NewTerm` or
  *  `EmptyTerm`.
  */
 export interface ElectionsEvent_MemberKicked {
@@ -1405,6 +1403,14 @@ export interface ElectionsEvent_NewTerm {
 }
 
 /**
+ *  A seat holder (member or runner-up) was slashed due to failing to retaining their position.
+ */
+export interface ElectionsEvent_SeatHolderSlashed {
+    __kind: 'SeatHolderSlashed'
+    value: [AccountId, Balance]
+}
+
+/**
  *  A voter was reported with the the report being successful or not.
  *  \[voter, reporter, success\]
  */
@@ -1413,7 +1419,15 @@ export interface ElectionsEvent_VoterReported {
     value: [AccountId, AccountId, boolean]
 }
 
-export type DemocracyEvent = DemocracyEvent_Cancelled | DemocracyEvent_Delegated | DemocracyEvent_Executed | DemocracyEvent_ExternalTabled | DemocracyEvent_NotPassed | DemocracyEvent_Passed | DemocracyEvent_PreimageInvalid | DemocracyEvent_PreimageMissing | DemocracyEvent_PreimageNoted | DemocracyEvent_PreimageReaped | DemocracyEvent_PreimageUsed | DemocracyEvent_Proposed | DemocracyEvent_Started | DemocracyEvent_Tabled | DemocracyEvent_Undelegated | DemocracyEvent_Unlocked | DemocracyEvent_Vetoed
+export type DemocracyEvent = DemocracyEvent_Blacklisted | DemocracyEvent_Cancelled | DemocracyEvent_Delegated | DemocracyEvent_Executed | DemocracyEvent_ExternalTabled | DemocracyEvent_NotPassed | DemocracyEvent_Passed | DemocracyEvent_PreimageInvalid | DemocracyEvent_PreimageMissing | DemocracyEvent_PreimageNoted | DemocracyEvent_PreimageReaped | DemocracyEvent_PreimageUsed | DemocracyEvent_Proposed | DemocracyEvent_Started | DemocracyEvent_Tabled | DemocracyEvent_Undelegated | DemocracyEvent_Unlocked | DemocracyEvent_Vetoed
+
+/**
+ *  A proposal \[hash\] has been blacklisted permanently.
+ */
+export interface DemocracyEvent_Blacklisted {
+    __kind: 'Blacklisted'
+    value: Hash
+}
 
 /**
  *  A referendum has been cancelled. \[ref_index\]
@@ -1669,7 +1683,7 @@ export interface ContractsEvent_ContractExecution {
 /**
  *  Contract has been evicted and is now in tombstone state.
  *  \[contract, tombstone\]
- *  
+ * 
  *  # Params
  * 
  *  - `contract`: `AccountId`: The account ID of the evicted contract.
@@ -1691,7 +1705,7 @@ export interface ContractsEvent_Instantiated {
 /**
  *  Restoration for a contract has been successful.
  *  \[donor, dest, code_hash, rent_allowance\]
- *  
+ * 
  *  # Params
  * 
  *  - `donor`: `AccountId`: Account ID of the restoring contract
@@ -1921,15 +1935,32 @@ export interface BalanceStatus_Reserved {
     __kind: 'Reserved'
 }
 
+export type Phase = Phase_ApplyExtrinsic | Phase_Finalization | Phase_Initialization
+
+export interface Phase_ApplyExtrinsic {
+    __kind: 'ApplyExtrinsic'
+    value: number
+}
+
+export interface Phase_Finalization {
+    __kind: 'Finalization'
+}
+
+export interface Phase_Initialization {
+    __kind: 'Initialization'
+}
+
 export const EventRecord: sts.Type<EventRecord> = sts.struct(() => {
     return  {
         phase: Phase,
-        event: Type_360,
+        event: Type_362,
         topics: sts.array(() => Hash),
     }
 })
 
-export const Type_360: sts.Type<Type_360> = sts.closedEnum(() => {
+export const Hash = sts.bytes()
+
+export const Type_362: sts.Type<Type_362> = sts.closedEnum(() => {
     return  {
         Balances: BalancesEvent,
         CereDDCModule: CereDDCModuleEvent,
@@ -1969,6 +2000,10 @@ export const VestingEvent: sts.Type<VestingEvent> = sts.closedEnum(() => {
         VestingUpdated: sts.tuple(() => [AccountId, Balance]),
     }
 })
+
+export const Balance = sts.bigint()
+
+export const AccountId = sts.bytes()
 
 export const UtilityEvent: sts.Type<UtilityEvent> = sts.closedEnum(() => {
     return  {
@@ -2109,7 +2144,7 @@ export const SudoEvent: sts.Type<SudoEvent> = sts.closedEnum(() => {
     return  {
         KeyChanged: AccountId,
         Sudid: DispatchResult,
-        SudoAsDone: sts.boolean(),
+        SudoAsDone: DispatchResult,
     }
 })
 
@@ -2175,6 +2210,8 @@ export const SchedulerEvent: sts.Type<SchedulerEvent> = sts.closedEnum(() => {
 })
 
 export const TaskAddress = sts.tuple(() => [BlockNumber, sts.number()])
+
+export const BlockNumber = sts.number()
 
 export const RecoveryEvent: sts.Type<RecoveryEvent> = sts.closedEnum(() => {
     return  {
@@ -2318,16 +2355,20 @@ export const Erc20Event: sts.Type<Erc20Event> = sts.closedEnum(() => {
 
 export const ElectionsEvent: sts.Type<ElectionsEvent> = sts.closedEnum(() => {
     return  {
+        CandidateSlashed: sts.tuple(() => [AccountId, Balance]),
+        ElectionError: sts.unit(),
         EmptyTerm: sts.unit(),
         MemberKicked: AccountId,
         MemberRenounced: AccountId,
         NewTerm: sts.array(() => sts.tuple(() => [AccountId, Balance])),
+        SeatHolderSlashed: sts.tuple(() => [AccountId, Balance]),
         VoterReported: sts.tuple(() => [AccountId, AccountId, sts.boolean()]),
     }
 })
 
 export const DemocracyEvent: sts.Type<DemocracyEvent> = sts.closedEnum(() => {
     return  {
+        Blacklisted: Hash,
         Cancelled: ReferendumIndex,
         Delegated: sts.tuple(() => [AccountId, AccountId]),
         Executed: sts.tuple(() => [ReferendumIndex, sts.boolean()]),
@@ -2433,171 +2474,6 @@ export const BalancesEvent: sts.Type<BalancesEvent> = sts.closedEnum(() => {
     }
 })
 
-export interface DigestOf {
-    logs: DigestItem[]
-}
-
-export type DigestItem = DigestItem_AuthoritiesChange | DigestItem_ChangesTrieRoot | DigestItem_ChangesTrieSignal | DigestItem_Consensus | DigestItem_Other | DigestItem_PreRuntime | DigestItem_RuntimeEnvironmentUpdated | DigestItem_Seal | DigestItem_SealV0
-
-export interface DigestItem_AuthoritiesChange {
-    __kind: 'AuthoritiesChange'
-    value: AuthorityId[]
-}
-
-export interface DigestItem_ChangesTrieRoot {
-    __kind: 'ChangesTrieRoot'
-    value: Hash
-}
-
-export interface DigestItem_ChangesTrieSignal {
-    __kind: 'ChangesTrieSignal'
-    value: ChangesTrieSignal
-}
-
-export interface DigestItem_Consensus {
-    __kind: 'Consensus'
-    value: Consensus
-}
-
-export interface DigestItem_Other {
-    __kind: 'Other'
-    value: Bytes
-}
-
-export interface DigestItem_PreRuntime {
-    __kind: 'PreRuntime'
-    value: PreRuntime
-}
-
-export interface DigestItem_RuntimeEnvironmentUpdated {
-    __kind: 'RuntimeEnvironmentUpdated'
-}
-
-export interface DigestItem_Seal {
-    __kind: 'Seal'
-    value: Seal
-}
-
-export interface DigestItem_SealV0 {
-    __kind: 'SealV0'
-    value: SealV0
-}
-
-export type SealV0 = [bigint, Signature]
-
-export type Signature = Bytes
-
-export type Seal = [ConsensusEngineId, Bytes]
-
-export type PreRuntime = [ConsensusEngineId, Bytes]
-
-export type Consensus = [ConsensusEngineId, Bytes]
-
-export type ConsensusEngineId = Bytes
-
-export type ChangesTrieSignal = ChangesTrieSignal_NewConfiguration
-
-export interface ChangesTrieSignal_NewConfiguration {
-    __kind: 'NewConfiguration'
-    value?: (ChangesTrieConfiguration | undefined)
-}
-
-export interface ChangesTrieConfiguration {
-    digestInterval: number
-    digestLevels: number
-}
-
-export const DigestOf: sts.Type<DigestOf> = sts.struct(() => {
-    return  {
-        logs: sts.array(() => DigestItem),
-    }
-})
-
-export const DigestItem: sts.Type<DigestItem> = sts.closedEnum(() => {
-    return  {
-        AuthoritiesChange: sts.array(() => AuthorityId),
-        ChangesTrieRoot: Hash,
-        ChangesTrieSignal: ChangesTrieSignal,
-        Consensus: Consensus,
-        Other: sts.bytes(),
-        PreRuntime: PreRuntime,
-        RuntimeEnvironmentUpdated: sts.unit(),
-        Seal: Seal,
-        SealV0: SealV0,
-    }
-})
-
-export const SealV0 = sts.tuple(() => [sts.bigint(), Signature])
-
-export const Signature = sts.bytes()
-
-export const Seal = sts.tuple(() => [ConsensusEngineId, sts.bytes()])
-
-export const PreRuntime = sts.tuple(() => [ConsensusEngineId, sts.bytes()])
-
-export const Consensus = sts.tuple(() => [ConsensusEngineId, sts.bytes()])
-
-export const ConsensusEngineId = sts.bytes()
-
-export const ChangesTrieSignal: sts.Type<ChangesTrieSignal> = sts.closedEnum(() => {
-    return  {
-        NewConfiguration: sts.option(() => ChangesTrieConfiguration),
-    }
-})
-
-export const ChangesTrieConfiguration: sts.Type<ChangesTrieConfiguration> = sts.struct(() => {
-    return  {
-        digestInterval: sts.number(),
-        digestLevels: sts.number(),
-    }
-})
-
-export type BlockNumber = number
-
-export type Hash = Bytes
-
-export const Hash = sts.bytes()
-
-export const BlockNumber = sts.number()
-
-export interface ExtrinsicsWeight {
-    normal: Weight
-    operational: Weight
-}
-
-export const ExtrinsicsWeight: sts.Type<ExtrinsicsWeight> = sts.struct(() => {
-    return  {
-        normal: Weight,
-        operational: Weight,
-    }
-})
-
-export type AccountId = Bytes
-
-export interface AccountInfo {
-    nonce: Index
-    consumers: RefCount
-    providers: RefCount
-    data: AccountData
-}
-
-export type RefCount = number
-
-export type Index = number
-
-export const AccountInfo: sts.Type<AccountInfo> = sts.struct(() => {
-    return  {
-        nonce: Index,
-        consumers: RefCount,
-        providers: RefCount,
-        data: AccountData,
-    }
-})
-
-export const RefCount = sts.number()
-
-export const Index = sts.number()
-
 export const BalanceStatus: sts.Type<BalanceStatus> = sts.closedEnum(() => {
     return  {
         Free: sts.unit(),
@@ -2605,6 +2481,24 @@ export const BalanceStatus: sts.Type<BalanceStatus> = sts.closedEnum(() => {
     }
 })
 
-export const Balance = sts.bigint()
+export const Phase: sts.Type<Phase> = sts.closedEnum(() => {
+    return  {
+        ApplyExtrinsic: sts.number(),
+        Finalization: sts.unit(),
+        Initialization: sts.unit(),
+    }
+})
 
-export const AccountId = sts.bytes()
+export interface ConsumedWeight {
+    normal: Weight
+    operational: Weight
+    mandatory: Weight
+}
+
+export const ConsumedWeight: sts.Type<ConsumedWeight> = sts.struct(() => {
+    return  {
+        normal: Weight,
+        operational: Weight,
+        mandatory: Weight,
+    }
+})
