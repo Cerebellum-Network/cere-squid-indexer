@@ -5,13 +5,57 @@ type Account @entity {
   ddcActiveBalance: BigInt!
 
   ddcBuckets: [DdcBucket!] @derivedFrom(field: "ownerId")
+  ddcClusters: [DdcCluster!] @derivedFrom(field: "managerId")
+  ddcNodes: [DdcNode!] @derivedFrom(field: "providerId")
+}
+
+type DdcCluster @entity {
+  id: ID!
+
+  managerId: Account! @index
+
+  treasuryShare: Int!
+  validatorsShare: Int!
+  clusterReserveShare: Int!
+  storageBondSize: BigInt!
+  storageChillDelay: Int!
+  storageUnbondingDelay: Int!
+  unitPerMbStored: BigInt!
+  unitPerMbStreamed: BigInt!
+  unitPerPutRequest: BigInt!
+  unitPerGetRequest: BigInt!
+
+  erasureCodingRequired: Int!
+  erasureCodingTotal: Int!
+  replicationTotal: Int!
+  status: String!
+
+  ddcBuckets: [DdcBucket!] @derivedFrom(field: "clusterId")
+  ddcNodes: [DdcNode!] @derivedFrom(field: "clusterId")
+}
+
+type DdcNode @entity {
+  id: ID!
+
+  providerId: Account! @index
+  clusterId: DdcCluster! @index
+
+  host: String!
+  domain: String
+  ssl: Boolean!
+  httpPort: Int!
+  grpcPort: Int!
+  p2pPort: Int!
+  mode: String!
 }
 
 type DdcBucket @entity {
   id: ID!
+
   bucketId: BigInt! @index @unique
   ownerId: Account! @index
-  clusterId: String! @index
+  clusterId: DdcCluster! @index
+
   isPublic: Boolean!
   isRemoved: Boolean!
   transferredBytes: BigInt!

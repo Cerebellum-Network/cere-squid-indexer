@@ -1,5 +1,6 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, BigIntColumn as BigIntColumn_, Index as Index_, ManyToOne as ManyToOne_, StringColumn as StringColumn_, BooleanColumn as BooleanColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, BigIntColumn as BigIntColumn_, Index as Index_, ManyToOne as ManyToOne_, BooleanColumn as BooleanColumn_} from "@subsquid/typeorm-store"
 import {Account} from "./account.model"
+import {DdcCluster} from "./ddcCluster.model"
 
 @Entity_()
 export class DdcBucket {
@@ -19,8 +20,8 @@ export class DdcBucket {
     ownerId!: Account
 
     @Index_()
-    @StringColumn_({nullable: false})
-    clusterId!: string
+    @ManyToOne_(() => DdcCluster, {nullable: true})
+    clusterId!: DdcCluster
 
     @BooleanColumn_({nullable: false})
     isPublic!: boolean
