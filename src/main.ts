@@ -73,7 +73,7 @@ processor.run(new TypeormDatabase({supportHotBlocks: true}), async (ctx) => {
         accounts.set(id, account)
     })
     // update DDC balances
-    accountToCereBalance.forEach((balance, id) => {
+    accountToDdcBalance.forEach((balance, id) => {
         const account = assertNotNull(accounts.get(id))
         account.ddcActiveBalance = balance
         accounts.set(id, account)
