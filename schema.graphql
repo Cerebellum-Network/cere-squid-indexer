@@ -14,9 +14,9 @@ type DdcCluster @entity {
 
   managerId: Account! @index
 
-  treasuryShare: Int!
-  validatorsShare: Int!
-  clusterReserveShare: Int!
+  treasuryShare: BigInt!
+  validatorsShare: BigInt!
+  clusterReserveShare: BigInt!
   storageBondSize: BigInt!
   storageChillDelay: Int!
   storageUnbondingDelay: Int!

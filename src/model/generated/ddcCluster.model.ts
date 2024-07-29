@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_, IntColumn as IntColumn_, BigIntColumn as BigIntColumn_, StringColumn as StringColumn_, OneToMany as OneToMany_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_, BigIntColumn as BigIntColumn_, IntColumn as IntColumn_, StringColumn as StringColumn_, OneToMany as OneToMany_} from "@subsquid/typeorm-store"
 import {Account} from "./account.model"
 import {DdcBucket} from "./ddcBucket.model"
 import {DdcNode} from "./ddcNode.model"
@@ -16,14 +16,14 @@ export class DdcCluster {
     @ManyToOne_(() => Account, {nullable: true})
     managerId!: Account
 
-    @IntColumn_({nullable: false})
-    treasuryShare!: number
+    @BigIntColumn_({nullable: false})
+    treasuryShare!: bigint
 
-    @IntColumn_({nullable: false})
-    validatorsShare!: number
+    @BigIntColumn_({nullable: false})
+    validatorsShare!: bigint
 
-    @IntColumn_({nullable: false})
-    clusterReserveShare!: number
+    @BigIntColumn_({nullable: false})
+    clusterReserveShare!: bigint
 
     @BigIntColumn_({nullable: false})
     storageBondSize!: bigint

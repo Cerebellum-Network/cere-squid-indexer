@@ -10,7 +10,8 @@ export const throwUnsupportedStorageSpec = (block: BlockHeader) => {
 }
 
 export const logStorageError = (entity: string, key: any, block: BlockHeader) => {
-    throw Error(`Unable to find ${entity} by key ${key} at block ${block.height} (${block.hash})`)
+    // TODO throw Error(`Unable to find ${entity} by key ${key} at block ${block.height} (${block.hash})`)
+    console.log(`Unable to find ${entity} by key ${key} at block ${block.height} (${block.hash})`)
 }
 
 export const toCereAddress = (accoutnId: string) => {

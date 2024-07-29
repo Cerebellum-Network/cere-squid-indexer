@@ -6,9 +6,9 @@ export interface DdcClusterInfo {
     id: string,
     managerId: string,
 
-    treasuryShare: number,
-    validatorsShare: number,
-    clusterReserveShare: number,
+    treasuryShare: bigint,
+    validatorsShare: bigint,
+    clusterReserveShare: bigint,
     storageBondSize: bigint,
     storageChillDelay: number,
     storageUnbondingDelay: number,
@@ -31,7 +31,7 @@ export class DdcClustersProcessor {
         return {
             id: clusterId,
             managerId: managerId,
-            clusterReserveShare: 0,
+            clusterReserveShare: 0n,
             erasureCodingRequired: 0,
             erasureCodingTotal: 0,
             replicationTotal: 0,
@@ -39,12 +39,12 @@ export class DdcClustersProcessor {
             storageBondSize: 0n,
             storageChillDelay: 0,
             storageUnbondingDelay: 0,
-            treasuryShare: 0,
+            treasuryShare: 0n,
             unitPerGetRequest: 0n,
             unitPerMbStored: 0n,
             unitPerMbStreamed: 0n,
             unitPerPutRequest: 0n,
-            validatorsShare: 0
+            validatorsShare: 0n
         }
     }
 
@@ -100,9 +100,9 @@ export class DdcClustersProcessor {
                 clusterGovParams = await storage.ddcClusters.clustersGovParams.v48400.get(block, clusterId)
             }
             if (clusterGovParams) {
-                clusterInfo.treasuryShare = Number(clusterGovParams.treasuryShare)
-                clusterInfo.validatorsShare = Number(clusterGovParams.validatorsShare)
-                clusterInfo.clusterReserveShare = Number(clusterGovParams.clusterReserveShare)
+                clusterInfo.treasuryShare = BigInt(clusterGovParams.treasuryShare)
+                clusterInfo.validatorsShare = BigInt(clusterGovParams.validatorsShare)
+                clusterInfo.clusterReserveShare = BigInt(clusterGovParams.clusterReserveShare)
                 clusterInfo.storageBondSize = clusterGovParams.storageBondSize
                 clusterInfo.storageChillDelay = clusterGovParams.storageChillDelay
                 clusterInfo.storageUnbondingDelay = clusterGovParams.storageUnbondingDelay

@@ -1,11 +1,11 @@
-module.exports = class Data1722272164370 {
-    name = 'Data1722272164370'
+module.exports = class Data1722285076216 {
+    name = 'Data1722285076216'
 
     async up(db) {
         await db.query(`CREATE TABLE "ddc_node" ("id" character varying NOT NULL, "host" text NOT NULL, "domain" text, "ssl" boolean NOT NULL, "http_port" integer NOT NULL, "grpc_port" integer NOT NULL, "p2p_port" integer NOT NULL, "mode" text NOT NULL, "provider_id_id" character varying, "cluster_id_id" character varying, CONSTRAINT "PK_cb26b78b5ac027ee4e2e8cda6d9" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_cdd74b74e6a03496fbff79a54f" ON "ddc_node" ("provider_id_id") `)
         await db.query(`CREATE INDEX "IDX_31a99788080251b2444bf50f95" ON "ddc_node" ("cluster_id_id") `)
-        await db.query(`CREATE TABLE "ddc_cluster" ("id" character varying NOT NULL, "treasury_share" integer NOT NULL, "validators_share" integer NOT NULL, "cluster_reserve_share" integer NOT NULL, "storage_bond_size" numeric NOT NULL, "storage_chill_delay" integer NOT NULL, "storage_unbonding_delay" integer NOT NULL, "unit_per_mb_stored" numeric NOT NULL, "unit_per_mb_streamed" numeric NOT NULL, "unit_per_put_request" numeric NOT NULL, "unit_per_get_request" numeric NOT NULL, "erasure_coding_required" integer NOT NULL, "erasure_coding_total" integer NOT NULL, "replication_total" integer NOT NULL, "status" text NOT NULL, "manager_id_id" character varying, CONSTRAINT "PK_fead8fedd55e91bb2c70262e7f7" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "ddc_cluster" ("id" character varying NOT NULL, "treasury_share" numeric NOT NULL, "validators_share" numeric NOT NULL, "cluster_reserve_share" numeric NOT NULL, "storage_bond_size" numeric NOT NULL, "storage_chill_delay" integer NOT NULL, "storage_unbonding_delay" integer NOT NULL, "unit_per_mb_stored" numeric NOT NULL, "unit_per_mb_streamed" numeric NOT NULL, "unit_per_put_request" numeric NOT NULL, "unit_per_get_request" numeric NOT NULL, "erasure_coding_required" integer NOT NULL, "erasure_coding_total" integer NOT NULL, "replication_total" integer NOT NULL, "status" text NOT NULL, "manager_id_id" character varying, CONSTRAINT "PK_fead8fedd55e91bb2c70262e7f7" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_1009191413e9fdd477ab9f6f4f" ON "ddc_cluster" ("manager_id_id") `)
         await db.query(`CREATE TABLE "ddc_bucket" ("id" character varying NOT NULL, "bucket_id" numeric NOT NULL, "is_public" boolean NOT NULL, "is_removed" boolean NOT NULL, "transferred_bytes" numeric NOT NULL, "stored_bytes" numeric NOT NULL, "number_of_puts" numeric NOT NULL, "number_of_gets" numeric NOT NULL, "owner_id_id" character varying, "cluster_id_id" character varying, CONSTRAINT "PK_6d33780d47ec0e7960c90e5b69f" PRIMARY KEY ("id"))`)
         await db.query(`CREATE UNIQUE INDEX "IDX_16f64a1893b3288a5481259a36" ON "ddc_bucket" ("bucket_id") `)

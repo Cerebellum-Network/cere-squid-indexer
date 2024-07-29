@@ -23,7 +23,7 @@ processor.run(new TypeormDatabase({supportHotBlocks: true}), async (ctx) => {
     for (let b of ctx.blocks) {
         const block = b.header
         for (let event of b.events) {
-            logger.info(`Received event ${event.name} at block ${block.height} (${block.hash})`)
+            logger.debug(`Received event ${event.name} at block ${block.height} (${block.hash})`)
             await cereBalancesProcessor.process(event, block)
             await ddcBalancesProcessor.process(event, block)
             await ddcClustersProcessor.process(event, block)
@@ -105,9 +105,13 @@ processor.run(new TypeormDatabase({supportHotBlocks: true}), async (ctx) => {
     // persist DDC Clusters
     await ctx.store.upsert(ddcClusterEntities)
 
-    const clusterIdsToFind = []
-    clusterIdsToFind.push([...ddcNodes.updatedNodes.values()].map(node => node.clusterId))
-    clusterIdsToFind.push([...ddcBuckets.values()].map(bucket => bucket.clusterId))
+    const clusterIdsToFind: string[] = []
+    ddcNodes.updatedNodes.forEach((node) => {
+        clusterIdsToFind.push(node.clusterId)
+    })
+    ddcBuckets.forEach((bucket) => {
+        clusterIdsToFind.push(bucket.clusterId)
+    })
 
     const existingClusters = await ctx.store.findBy(DdcCluster, {id: In(clusterIdsToFind)})
     const ddcNodeClustersMap = new Map<string, DdcCluster>
