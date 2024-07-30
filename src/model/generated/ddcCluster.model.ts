@@ -1,5 +1,6 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_, BigIntColumn as BigIntColumn_, IntColumn as IntColumn_, StringColumn as StringColumn_, OneToMany as OneToMany_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_, BigIntColumn as BigIntColumn_, IntColumn as IntColumn_, OneToMany as OneToMany_} from "@subsquid/typeorm-store"
 import {Account} from "./account.model"
+import {DdcClusterStatus} from "./_ddcClusterStatus"
 import {DdcBucket} from "./ddcBucket.model"
 import {DdcNode} from "./ddcNode.model"
 
@@ -55,8 +56,8 @@ export class DdcCluster {
     @IntColumn_({nullable: false})
     replicationTotal!: number
 
-    @StringColumn_({nullable: false})
-    status!: string
+    @Column_("varchar", {length: 9, nullable: false})
+    status!: DdcClusterStatus
 
     @OneToMany_(() => DdcBucket, e => e.clusterId)
     ddcBuckets!: DdcBucket[]

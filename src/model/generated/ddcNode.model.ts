@@ -1,6 +1,7 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_, StringColumn as StringColumn_, BooleanColumn as BooleanColumn_, IntColumn as IntColumn_} from "@subsquid/typeorm-store"
 import {Account} from "./account.model"
 import {DdcCluster} from "./ddcCluster.model"
+import {DdcNodeMode} from "./_ddcNodeMode"
 
 @Entity_()
 export class DdcNode {
@@ -17,7 +18,7 @@ export class DdcNode {
 
     @Index_()
     @ManyToOne_(() => DdcCluster, {nullable: true})
-    clusterId!: DdcCluster
+    clusterId!: DdcCluster | undefined | null
 
     @StringColumn_({nullable: false})
     host!: string
@@ -37,6 +38,6 @@ export class DdcNode {
     @IntColumn_({nullable: false})
     p2pPort!: number
 
-    @StringColumn_({nullable: false})
-    mode!: string
+    @Column_("varchar", {length: 7, nullable: false})
+    mode!: DdcNodeMode
 }

@@ -28,17 +28,21 @@ type DdcCluster @entity {
   erasureCodingRequired: Int!
   erasureCodingTotal: Int!
   replicationTotal: Int!
-  status: String!
+  status: DdcClusterStatus!
 
   ddcBuckets: [DdcBucket!] @derivedFrom(field: "clusterId")
   ddcNodes: [DdcNode!] @derivedFrom(field: "clusterId")
+}
+
+enum DdcClusterStatus {
+  Activated, Bonded, Unbonded, Unbonding
 }
 
 type DdcNode @entity {
   id: ID!
 
   providerId: Account! @index
-  clusterId: DdcCluster! @index
+  clusterId: DdcCluster
 
   host: String!
   domain: String
@@ -46,7 +50,11 @@ type DdcNode @entity {
   httpPort: Int!
   grpcPort: Int!
   p2pPort: Int!
-  mode: String!
+  mode: DdcNodeMode!
+}
+
+enum DdcNodeMode {
+  Storage, Cache, Full, DAC
 }
 
 type DdcBucket @entity {

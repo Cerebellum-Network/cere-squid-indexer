@@ -43,7 +43,7 @@ processor.run(new TypeormDatabase({supportHotBlocks: true}), async (ctx) => {
     const accounts = new Map<string, Account>
 
     async function createAccounts(source: string[]) {
-        let existingAccounts = await ctx.store.findBy(Account, {id: In(source)})
+        const existingAccounts = await ctx.store.findBy(Account, {id: In(source)})
         existingAccounts.forEach((account) => {
             accounts.set(account.id, account)
         })
@@ -81,6 +81,7 @@ processor.run(new TypeormDatabase({supportHotBlocks: true}), async (ctx) => {
     // persist accounts
     await ctx.store.upsert([...accounts.values()])
 
+    // map DDC Clusters to entities
     const ddcClusterEntities: DdcCluster[] = []
     ddcClusters.forEach((c) => {
         ddcClusterEntities.push(new DdcCluster({
@@ -105,51 +106,92 @@ processor.run(new TypeormDatabase({supportHotBlocks: true}), async (ctx) => {
     // persist DDC Clusters
     await ctx.store.upsert(ddcClusterEntities)
 
-    const clusterIdsToFind: string[] = []
-    ddcNodes.updatedNodes.forEach((node) => {
-        clusterIdsToFind.push(node.clusterId)
+    // Find clusters for nodes and buckets mapping
+    const clusterIdsToFind: Set<String> = new Set<String>
+    ddcNodes.addedToCluster.forEach((_, clusterId) => {
+        clusterIdsToFind.add(clusterId)
     })
     ddcBuckets.forEach((bucket) => {
-        clusterIdsToFind.push(bucket.clusterId)
+        clusterIdsToFind.add(bucket.clusterId)
     })
 
-    const existingClusters = await ctx.store.findBy(DdcCluster, {id: In(clusterIdsToFind)})
-    const ddcNodeClustersMap = new Map<string, DdcCluster>
+    const existingClusters = await ctx.store.findBy(DdcCluster, {id: In([...clusterIdsToFind.values()])})
+    const ddcClustersMap = new Map<string, DdcCluster>
     existingClusters.forEach(c => {
-        ddcNodeClustersMap.set(c.id, c)
+        ddcClustersMap.set(c.id, c)
     })
 
-    const ddcNodeEntities: DdcNode[] = []
+    // Find existing DDC Nodes
+    const allModifiedDdcNodes = new Set<string>
+    ddcNodes.addedToCluster.forEach((nodes) => {
+        nodes.forEach((node) => {
+            allModifiedDdcNodes.add(node)
+        })
+    })
+    ddcNodes.removedFromCluster.forEach((nodes) => {
+        nodes.forEach((node) => {
+            allModifiedDdcNodes.add(node)
+        })
+    })
+    ddcNodes.updatedNodes.forEach((_, nodeId) => {
+        allModifiedDdcNodes.add(nodeId)
+    })
+    ddcNodes.removedNodes.forEach((nodeId) => {
+        allModifiedDdcNodes.add(nodeId)
+    })
+    const existingDdcNodes = await ctx.store.findBy(DdcNode, {id: In([...allModifiedDdcNodes.values()])})
+    const ddcNodesMap = new Map<string, DdcNode>
+    existingDdcNodes.forEach((node) => {
+        ddcNodesMap.set(node.id, node)
+    })
+    // update DDC nodes
     ddcNodes.updatedNodes.forEach((node) => {
-        const cluster = ddcNodeClustersMap.get(node.clusterId)
-        if (!cluster) {
-            logger.warn(`No DDC cluster with id ${node.clusterId} found. Skipping DDC node ${node.id} for persistence`)
-            return
-        }
-        ddcNodeEntities.push(new DdcNode({
+        const nodeEntity = ddcNodesMap.get(node.id) ?? new DdcNode({
             id: node.id,
             providerId: accounts.get(node.providerId),
-            clusterId: cluster,
-            host: node.host,
-            domain: node.domain,
-            ssl: node.ssl,
-            httpPort: node.httpPort,
-            grpcPort: node.grpcPort,
-            p2pPort: node.p2pPort,
-            mode: node.mode,
-        }))
+        })
+        nodeEntity.host = node.host
+        nodeEntity.domain = node.domain
+        nodeEntity.ssl = node.ssl
+        nodeEntity.httpPort = node.httpPort
+        nodeEntity.grpcPort = node.grpcPort
+        nodeEntity.p2pPort = node.p2pPort
+        nodeEntity.mode = node.mode
+        ddcNodesMap.set(node.id, nodeEntity)
     })
-
+    // add to cluster
+    ddcNodes.addedToCluster.forEach((nodes, clusterId) => {
+        nodes.forEach((node) => {
+            const nodeEntity = ddcNodesMap.get(node)
+            if (nodeEntity) {
+                nodeEntity.clusterId = ddcClustersMap.get(clusterId)
+            }
+        })
+    })
+    // remove from cluster
+    ddcNodes.removedFromCluster.forEach((nodes) => {
+        nodes.forEach((node) => {
+            const nodeEntity = ddcNodesMap.get(node)
+            if (nodeEntity) {
+                nodeEntity.clusterId = null
+            }
+        })
+    })
     // persist DDC Nodes
-    await ctx.store.upsert(ddcNodeEntities)
-
-    // remove DDC Nodes
-    const toRemove = await ctx.store.findBy(DdcNode, {id: In([...ddcNodes.removedNodes.values()])})
-    await ctx.store.remove(toRemove)
+    await ctx.store.upsert([...ddcNodesMap.values()])
+    // remove deleted nodes
+    const ddcNodesToRemove: DdcNode[] = []
+    ddcNodes.removedNodes.forEach((nodeId) => {
+        const toRemove = ddcNodesMap.get(nodeId)
+        if (toRemove) {
+            ddcNodesToRemove.push(toRemove)
+        }
+    })
+    await ctx.store.remove(ddcNodesToRemove)
 
     const ddcBucketEntities: DdcBucket[] = []
     ddcBuckets.forEach((bucket) => {
-        const cluster = ddcNodeClustersMap.get(bucket.clusterId)
+        const cluster = ddcClustersMap.get(bucket.clusterId)
         if (!cluster) {
             logger.warn(`No DDC cluster with id ${bucket.clusterId} found. Skipping bucket ${bucket.bucketId} for persistence`)
             return

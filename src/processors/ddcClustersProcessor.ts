@@ -1,6 +1,7 @@
 import {BlockHeader, Event} from "@subsquid/substrate-processor";
 import {events, storage} from "../types";
 import {logStorageError, throwUnsupportedSpec, throwUnsupportedStorageSpec, toCereAddress} from "../utils";
+import {DdcClusterStatus} from "../model";
 
 export interface DdcClusterInfo {
     id: string,
@@ -21,7 +22,7 @@ export interface DdcClusterInfo {
     erasureCodingTotal: number,
     replicationTotal: number,
 
-    status: string,
+    status: DdcClusterStatus,
 }
 
 export class DdcClustersProcessor {
@@ -35,7 +36,7 @@ export class DdcClustersProcessor {
             erasureCodingRequired: 0,
             erasureCodingTotal: 0,
             replicationTotal: 0,
-            status: "Activated",
+            status: DdcClusterStatus.Activated,
             storageBondSize: 0n,
             storageChillDelay: 0,
             storageUnbondingDelay: 0,
@@ -80,7 +81,7 @@ export class DdcClustersProcessor {
                 clusterInfo.erasureCodingRequired = cluster.props.erasureCodingRequired
                 clusterInfo.erasureCodingTotal = cluster.props.erasureCodingTotal
                 clusterInfo.replicationTotal = cluster.props.replicationTotal
-                clusterInfo.status = cluster.status.__kind
+                clusterInfo.status = DdcClusterStatus[cluster.status.__kind]
             }
         } else {
             throwUnsupportedStorageSpec(block)
