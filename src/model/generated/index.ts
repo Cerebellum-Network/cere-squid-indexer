@@ -1,2 +1,6 @@
 export * from "./account.model"
+export * from "./ddcCluster.model"
+export * from "./_ddcClusterStatus"
+export * from "./ddcNode.model"
+export * from "./_ddcNodeMode"
 export * from "./ddcBucket.model"
