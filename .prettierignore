@@ -1,0 +1,9 @@
+*.graphql
+*.js
+*.json
+*.md
+*.yaml
+*.yml
+
+src/model/generated/
+src/types/

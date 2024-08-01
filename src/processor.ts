@@ -67,15 +67,15 @@ export const processor = new SubstrateBatchProcessor()
             events.ddcNodes.nodeDeleted.name,
             events.ddcNodes.nodeParamsChanged.name,
         ],
-        extrinsic: true
+        extrinsic: true,
     })
     .setFields({
         event: {
-            args: true
+            args: true,
         },
         block: {
-            timestamp: true
-        }
+            timestamp: true,
+        },
     })
 
 export type Fields = SubstrateBatchProcessorFields<typeof processor>

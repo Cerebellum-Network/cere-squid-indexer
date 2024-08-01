@@ -5,7 +5,8 @@
     "node": ">=16"
   },
   "scripts": {
-    "build": "rm -rf lib && tsc"
+    "build": "rm -rf lib && tsc",
+    "format": "prettier . '!./data' --write"
   },
   "dependencies": {
     "@subsquid/graphql-server": "^4.5.1",
@@ -22,6 +23,7 @@
     "@subsquid/substrate-typegen": "^8.1.0",
     "@subsquid/typeorm-codegen": "^2.0.0",
     "@types/node": "^20.12.7",
+    "prettier": "3.3.3",
     "typescript": "^5.4.5"
   }
 }
