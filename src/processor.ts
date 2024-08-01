@@ -50,8 +50,6 @@ export const processor = new SubstrateBatchProcessor()
             timestamp: true
         }
     })
-    // Uncomment to disable RPC ingestion and drastically reduce no of RPC calls
-    //.useArchiveOnly()
 
 export type Fields = SubstrateBatchProcessorFields<typeof processor>
 export type Block = BlockHeader<Fields>
