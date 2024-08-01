@@ -1,21 +1,26 @@
-import {assertNotNull} from '@subsquid/util-internal'
+import { assertNotNull } from '@subsquid/util-internal'
 import {
     BlockHeader,
     DataHandlerContext,
     Event as _Event,
     SubstrateBatchProcessor,
-    SubstrateBatchProcessorFields
+    SubstrateBatchProcessorFields,
 } from '@subsquid/substrate-processor'
-import {events} from './types'
+import { events } from './types'
 
 export const processor = new SubstrateBatchProcessor()
     .setRpcEndpoint({
-        url: assertNotNull(process.env.RPC_CERE_HTTP, 'No RPC endpoint supplied'),
-        rateLimit: parseInt(process.env.SQD_RATE_LIMIT || "500"),
-        capacity: parseInt(process.env.SQD_CAPACITY || "10"),
+        url: assertNotNull(
+            process.env.RPC_CERE_HTTP,
+            'No RPC endpoint supplied',
+        ),
+        rateLimit: parseInt(process.env.SQD_RATE_LIMIT || '500'),
+        capacity: parseInt(process.env.SQD_CAPACITY || '10'),
     })
-    .setBlockRange({from: parseInt(process.env.SQD_FIRST_BLOCK || "0")})
-    .setTypesBundle(process.env.TYPES_BUNDLE || '../specs/cere-types-bundle.json')
+    .setBlockRange({ from: parseInt(process.env.SQD_FIRST_BLOCK || '0') })
+    .setTypesBundle(
+        process.env.TYPES_BUNDLE || '../specs/cere-types-bundle.json',
+    )
     .addEvent({
         name: [
             events.balances.endowed.name,
