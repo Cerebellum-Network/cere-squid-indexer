@@ -6,7 +6,7 @@ import {
     SubstrateBatchProcessorFields,
     Event as _Event,
     Call as _Call,
-    Extrinsic as _Extrinsic
+    Extrinsic as _Extrinsic,
 } from '@subsquid/substrate-processor'
 
 import { events } from './types'
@@ -19,13 +19,16 @@ export const processor = new SubstrateBatchProcessor()
     .setRpcEndpoint({
         // Set via .env for local runs or via secrets when deploying to Subsquid Cloud
         // https://docs.subsquid.io/deploy-squid/env-variables/
-        url: assertNotNull(process.env.RPC_CERE_HTTP, 'No RPC endpoint supplied'),
+        url: assertNotNull(
+            process.env.RPC_CERE_HTTP,
+            'No RPC endpoint supplied',
+        ),
         // More RPC connection options at https://docs.subsquid.io/substrate-indexing/setup/general/#set-data-source
-        rateLimit: parseInt(process.env.SQD_RATE_LIMIT || "500"),
-        capacity: parseInt(process.env.SQD_CAPACITY || "10"),
+        rateLimit: parseInt(process.env.SQD_RATE_LIMIT || '500'),
+        capacity: parseInt(process.env.SQD_CAPACITY || '10'),
         //maxBatchCallSize: 1000,
     })
-    .setBlockRange({ from: parseInt(process.env.SQD_FIRST_BLOCK || "1") })
+    .setBlockRange({ from: parseInt(process.env.SQD_FIRST_BLOCK || '1') })
     .addEvent({
         name: [
             events.balances.transfer.name,
@@ -36,19 +39,19 @@ export const processor = new SubstrateBatchProcessor()
             events.ddcCustomers.withdrawn.name,
             events.ddcCustomers.charged.name,
         ],
-        extrinsic: true
+        extrinsic: true,
     })
     .setFields({
         event: {
-            args: true
+            args: true,
         },
         extrinsic: {
             hash: true,
-            fee: true
+            fee: true,
         },
         block: {
-            timestamp: true
-        }
+            timestamp: true,
+        },
     })
 
 export type Fields = SubstrateBatchProcessorFields<typeof processor>
