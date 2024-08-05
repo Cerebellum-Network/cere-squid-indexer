@@ -6,9 +6,14 @@ import {
     throwUnsupportedStorageSpec,
     toCereAddress,
 } from '../utils'
+import { BaseProcessor } from './processor'
 
-export class CereBalancesProcessor {
-    private state = new Map<string, bigint>()
+type State = Map<string, bigint>
+
+export class CereBalancesProcessor extends BaseProcessor<State> {
+    constructor() {
+        super(new Map<string, bigint>())
+    }
 
     private async processBalancesEvent(accountId: string, block: BlockHeader) {
         try {
@@ -32,7 +37,7 @@ export class CereBalancesProcessor {
                 throwUnsupportedStorageSpec(block)
             }
             if (accountInStorage) {
-                this.state.set(
+                this._state.set(
                     toCereAddress(accountId),
                     accountInStorage.data.free,
                 )
@@ -46,10 +51,6 @@ export class CereBalancesProcessor {
                 throw error
             }
         }
-    }
-
-    getState(): Map<string, bigint> {
-        return this.state
     }
 
     async process(event: Event, block: BlockHeader) {

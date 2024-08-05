@@ -7,8 +7,9 @@ import {
     toCereAddress,
 } from '../utils'
 import { DdcNodeMode } from '../model'
+import { BaseProcessor } from './processor'
 
-export interface DdcNodeInfo {
+interface DdcNodeInfo {
     id: string
 
     providerId: string
@@ -23,19 +24,21 @@ export interface DdcNodeInfo {
     mode: DdcNodeMode
 }
 
-export interface State {
+type State = {
     addedToCluster: Map<string, Set<string>>
     removedFromCluster: Map<string, Set<string>>
     updatedNodes: Map<string, DdcNodeInfo>
     removedNodes: Set<string>
 }
 
-export class DdcNodesProcessor {
-    private state: State = {
-        addedToCluster: new Map<string, Set<string>>(),
-        removedFromCluster: new Map<string, Set<string>>(),
-        updatedNodes: new Map<string, DdcNodeInfo>(),
-        removedNodes: new Set<string>(),
+export class DdcNodesProcessor extends BaseProcessor<State> {
+    constructor() {
+        super({
+            addedToCluster: new Map<string, Set<string>>(),
+            removedFromCluster: new Map<string, Set<string>>(),
+            updatedNodes: new Map<string, DdcNodeInfo>(),
+            removedNodes: new Set<string>(),
+        })
     }
 
     private async processDdcNodesEvents(nodeId: string, block: BlockHeader) {
@@ -140,14 +143,10 @@ export class DdcNodesProcessor {
         }
         if (nodeInfo) {
             nodeInfo.providerId = toCereAddress(nodeInfo.providerId)
-            this.state.updatedNodes.set(nodeId, nodeInfo)
+            this._state.updatedNodes.set(nodeId, nodeInfo)
         } else {
             logStorageError('DDC node', nodeId, block)
         }
-    }
-
-    getState(): State {
-        return this.state
     }
 
     async process(event: Event, block: BlockHeader) {
@@ -167,10 +166,11 @@ export class DdcNodesProcessor {
                 }
                 if (decodedEvent) {
                     const nodesInCluster =
-                        this.state.addedToCluster.get(decodedEvent.clusterId) ??
-                        new Set<string>()
+                        this._state.addedToCluster.get(
+                            decodedEvent.clusterId,
+                        ) ?? new Set<string>()
                     nodesInCluster.add(decodedEvent.nodePubKey.value)
-                    this.state.addedToCluster.set(
+                    this._state.addedToCluster.set(
                         decodedEvent.clusterId,
                         nodesInCluster,
                     )
@@ -196,11 +196,11 @@ export class DdcNodesProcessor {
                 }
                 if (decodedEvent) {
                     const nodesRemovedFromCluster =
-                        this.state.removedFromCluster.get(
+                        this._state.removedFromCluster.get(
                             decodedEvent.clusterId,
                         ) ?? new Set<string>()
                     nodesRemovedFromCluster.add(decodedEvent.nodePubKey.value)
-                    this.state.removedFromCluster.set(
+                    this._state.removedFromCluster.set(
                         decodedEvent.clusterId,
                         nodesRemovedFromCluster,
                     )
@@ -253,7 +253,7 @@ export class DdcNodesProcessor {
                     throwUnsupportedSpec(event, block)
                 }
                 if (removedNode) {
-                    this.state.removedNodes.add(removedNode)
+                    this._state.removedNodes.add(removedNode)
                 }
                 break
             }

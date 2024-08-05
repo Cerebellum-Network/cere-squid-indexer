@@ -6,9 +6,14 @@ import {
     throwUnsupportedStorageSpec,
     toCereAddress,
 } from '../utils'
+import { BaseProcessor } from './processor'
 
-export class DdcBalancesProcessor {
-    private state = new Map<string, bigint>()
+type State = Map<string, bigint>
+
+export class DdcBalancesProcessor extends BaseProcessor<State> {
+    constructor() {
+        super(new Map<string, bigint>())
+    }
 
     private async processDdcCustomersBalancesEvents(
         accountId: string,
@@ -24,14 +29,10 @@ export class DdcBalancesProcessor {
             throwUnsupportedStorageSpec(block)
         }
         if (accountInStorage) {
-            this.state.set(toCereAddress(accountId), accountInStorage.active)
+            this._state.set(toCereAddress(accountId), accountInStorage.active)
         } else {
             logStorageError('DDC Customer ledger', accountId, block)
         }
-    }
-
-    getState(): Map<string, bigint> {
-        return this.state
     }
 
     async process(event: Event, block: BlockHeader) {

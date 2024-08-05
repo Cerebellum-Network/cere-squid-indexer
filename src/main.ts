@@ -35,11 +35,11 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     }
 
     // retrieving state from processors
-    const accountToCereBalance = cereBalancesProcessor.getState()
-    const accountToDdcBalance = ddcBalancesProcessor.getState()
-    const ddcClusters = ddcClustersProcessor.getState()
-    const ddcNodes = ddcNodesProcessor.getState()
-    const ddcBuckets = ddcBucketsProcessor.getState()
+    const accountToCereBalance = cereBalancesProcessor.state
+    const accountToDdcBalance = ddcBalancesProcessor.state
+    const ddcClusters = ddcClustersProcessor.state
+    const ddcNodes = ddcNodesProcessor.state
+    const ddcBuckets = ddcBucketsProcessor.state
 
     // create missing accounts
     const accounts = new Map<string, Account>()
