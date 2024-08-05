@@ -26,11 +26,14 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
             logger.debug(
                 `Received event ${event.name} at block ${block.height} (${block.hash})`,
             )
-            await cereBalancesProcessor.process(event, block)
-            await ddcBalancesProcessor.process(event, block)
-            await ddcClustersProcessor.process(event, block)
-            await ddcNodesProcessor.process(event, block)
-            await ddcBucketsProcessor.process(event, block)
+
+            await Promise.all([
+                cereBalancesProcessor.process(event, block),
+                ddcBalancesProcessor.process(event, block),
+                ddcClustersProcessor.process(event, block),
+                ddcNodesProcessor.process(event, block),
+                ddcBucketsProcessor.process(event, block),
+            ])
         }
     }
 
