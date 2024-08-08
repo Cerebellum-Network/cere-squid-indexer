@@ -149,8 +149,6 @@ export interface StorageNode {
 
 export interface StorageNodeProps {
     host: Bytes
-    domain: Bytes
-    ssl: boolean
     httpPort: number
     grpcPort: number
     p2PPort: number
@@ -168,8 +166,6 @@ export const StorageNode: sts.Type<StorageNode> = sts.struct(() => {
 export const StorageNodeProps: sts.Type<StorageNodeProps> = sts.struct(() => {
     return  {
         host: sts.bytes(),
-        domain: sts.bytes(),
-        ssl: sts.boolean(),
         httpPort: sts.number(),
         grpcPort: sts.number(),
         p2PPort: sts.number(),
