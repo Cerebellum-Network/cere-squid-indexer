@@ -4,6 +4,7 @@ import * as v48013 from '../v48013'
 import * as v48017 from '../v48017'
 import * as v54001 from '../v54001'
 import * as v54004 from '../v54004'
+import * as v54105 from '../v54105'
 
 export const clusterCreated =  {
     name: 'DdcClusters.ClusterCreated',
@@ -129,6 +130,17 @@ export const clusterUnbonding =  {
         'DdcClusters.ClusterUnbonding',
         sts.struct({
             clusterId: v54004.H160,
+        })
+    ),
+}
+
+export const clusterEraValidated =  {
+    name: 'DdcClusters.ClusterEraValidated',
+    v54105: new EventType(
+        'DdcClusters.ClusterEraValidated',
+        sts.struct({
+            clusterId: v54105.H160,
+            eraId: sts.number(),
         })
     ),
 }
