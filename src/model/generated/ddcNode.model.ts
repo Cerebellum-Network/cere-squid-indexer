@@ -26,8 +26,8 @@ export class DdcNode {
     @StringColumn_({nullable: true})
     domain!: string | undefined | null
 
-    @BooleanColumn_({nullable: false})
-    ssl!: boolean
+    @BooleanColumn_({nullable: true})
+    ssl!: boolean | undefined | null
 
     @IntColumn_({nullable: false})
     httpPort!: number
