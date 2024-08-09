@@ -118,7 +118,22 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
                 clusterInfo.replicationTotal = cluster.props.replicationTotal
                 clusterInfo.status = DdcClusterStatus[cluster.status.__kind]
             }
-        } else {
+        } else if (storage.ddcClusters.clusters.v54105.is(block)) {
+            const cluster = await storage.ddcClusters.clusters.v54105.get(
+                block,
+                clusterId,
+            )
+            if (cluster) {
+                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId)
+                clusterInfo.erasureCodingRequired =
+                    cluster.props.erasureCodingRequired
+                clusterInfo.erasureCodingTotal =
+                    cluster.props.erasureCodingTotal
+                clusterInfo.replicationTotal = cluster.props.replicationTotal
+                clusterInfo.status = DdcClusterStatus[cluster.status.__kind]
+            }
+        }
+        else {
             throwUnsupportedStorageSpec(block)
         }
         if (clusterInfo) {
