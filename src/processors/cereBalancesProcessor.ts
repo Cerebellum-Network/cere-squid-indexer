@@ -6,9 +6,14 @@ import {
     throwUnsupportedStorageSpec,
     toCereAddress,
 } from '../utils'
+import { BaseProcessor } from './processor'
 
-export class CereBalancesProcessor {
-    private state = new Map<string, bigint>()
+type State = Map<string, bigint>
+
+export class CereBalancesProcessor extends BaseProcessor<State> {
+    constructor() {
+        super(new Map<string, bigint>())
+    }
 
     private async processBalancesEvent(accountId: string, block: BlockHeader) {
         try {
@@ -32,7 +37,7 @@ export class CereBalancesProcessor {
                 throwUnsupportedStorageSpec(block)
             }
             if (accountInStorage) {
-                this.state.set(
+                this._state.set(
                     toCereAddress(accountId),
                     accountInStorage.data.free,
                 )
@@ -40,16 +45,15 @@ export class CereBalancesProcessor {
                 logStorageError('account', accountId, block)
             }
         } catch (error) {
-            if (error?.toString() === 'Error: Unexpected EOF' || error?.toString() === 'Error: Unprocessed data left') {
+            if (
+                error?.toString() === 'Error: Unexpected EOF' ||
+                error?.toString() === 'Error: Unprocessed data left'
+            ) {
                 // some accounts in old blocks can not be parsed, just ignore them
             } else {
                 throw error
             }
         }
-    }
-
-    getState(): Map<string, bigint> {
-        return this.state
     }
 
     async process(event: Event, block: BlockHeader) {

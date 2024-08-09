@@ -60,7 +60,6 @@ enum DdcNodeMode {
 type DdcBucket @entity {
   id: ID!
 
-  bucketId: BigInt! @index @unique
   ownerId: Account! @index
   clusterId: DdcCluster! @index
 

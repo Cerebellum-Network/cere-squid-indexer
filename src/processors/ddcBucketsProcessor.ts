@@ -6,6 +6,7 @@ import {
     throwUnsupportedStorageSpec,
     toCereAddress,
 } from '../utils'
+import { BaseProcessor } from './processor'
 
 export interface DdcBucketInfo {
     ownerId: string
@@ -19,8 +20,12 @@ export interface DdcBucketInfo {
     numberOfGets: bigint
 }
 
-export class DdcBucketsProcessor {
-    private state = new Map<bigint, DdcBucketInfo>()
+type State = Map<bigint, DdcBucketInfo>
+
+export class DdcBucketsProcessor extends BaseProcessor<State> {
+    constructor() {
+        super(new Map<bigint, DdcBucketInfo>())
+    }
 
     private async processDdcBucketsEvents(
         bucketId: bigint,
@@ -107,14 +112,10 @@ export class DdcBucketsProcessor {
         }
         if (bucketInfo) {
             bucketInfo.ownerId = toCereAddress(bucketInfo.ownerId)
-            this.state.set(bucketId, bucketInfo)
+            this._state.set(bucketId, bucketInfo)
         } else {
             logStorageError('bucket', bucketId, block)
         }
-    }
-
-    getState(): Map<bigint, DdcBucketInfo> {
-        return this.state
     }
 
     async process(event: Event, block: BlockHeader) {

@@ -26,20 +26,23 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
             logger.debug(
                 `Received event ${event.name} at block ${block.height} (${block.hash})`,
             )
-            await cereBalancesProcessor.process(event, block)
-            await ddcBalancesProcessor.process(event, block)
-            await ddcClustersProcessor.process(event, block)
-            await ddcNodesProcessor.process(event, block)
-            await ddcBucketsProcessor.process(event, block)
+
+            await Promise.all([
+                cereBalancesProcessor.process(event, block),
+                ddcBalancesProcessor.process(event, block),
+                ddcClustersProcessor.process(event, block),
+                ddcNodesProcessor.process(event, block),
+                ddcBucketsProcessor.process(event, block),
+            ])
         }
     }
 
     // retrieving state from processors
-    const accountToCereBalance = cereBalancesProcessor.getState()
-    const accountToDdcBalance = ddcBalancesProcessor.getState()
-    const ddcClusters = ddcClustersProcessor.getState()
-    const ddcNodes = ddcNodesProcessor.getState()
-    const ddcBuckets = ddcBucketsProcessor.getState()
+    const accountToCereBalance = cereBalancesProcessor.state
+    const accountToDdcBalance = ddcBalancesProcessor.state
+    const ddcClusters = ddcClustersProcessor.state
+    const ddcNodes = ddcNodesProcessor.state
+    const ddcBuckets = ddcBucketsProcessor.state
 
     // create missing accounts
     const accounts = new Map<string, Account>()
@@ -222,7 +225,6 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
         ddcBucketEntities.push(
             new DdcBucket({
                 id: bucket.bucketId.toString(),
-                bucketId: bucket.bucketId,
                 ownerId: accounts.get(bucket.ownerId),
                 clusterId: cluster,
                 isPublic: bucket.isPublic,
