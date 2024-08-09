@@ -45,7 +45,10 @@ export class CereBalancesProcessor extends BaseProcessor<State> {
                 logStorageError('account', accountId, block)
             }
         } catch (error) {
-            if (error?.toString() === 'Error: Unexpected EOF' || error?.toString() === 'Error: Unprocessed data left') {
+            if (
+                error?.toString() === 'Error: Unexpected EOF' ||
+                error?.toString() === 'Error: Unprocessed data left'
+            ) {
                 // some accounts in old blocks can not be parsed, just ignore them
             } else {
                 throw error
