@@ -16,8 +16,8 @@ interface DdcNodeInfo {
     clusterId: string | undefined
 
     host: string
-    domain: string | undefined | null
-    ssl: boolean | undefined
+    domain: string | null
+    ssl: boolean
     httpPort: number
     grpcPort: number
     p2pPort: number
@@ -73,8 +73,8 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                     providerId: node.providerId,
                     clusterId: node.clusterId,
                     host: node.props.host,
-                    domain: undefined,
-                    ssl: undefined,
+                    domain: node.props.domain,
+                    ssl: node.props.ssl,
                     httpPort: node.props.httpPort,
                     grpcPort: node.props.grpcPort,
                     p2pPort: node.props.p2PPort,
@@ -92,8 +92,8 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                     providerId: node.providerId,
                     clusterId: node.clusterId,
                     host: node.props.host,
-                    domain: undefined,
-                    ssl: undefined,
+                    domain: node.props.domain,
+                    ssl: node.props.ssl,
                     httpPort: node.props.httpPort,
                     grpcPort: node.props.grpcPort,
                     p2pPort: node.props.p2PPort,

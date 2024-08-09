@@ -46,7 +46,7 @@ type DdcNode @entity {
 
   host: String!
   domain: String
-  ssl: Boolean
+  ssl: Boolean!
   httpPort: Int!
   grpcPort: Int!
   p2pPort: Int!
