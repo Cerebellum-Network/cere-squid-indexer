@@ -225,7 +225,6 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
         ddcBucketEntities.push(
             new DdcBucket({
                 id: bucket.bucketId.toString(),
-                bucketId: bucket.bucketId,
                 ownerId: accounts.get(bucket.ownerId),
                 clusterId: cluster,
                 isPublic: bucket.isPublic,
