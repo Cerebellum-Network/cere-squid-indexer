@@ -181,6 +181,10 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
         nodeEntity.grpcPort = node.grpcPort
         nodeEntity.p2pPort = node.p2pPort
         nodeEntity.mode = node.mode
+        nodeEntity.transferredBytes = node.transferredBytes
+        nodeEntity.storedBytes = node.storedBytes
+        nodeEntity.numberOfPuts = node.numberOfPuts
+        nodeEntity.numberOfGets = node.numberOfGets
         ddcNodesMap.set(node.id, nodeEntity)
     })
     // add to cluster
