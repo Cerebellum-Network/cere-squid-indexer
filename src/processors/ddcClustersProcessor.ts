@@ -132,8 +132,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
                 clusterInfo.replicationTotal = cluster.props.replicationTotal
                 clusterInfo.status = DdcClusterStatus[cluster.status.__kind]
             }
-        }
-        else {
+        } else {
             throwUnsupportedStorageSpec(block)
         }
         if (clusterInfo) {
