@@ -51,6 +51,11 @@ type DdcNode @entity {
   grpcPort: Int!
   p2pPort: Int!
   mode: DdcNodeMode!
+
+  transferredBytes: BigInt!
+  storedBytes: BigInt!
+  numberOfPuts: BigInt!
+  numberOfGets: BigInt!
 }
 
 enum DdcNodeMode {
