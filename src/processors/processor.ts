@@ -10,7 +10,7 @@ export abstract class BaseProcessor<
     constructor(protected _state: State) {}
 
     get state(): State {
-        return assertNotNull(this.state)
+        return assertNotNull(this._state)
     }
 
     abstract process(event: Event, block: BlockHeader): Promise<void>
