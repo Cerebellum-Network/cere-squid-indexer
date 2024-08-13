@@ -28,6 +28,9 @@ export class DdcBucketsProcessor {
     ) {
         let bucketInfo: DdcBucketInfo | undefined
         if (storage.ddcCustomers.buckets.v48013.is(block)) {
+            if (block.specVersion >= 48017) {
+                console.log(`Unexpected storage layout version selection. Selected v48013 for spec version ${block._runtime.specVersion} which is higher than the next v48017.`)
+            }
             const bucket = await storage.ddcCustomers.buckets.v48013.get(
                 block,
                 bucketId,
