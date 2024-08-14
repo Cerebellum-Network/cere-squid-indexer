@@ -7,6 +7,7 @@ import {
     toCereAddress,
 } from '../utils'
 import { DdcClusterStatus } from '../model'
+import { BaseProcessor } from './processor'
 
 export interface DdcClusterInfo {
     id: string
@@ -30,8 +31,12 @@ export interface DdcClusterInfo {
     status: DdcClusterStatus
 }
 
-export class DdcClustersProcessor {
-    private state = new Map<string, DdcClusterInfo>()
+type State = Map<string, DdcClusterInfo>
+
+export class DdcClustersProcessor extends BaseProcessor<State> {
+    constructor() {
+        super(new Map<string, DdcClusterInfo>())
+    }
 
     private newClusterInfo(
         clusterId: string,
@@ -113,6 +118,20 @@ export class DdcClustersProcessor {
                 clusterInfo.replicationTotal = cluster.props.replicationTotal
                 clusterInfo.status = DdcClusterStatus[cluster.status.__kind]
             }
+        } else if (storage.ddcClusters.clusters.v54105.is(block)) {
+            const cluster = await storage.ddcClusters.clusters.v54105.get(
+                block,
+                clusterId,
+            )
+            if (cluster) {
+                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId)
+                clusterInfo.erasureCodingRequired =
+                    cluster.props.erasureCodingRequired
+                clusterInfo.erasureCodingTotal =
+                    cluster.props.erasureCodingTotal
+                clusterInfo.replicationTotal = cluster.props.replicationTotal
+                clusterInfo.status = DdcClusterStatus[cluster.status.__kind]
+            }
         } else {
             throwUnsupportedStorageSpec(block)
         }
@@ -173,14 +192,10 @@ export class DdcClustersProcessor {
                 clusterInfo.unitPerGetRequest =
                     clusterGovParams.unitPerGetRequest
             }
-            this.state.set(clusterId, clusterInfo)
+            this._state.set(clusterId, clusterInfo)
         } else {
             logStorageError('DDC cluster', clusterId, block)
         }
-    }
-
-    getState(): Map<string, DdcClusterInfo> {
-        return this.state
     }
 
     async process(event: Event, block: BlockHeader) {

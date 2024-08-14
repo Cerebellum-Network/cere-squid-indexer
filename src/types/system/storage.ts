@@ -44,6 +44,10 @@ import * as v54001 from '../v54001'
 import * as v54002 from '../v54002'
 import * as v54004 from '../v54004'
 import * as v54100 from '../v54100'
+import * as v54105 from '../v54105'
+import * as v54106 from '../v54106'
+import * as v54112 from '../v54112'
+import * as v54113 from '../v54113'
 
 export const account =  {
     /**
@@ -733,6 +737,46 @@ export const events =  {
      *  just in case someone still reads them from within the runtime.
      */
     v54100: new StorageType('System.Events', 'Default', [], sts.array(() => v54100.EventRecord)) as EventsV54100,
+    /**
+     *  Events deposited for the current block.
+     * 
+     *  NOTE: The item is unbound and should therefore never be read on chain.
+     *  It could otherwise inflate the PoV size of a block.
+     * 
+     *  Events have a large in-memory size. Box the events to not go out-of-memory
+     *  just in case someone still reads them from within the runtime.
+     */
+    v54105: new StorageType('System.Events', 'Default', [], sts.array(() => v54105.EventRecord)) as EventsV54105,
+    /**
+     *  Events deposited for the current block.
+     * 
+     *  NOTE: The item is unbound and should therefore never be read on chain.
+     *  It could otherwise inflate the PoV size of a block.
+     * 
+     *  Events have a large in-memory size. Box the events to not go out-of-memory
+     *  just in case someone still reads them from within the runtime.
+     */
+    v54106: new StorageType('System.Events', 'Default', [], sts.array(() => v54106.EventRecord)) as EventsV54106,
+    /**
+     *  Events deposited for the current block.
+     * 
+     *  NOTE: The item is unbound and should therefore never be read on chain.
+     *  It could otherwise inflate the PoV size of a block.
+     * 
+     *  Events have a large in-memory size. Box the events to not go out-of-memory
+     *  just in case someone still reads them from within the runtime.
+     */
+    v54112: new StorageType('System.Events', 'Default', [], sts.array(() => v54112.EventRecord)) as EventsV54112,
+    /**
+     *  Events deposited for the current block.
+     * 
+     *  NOTE: The item is unbound and should therefore never be read on chain.
+     *  It could otherwise inflate the PoV size of a block.
+     * 
+     *  Events have a large in-memory size. Box the events to not go out-of-memory
+     *  just in case someone still reads them from within the runtime.
+     */
+    v54113: new StorageType('System.Events', 'Default', [], sts.array(() => v54113.EventRecord)) as EventsV54113,
 }
 
 /**
@@ -1351,6 +1395,66 @@ export interface EventsV54100  {
     is(block: RuntimeCtx): boolean
     getDefault(block: Block): v54100.EventRecord[]
     get(block: Block): Promise<(v54100.EventRecord[] | undefined)>
+}
+
+/**
+ *  Events deposited for the current block.
+ * 
+ *  NOTE: The item is unbound and should therefore never be read on chain.
+ *  It could otherwise inflate the PoV size of a block.
+ * 
+ *  Events have a large in-memory size. Box the events to not go out-of-memory
+ *  just in case someone still reads them from within the runtime.
+ */
+export interface EventsV54105  {
+    is(block: RuntimeCtx): boolean
+    getDefault(block: Block): v54105.EventRecord[]
+    get(block: Block): Promise<(v54105.EventRecord[] | undefined)>
+}
+
+/**
+ *  Events deposited for the current block.
+ * 
+ *  NOTE: The item is unbound and should therefore never be read on chain.
+ *  It could otherwise inflate the PoV size of a block.
+ * 
+ *  Events have a large in-memory size. Box the events to not go out-of-memory
+ *  just in case someone still reads them from within the runtime.
+ */
+export interface EventsV54106  {
+    is(block: RuntimeCtx): boolean
+    getDefault(block: Block): v54106.EventRecord[]
+    get(block: Block): Promise<(v54106.EventRecord[] | undefined)>
+}
+
+/**
+ *  Events deposited for the current block.
+ * 
+ *  NOTE: The item is unbound and should therefore never be read on chain.
+ *  It could otherwise inflate the PoV size of a block.
+ * 
+ *  Events have a large in-memory size. Box the events to not go out-of-memory
+ *  just in case someone still reads them from within the runtime.
+ */
+export interface EventsV54112  {
+    is(block: RuntimeCtx): boolean
+    getDefault(block: Block): v54112.EventRecord[]
+    get(block: Block): Promise<(v54112.EventRecord[] | undefined)>
+}
+
+/**
+ *  Events deposited for the current block.
+ * 
+ *  NOTE: The item is unbound and should therefore never be read on chain.
+ *  It could otherwise inflate the PoV size of a block.
+ * 
+ *  Events have a large in-memory size. Box the events to not go out-of-memory
+ *  just in case someone still reads them from within the runtime.
+ */
+export interface EventsV54113  {
+    is(block: RuntimeCtx): boolean
+    getDefault(block: Block): v54113.EventRecord[]
+    get(block: Block): Promise<(v54113.EventRecord[] | undefined)>
 }
 
 export const eventCount =  {

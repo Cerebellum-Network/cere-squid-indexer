@@ -7,8 +7,9 @@ import {
     toCereAddress,
 } from '../utils'
 import { DdcNodeMode } from '../model'
+import { BaseProcessor } from './processor'
 
-export interface DdcNodeInfo {
+interface DdcNodeInfo {
     id: string
 
     providerId: string
@@ -21,21 +22,28 @@ export interface DdcNodeInfo {
     grpcPort: number
     p2pPort: number
     mode: DdcNodeMode
+
+    transferredBytes: bigint
+    storedBytes: bigint
+    numberOfPuts: bigint
+    numberOfGets: bigint
 }
 
-export interface State {
+type State = {
     addedToCluster: Map<string, Set<string>>
     removedFromCluster: Map<string, Set<string>>
     updatedNodes: Map<string, DdcNodeInfo>
     removedNodes: Set<string>
 }
 
-export class DdcNodesProcessor {
-    private state: State = {
-        addedToCluster: new Map<string, Set<string>>(),
-        removedFromCluster: new Map<string, Set<string>>(),
-        updatedNodes: new Map<string, DdcNodeInfo>(),
-        removedNodes: new Set<string>(),
+export class DdcNodesProcessor extends BaseProcessor<State> {
+    constructor() {
+        super({
+            addedToCluster: new Map<string, Set<string>>(),
+            removedFromCluster: new Map<string, Set<string>>(),
+            updatedNodes: new Map<string, DdcNodeInfo>(),
+            removedNodes: new Set<string>(),
+        })
     }
 
     private async processDdcNodesEvents(nodeId: string, block: BlockHeader) {
@@ -57,6 +65,10 @@ export class DdcNodesProcessor {
                     grpcPort: 9090,
                     p2pPort: 9070,
                     mode: DdcNodeMode.Storage,
+                    transferredBytes: 0n,
+                    storedBytes: 0n,
+                    numberOfPuts: 0n,
+                    numberOfGets: 0n,
                 }
             }
         } else if (storage.ddcNodes.storageNodes.v48013.is(block)) {
@@ -76,6 +88,10 @@ export class DdcNodesProcessor {
                     grpcPort: node.props.grpcPort,
                     p2pPort: node.props.p2PPort,
                     mode: DdcNodeMode.Storage,
+                    transferredBytes: 0n,
+                    storedBytes: 0n,
+                    numberOfPuts: 0n,
+                    numberOfGets: 0n,
                 }
             }
         } else if (storage.ddcNodes.storageNodes.v48017.is(block)) {
@@ -95,6 +111,10 @@ export class DdcNodesProcessor {
                     grpcPort: node.props.grpcPort,
                     p2pPort: node.props.p2PPort,
                     mode: DdcNodeMode[node.props.mode.__kind],
+                    transferredBytes: 0n,
+                    storedBytes: 0n,
+                    numberOfPuts: 0n,
+                    numberOfGets: 0n,
                 }
             }
         } else if (storage.ddcNodes.storageNodes.v48400.is(block)) {
@@ -114,6 +134,10 @@ export class DdcNodesProcessor {
                     grpcPort: node.props.grpcPort,
                     p2pPort: node.props.p2PPort,
                     mode: DdcNodeMode[node.props.mode.__kind],
+                    transferredBytes: 0n,
+                    storedBytes: 0n,
+                    numberOfPuts: 0n,
+                    numberOfGets: 0n,
                 }
             }
         } else if (storage.ddcNodes.storageNodes.v54100.is(block)) {
@@ -133,6 +157,33 @@ export class DdcNodesProcessor {
                     grpcPort: node.props.grpcPort,
                     p2pPort: node.props.p2PPort,
                     mode: DdcNodeMode[node.props.mode.__kind],
+                    transferredBytes: 0n,
+                    storedBytes: 0n,
+                    numberOfPuts: 0n,
+                    numberOfGets: 0n,
+                }
+            }
+        } else if (storage.ddcNodes.storageNodes.v54113.is(block)) {
+            const node = await storage.ddcNodes.storageNodes.v54113.get(
+                block,
+                nodeId,
+            )
+            if (node) {
+                nodeInfo = {
+                    id: nodeId,
+                    providerId: node.providerId,
+                    clusterId: node.clusterId,
+                    host: node.props.host,
+                    domain: node.props.domain,
+                    ssl: node.props.ssl,
+                    httpPort: node.props.httpPort,
+                    grpcPort: node.props.grpcPort,
+                    p2pPort: node.props.p2PPort,
+                    mode: DdcNodeMode[node.props.mode.__kind],
+                    transferredBytes: node.totalUsage?.transferredBytes ?? 0n,
+                    storedBytes: node.totalUsage?.storedBytes ?? 0n,
+                    numberOfPuts: node.totalUsage?.numberOfPuts ?? 0n,
+                    numberOfGets: node.totalUsage?.numberOfGets ?? 0n,
                 }
             }
         } else {
@@ -140,14 +191,10 @@ export class DdcNodesProcessor {
         }
         if (nodeInfo) {
             nodeInfo.providerId = toCereAddress(nodeInfo.providerId)
-            this.state.updatedNodes.set(nodeId, nodeInfo)
+            this._state.updatedNodes.set(nodeId, nodeInfo)
         } else {
             logStorageError('DDC node', nodeId, block)
         }
-    }
-
-    getState(): State {
-        return this.state
     }
 
     async process(event: Event, block: BlockHeader) {
@@ -167,10 +214,11 @@ export class DdcNodesProcessor {
                 }
                 if (decodedEvent) {
                     const nodesInCluster =
-                        this.state.addedToCluster.get(decodedEvent.clusterId) ??
-                        new Set<string>()
+                        this._state.addedToCluster.get(
+                            decodedEvent.clusterId,
+                        ) ?? new Set<string>()
                     nodesInCluster.add(decodedEvent.nodePubKey.value)
-                    this.state.addedToCluster.set(
+                    this._state.addedToCluster.set(
                         decodedEvent.clusterId,
                         nodesInCluster,
                     )
@@ -196,11 +244,11 @@ export class DdcNodesProcessor {
                 }
                 if (decodedEvent) {
                     const nodesRemovedFromCluster =
-                        this.state.removedFromCluster.get(
+                        this._state.removedFromCluster.get(
                             decodedEvent.clusterId,
                         ) ?? new Set<string>()
                     nodesRemovedFromCluster.add(decodedEvent.nodePubKey.value)
-                    this.state.removedFromCluster.set(
+                    this._state.removedFromCluster.set(
                         decodedEvent.clusterId,
                         nodesRemovedFromCluster,
                     )
@@ -253,7 +301,7 @@ export class DdcNodesProcessor {
                     throwUnsupportedSpec(event, block)
                 }
                 if (removedNode) {
-                    this.state.removedNodes.add(removedNode)
+                    this._state.removedNodes.add(removedNode)
                 }
                 break
             }

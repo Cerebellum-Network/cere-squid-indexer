@@ -1,11 +1,6 @@
 # Cere Squid Indexer
 
-This is an indexer for [Cerebellum Network](https://www.cere.network/) build using [Subsquid](https://subsquid.io/) [squid-sdk](https://github.com/subsquid/squid-sdk).
-
-## Indexed data
-
-1. Balance transfers,
-2. DDC Customers bucket owners relation to bucket IDs.
+This is an indexer for [Cerebellum Network](https://www.cere.network/) blockchain built using [Subsquid](https://subsquid.io/) [squid-sdk](https://github.com/subsquid/squid-sdk).
 
 ## Usage
 
@@ -16,14 +11,8 @@ Please [install](https://docs.subsquid.io/squid-cli/installation/) it before pro
 # 1. Install dependencies
 npm ci
 
-# 2. Start target Postgres database from `docker-compose.yml` and detach
+# 2. Start target Postgres database, processor, and GraphQL server from `docker-compose.yml` and detach
 sqd up
-
-# 3. Apply database migrations, load .env, and start the squid processor
-sqd process
-
-# 4. Start the GraphQL server
-sqd serve
 ```
 
 A GraphiQL playground will be available at [127.0.0.1:4350/graphql](http://localhost:4350/graphql).
@@ -51,25 +40,19 @@ All database changes are applied through migration files located at `db/migratio
 It is all [TypeORM](https://typeorm.io/#/migrations) under the hood.
 
 ```bash
+# Update database connection credentials in .env and load them.
+source .env
+
 # Connect to database, analyze its state and generate migration to match the target schema.
 # The target schema is derived from entity classes generated earlier.
 # Don't forget to compile your entity classes beforehand!
-npx squid-typeorm-migration generate
-
-# Create template file for custom database changes
-npx squid-typeorm-migration create
-
-# Apply database migrations from `db/migrations`
-npx squid-typeorm-migration apply
-
-# Revert the last performed migration
-npx squid-typeorm-migration revert         
+sqd generate
 ```
 
 ### 4. Extend processor
 
-Now extend the processor adding your events listening and RPC requests to `getEventsInfo` in `src/main.ts` to compose
-im-memory data for the indexer and persist it in the `processor.run` callback.
+Create or extend an existing processor with new events listening and RPC requests in `src/processors`.
+Now you can add processor state persistance to the `processor.run` callback.
 
 ## Project conventions
 
@@ -91,5 +74,9 @@ specification file with the runtime metadata.
 Create blockchain specification file for `typegen.json` using [substrate-metadata-explorer](https://github.com/subsquid/squid-sdk/tree/master/substrate/substrate-metadata-explorer).
 
 ```bash
-npx @subsquid/substrate-metadata-explorer --rpc $RPC_WS --out specs/out.jsonl
+# Export new runtime metadata
+npx @subsquid/substrate-metadata-explorer --rpc $RPC_WS --fromBlock $FROM_BLOCK_NUMBER --out specs/out.jsonl
+
+# Add new runtime metadata to existing file used in `typegen.json` and regenerate types.
+npx squid-substrate-typegen ./typegen.json
 ```

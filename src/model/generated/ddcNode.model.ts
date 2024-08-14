@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_, StringColumn as StringColumn_, BooleanColumn as BooleanColumn_, IntColumn as IntColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_, StringColumn as StringColumn_, BooleanColumn as BooleanColumn_, IntColumn as IntColumn_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
 import {Account} from "./account.model"
 import {DdcCluster} from "./ddcCluster.model"
 import {DdcNodeMode} from "./_ddcNodeMode"
@@ -40,4 +40,16 @@ export class DdcNode {
 
     @Column_("varchar", {length: 7, nullable: false})
     mode!: DdcNodeMode
+
+    @BigIntColumn_({nullable: false})
+    transferredBytes!: bigint
+
+    @BigIntColumn_({nullable: false})
+    storedBytes!: bigint
+
+    @BigIntColumn_({nullable: false})
+    numberOfPuts!: bigint
+
+    @BigIntColumn_({nullable: false})
+    numberOfGets!: bigint
 }

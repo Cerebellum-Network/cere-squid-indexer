@@ -51,6 +51,11 @@ type DdcNode @entity {
   grpcPort: Int!
   p2pPort: Int!
   mode: DdcNodeMode!
+
+  transferredBytes: BigInt!
+  storedBytes: BigInt!
+  numberOfPuts: BigInt!
+  numberOfGets: BigInt!
 }
 
 enum DdcNodeMode {
@@ -60,7 +65,6 @@ enum DdcNodeMode {
 type DdcBucket @entity {
   id: ID!
 
-  bucketId: BigInt! @index @unique
   ownerId: Account! @index
   clusterId: DdcCluster! @index
 

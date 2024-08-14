@@ -6,6 +6,7 @@ import {
     throwUnsupportedStorageSpec,
     toCereAddress,
 } from '../utils'
+import { BaseProcessor } from './processor'
 
 export interface DdcBucketInfo {
     ownerId: string
@@ -19,15 +20,28 @@ export interface DdcBucketInfo {
     numberOfGets: bigint
 }
 
-export class DdcBucketsProcessor {
-    private state = new Map<bigint, DdcBucketInfo>()
+type State = Map<bigint, DdcBucketInfo>
+
+export class DdcBucketsProcessor extends BaseProcessor<State> {
+    constructor() {
+        super(new Map<bigint, DdcBucketInfo>())
+    }
 
     private async processDdcBucketsEvents(
         bucketId: bigint,
         block: BlockHeader,
     ) {
+        // TODO(khssnv)
+        // The `blockSpecVersion` is added because previously the following
+        // `storage.ddcCustomers.buckets.v48013.is(block)` returned `true` when `v54100` is
+        // expected. Remove it and return back to the `.is(block)` version selector when
+        // the problem is fixed. With `blockSpecVersion` we can't detect if incoming block has an
+        // unsupported future version of the storage.
+        const blockSpecVersion = block._runtime.specVersion
+
         let bucketInfo: DdcBucketInfo | undefined
-        if (storage.ddcCustomers.buckets.v48013.is(block)) {
+        // if (storage.ddcCustomers.buckets.v48013.is(block)) {
+        if (blockSpecVersion >= 48013 && blockSpecVersion < 48017) {
             const bucket = await storage.ddcCustomers.buckets.v48013.get(
                 block,
                 bucketId,
@@ -45,7 +59,8 @@ export class DdcBucketsProcessor {
                     numberOfGets: 0n,
                 }
             }
-        } else if (storage.ddcCustomers.buckets.v48017.is(block)) {
+        // } else if (storage.ddcCustomers.buckets.v48017.is(block)) {
+        } else if (blockSpecVersion <= 48017 && blockSpecVersion < 50000) {
             const bucket = await storage.ddcCustomers.buckets.v48017.get(
                 block,
                 bucketId,
@@ -63,7 +78,8 @@ export class DdcBucketsProcessor {
                     numberOfGets: 0n,
                 }
             }
-        } else if (storage.ddcCustomers.buckets.v50000.is(block)) {
+        // } else if (storage.ddcCustomers.buckets.v50000.is(block)) {
+        } else if (blockSpecVersion >= 50000 && blockSpecVersion < 54100) {
             const bucket = await storage.ddcCustomers.buckets.v50000.get(
                 block,
                 bucketId,
@@ -81,7 +97,8 @@ export class DdcBucketsProcessor {
                     numberOfGets: 0n,
                 }
             }
-        } else if (storage.ddcCustomers.buckets.v54100.is(block)) {
+        // } else if (storage.ddcCustomers.buckets.v54100.is(block)) {
+        } else if (blockSpecVersion >= 54100) {
             const bucket = await storage.ddcCustomers.buckets.v54100.get(
                 block,
                 bucketId,
@@ -107,14 +124,10 @@ export class DdcBucketsProcessor {
         }
         if (bucketInfo) {
             bucketInfo.ownerId = toCereAddress(bucketInfo.ownerId)
-            this.state.set(bucketId, bucketInfo)
+            this._state.set(bucketId, bucketInfo)
         } else {
             logStorageError('bucket', bucketId, block)
         }
-    }
-
-    getState(): Map<bigint, DdcBucketInfo> {
-        return this.state
     }
 
     async process(event: Event, block: BlockHeader) {
