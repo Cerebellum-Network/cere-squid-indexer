@@ -76,6 +76,10 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                 block,
                 nodeId,
             )
+            console.log(`DdcNodesProcessor.processDdcNodesEvents.v48013`)
+            console.log(`   Storage item StorageNode (struct), field pubKey (enum): ${node?.pubKey}`)
+            console.log(`   Storage item StorageNode (struct), field host (BoundedVec): ${node?.props.host}`)
+            console.log(`   Storage item StorageNode (struct), field domain (BoundedVec): ${node?.props.domain}`)
             if (node) {
                 nodeInfo = {
                     id: nodeId,
@@ -265,6 +269,8 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                     const nodeId =
                         events.ddcNodes.nodeCreated.v48017.decode(event)
                             .nodePubKey.value
+                    console.log(`DdcNodesProcessor.process.v48017`)
+                    console.log(`   Event NodeCreated (struct), field nodePubKey (enum): ${nodeId}`)
                     await this.processDdcNodesEvents(nodeId, block)
                 } else {
                     throwUnsupportedSpec(event, block)
