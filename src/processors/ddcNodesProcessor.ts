@@ -2,6 +2,7 @@ import type { HexString } from '@polkadot/util/types'
 import { BlockHeader, Event } from '@subsquid/substrate-processor'
 import { events, storage } from '../types'
 import {
+    decodeAsciiStringFromScaleVecFixed,
     decodeCereAddressFromScaleAddress,
     logStorageError,
     throwUnsupportedSpec,
@@ -10,6 +11,9 @@ import {
 } from '../utils'
 import { DdcNodeMode } from '../model'
 import { BaseProcessor } from './processor'
+
+const MaxHostLen = 255;
+const MaxDomainLen = 255;
 
 interface DdcNodeInfo {
     id: string
@@ -77,8 +81,8 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                     id: decodeCereAddressFromScaleAddress(node.pubKey as HexString),
                     providerId: node.providerId,
                     clusterId: node.clusterId,
-                    host: node.props.host,
-                    domain: node.props.domain,
+                    host: decodeAsciiStringFromScaleVecFixed(MaxHostLen, node.props.host as HexString),
+                    domain: decodeAsciiStringFromScaleVecFixed(MaxDomainLen, node.props.domain as HexString),
                     ssl: node.props.ssl,
                     httpPort: node.props.httpPort,
                     grpcPort: node.props.grpcPort,
@@ -97,8 +101,8 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                     id: decodeCereAddressFromScaleAddress(node.pubKey as HexString),
                     providerId: node.providerId,
                     clusterId: node.clusterId,
-                    host: node.props.host,
-                    domain: node.props.domain,
+                    host: decodeAsciiStringFromScaleVecFixed(MaxHostLen, node.props.host as HexString),
+                    domain: decodeAsciiStringFromScaleVecFixed(MaxDomainLen, node.props.domain as HexString),
                     ssl: node.props.ssl,
                     httpPort: node.props.httpPort,
                     grpcPort: node.props.grpcPort,
@@ -117,8 +121,8 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                     id: decodeCereAddressFromScaleAddress(node.pubKey as HexString),
                     providerId: node.providerId,
                     clusterId: node.clusterId,
-                    host: node.props.host,
-                    domain: node.props.domain,
+                    host: decodeAsciiStringFromScaleVecFixed(MaxHostLen, node.props.host as HexString),
+                    domain: decodeAsciiStringFromScaleVecFixed(MaxDomainLen, node.props.domain as HexString),
                     ssl: node.props.ssl,
                     httpPort: node.props.httpPort,
                     grpcPort: node.props.grpcPort,
@@ -137,8 +141,8 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                     id: decodeCereAddressFromScaleAddress(node.pubKey as HexString),
                     providerId: node.providerId,
                     clusterId: node.clusterId,
-                    host: node.props.host,
-                    domain: node.props.domain,
+                    host: decodeAsciiStringFromScaleVecFixed(MaxHostLen, node.props.host as HexString),
+                    domain: decodeAsciiStringFromScaleVecFixed(MaxDomainLen, node.props.domain as HexString),
                     ssl: node.props.ssl,
                     httpPort: node.props.httpPort,
                     grpcPort: node.props.grpcPort,
@@ -157,8 +161,8 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                     id: decodeCereAddressFromScaleAddress(node.pubKey as HexString),
                     providerId: node.providerId,
                     clusterId: node.clusterId,
-                    host: node.props.host,
-                    domain: node.props.domain,
+                    host: decodeAsciiStringFromScaleVecFixed(MaxHostLen, node.props.host as HexString),
+                    domain: decodeAsciiStringFromScaleVecFixed(MaxDomainLen, node.props.domain as HexString),
                     ssl: node.props.ssl,
                     httpPort: node.props.httpPort,
                     grpcPort: node.props.grpcPort,
