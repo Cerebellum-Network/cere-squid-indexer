@@ -1,6 +1,13 @@
+import type { HexString } from '@polkadot/util/types'
 import { BlockHeader, Event } from '@subsquid/substrate-processor'
 import { events, storage } from '../types'
-import { logStorageError, throwUnsupportedSpec, throwUnsupportedStorageSpec, toCereAddress } from '../utils'
+import {
+    decodeCereAddressFromScaleAddress,
+    logStorageError,
+    throwUnsupportedSpec,
+    throwUnsupportedStorageSpec,
+    toCereAddress,
+} from '../utils'
 import { DdcNodeMode } from '../model'
 import { BaseProcessor } from './processor'
 
@@ -47,7 +54,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
             const node = await storage.ddcNodes.storageNodes.v48008.get(block, nodeId)
             if (node) {
                 nodeInfo = {
-                    id: nodeId,
+                    id: decodeCereAddressFromScaleAddress(node.pubKey as HexString),
                     providerId: node.providerId,
                     clusterId: node.clusterId,
                     host: 'localhost',
@@ -67,7 +74,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
             const node = await storage.ddcNodes.storageNodes.v48013.get(block, nodeId)
             if (node) {
                 nodeInfo = {
-                    id: nodeId,
+                    id: decodeCereAddressFromScaleAddress(node.pubKey as HexString),
                     providerId: node.providerId,
                     clusterId: node.clusterId,
                     host: node.props.host,
@@ -87,7 +94,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
             const node = await storage.ddcNodes.storageNodes.v48017.get(block, nodeId)
             if (node) {
                 nodeInfo = {
-                    id: nodeId,
+                    id: decodeCereAddressFromScaleAddress(node.pubKey as HexString),
                     providerId: node.providerId,
                     clusterId: node.clusterId,
                     host: node.props.host,
@@ -107,7 +114,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
             const node = await storage.ddcNodes.storageNodes.v48400.get(block, nodeId)
             if (node) {
                 nodeInfo = {
-                    id: nodeId,
+                    id: decodeCereAddressFromScaleAddress(node.pubKey as HexString),
                     providerId: node.providerId,
                     clusterId: node.clusterId,
                     host: node.props.host,
@@ -127,7 +134,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
             const node = await storage.ddcNodes.storageNodes.v54100.get(block, nodeId)
             if (node) {
                 nodeInfo = {
-                    id: nodeId,
+                    id: decodeCereAddressFromScaleAddress(node.pubKey as HexString),
                     providerId: node.providerId,
                     clusterId: node.clusterId,
                     host: node.props.host,
@@ -147,7 +154,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
             const node = await storage.ddcNodes.storageNodes.v54113.get(block, nodeId)
             if (node) {
                 nodeInfo = {
-                    id: nodeId,
+                    id: decodeCereAddressFromScaleAddress(node.pubKey as HexString),
                     providerId: node.providerId,
                     clusterId: node.clusterId,
                     host: node.props.host,
