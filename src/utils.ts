@@ -1,3 +1,5 @@
+import { TypeRegistry, GenericAddress } from '@polkadot/types'
+import { HexString } from '@polkadot/util/types'
 import { BlockHeader, Event } from '@subsquid/substrate-processor'
 import * as ss58 from '@subsquid/ss58'
 
@@ -16,4 +18,12 @@ export const logStorageError = (entity: string, key: any, block: BlockHeader) =>
 
 export const toCereAddress = (accoutnId: string) => {
     return ss58.codec('cere').encode(accoutnId)
+}
+
+const registry = new TypeRegistry()
+
+export const decodeCereAddressFromScaleAddress = (data: HexString) => {
+    const decodedGenericAddress = new GenericAddress(registry, data)
+    const ss58Address = ss58.decode(decodedGenericAddress.toString())
+    return toCereAddress(ss58Address.bytes)
 }
