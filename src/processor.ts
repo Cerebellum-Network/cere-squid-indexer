@@ -10,17 +10,12 @@ import { events } from './types'
 
 export const processor = new SubstrateBatchProcessor()
     .setRpcEndpoint({
-        url: assertNotNull(
-            process.env.RPC_CERE_HTTP,
-            'No RPC endpoint supplied',
-        ),
+        url: assertNotNull(process.env.RPC_CERE_HTTP, 'No RPC endpoint supplied'),
         rateLimit: parseInt(process.env.SQD_RATE_LIMIT || '500'),
         capacity: parseInt(process.env.SQD_CAPACITY || '10'),
     })
     .setBlockRange({ from: parseInt(process.env.SQD_FIRST_BLOCK || '0') })
-    .setTypesBundle(
-        process.env.TYPES_BUNDLE || '../specs/cere-types-bundle.json',
-    )
+    .setTypesBundle(process.env.TYPES_BUNDLE || '../specs/cere-types-bundle.json')
     .addEvent({
         name: [
             events.balances.endowed.name,

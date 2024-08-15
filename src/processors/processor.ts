@@ -2,10 +2,7 @@ import { assertNotNull } from '@subsquid/substrate-processor'
 import { BlockHeader, Event } from '@subsquid/substrate-processor'
 
 export abstract class BaseProcessor<
-    State extends
-        | Map<any, any>
-        | Set<any>
-        | { [key: string]: Map<any, any> | Set<any> },
+    State extends Map<any, any> | Set<any> | { [key: string]: Map<any, any> | Set<any> },
 > {
     constructor(protected _state: State) {}
 

@@ -23,9 +23,7 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     for (let b of ctx.blocks) {
         const block = b.header
         for (let event of b.events) {
-            logger.debug(
-                `Received event ${event.name} at block ${block.height} (${block.hash})`,
-            )
+            logger.debug(`Received event ${event.name} at block ${block.height} (${block.hash})`)
 
             await Promise.all([
                 cereBalancesProcessor.process(event, block),
@@ -74,9 +72,7 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     const ddcClusterAccounts = [...ddcClusters.values()].map((c) => c.managerId)
     await createAccounts(ddcClusterAccounts)
 
-    const ddcNodesAccounts = [...ddcNodes.updatedNodes.values()].map(
-        (c) => c.providerId,
-    )
+    const ddcNodesAccounts = [...ddcNodes.updatedNodes.values()].map((c) => c.providerId)
     await createAccounts(ddcNodesAccounts)
 
     const ddcBucketsAccounts = [...ddcBuckets.values()].map((c) => c.ownerId)

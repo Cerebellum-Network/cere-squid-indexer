@@ -1,6 +1,8 @@
+import type { HexString } from '@polkadot/util/types'
 import { BlockHeader, Event } from '@subsquid/substrate-processor'
 import { events, storage } from '../types'
 import {
+    decodeAsciiStringFromScaleVecFixed,
     logStorageError,
     throwUnsupportedSpec,
     throwUnsupportedStorageSpec,
@@ -8,6 +10,9 @@ import {
 } from '../utils'
 import { DdcNodeMode } from '../model'
 import { BaseProcessor } from './processor'
+
+const MaxHostLen = 255;
+const MaxDomainLen = 255;
 
 interface DdcNodeInfo {
     id: string
@@ -49,13 +54,10 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
     private async processDdcNodesEvents(nodeId: string, block: BlockHeader) {
         let nodeInfo: DdcNodeInfo | undefined
         if (storage.ddcNodes.storageNodes.v48008.is(block)) {
-            const node = await storage.ddcNodes.storageNodes.v48008.get(
-                block,
-                nodeId,
-            )
+            const node = await storage.ddcNodes.storageNodes.v48008.get(block, nodeId)
             if (node) {
                 nodeInfo = {
-                    id: nodeId,
+                    id: toCereAddress(node.pubKey),
                     providerId: node.providerId,
                     clusterId: node.clusterId,
                     host: 'localhost',
@@ -72,17 +74,14 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                 }
             }
         } else if (storage.ddcNodes.storageNodes.v48013.is(block)) {
-            const node = await storage.ddcNodes.storageNodes.v48013.get(
-                block,
-                nodeId,
-            )
+            const node = await storage.ddcNodes.storageNodes.v48013.get(block, nodeId)
             if (node) {
                 nodeInfo = {
-                    id: nodeId,
+                    id: toCereAddress(node.pubKey),
                     providerId: node.providerId,
                     clusterId: node.clusterId,
-                    host: node.props.host,
-                    domain: node.props.domain,
+                    host: decodeAsciiStringFromScaleVecFixed(MaxHostLen, node.props.host as HexString),
+                    domain: decodeAsciiStringFromScaleVecFixed(MaxDomainLen, node.props.domain as HexString),
                     ssl: node.props.ssl,
                     httpPort: node.props.httpPort,
                     grpcPort: node.props.grpcPort,
@@ -95,17 +94,14 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                 }
             }
         } else if (storage.ddcNodes.storageNodes.v48017.is(block)) {
-            const node = await storage.ddcNodes.storageNodes.v48017.get(
-                block,
-                nodeId,
-            )
+            const node = await storage.ddcNodes.storageNodes.v48017.get(block, nodeId)
             if (node) {
                 nodeInfo = {
-                    id: nodeId,
+                    id: toCereAddress(node.pubKey),
                     providerId: node.providerId,
                     clusterId: node.clusterId,
-                    host: node.props.host,
-                    domain: node.props.domain,
+                    host: decodeAsciiStringFromScaleVecFixed(MaxHostLen, node.props.host as HexString),
+                    domain: decodeAsciiStringFromScaleVecFixed(MaxDomainLen, node.props.domain as HexString),
                     ssl: node.props.ssl,
                     httpPort: node.props.httpPort,
                     grpcPort: node.props.grpcPort,
@@ -118,17 +114,14 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                 }
             }
         } else if (storage.ddcNodes.storageNodes.v48400.is(block)) {
-            const node = await storage.ddcNodes.storageNodes.v48400.get(
-                block,
-                nodeId,
-            )
+            const node = await storage.ddcNodes.storageNodes.v48400.get(block, nodeId)
             if (node) {
                 nodeInfo = {
-                    id: nodeId,
+                    id: toCereAddress(node.pubKey),
                     providerId: node.providerId,
                     clusterId: node.clusterId,
-                    host: node.props.host,
-                    domain: node.props.domain,
+                    host: decodeAsciiStringFromScaleVecFixed(MaxHostLen, node.props.host as HexString),
+                    domain: decodeAsciiStringFromScaleVecFixed(MaxDomainLen, node.props.domain as HexString),
                     ssl: node.props.ssl,
                     httpPort: node.props.httpPort,
                     grpcPort: node.props.grpcPort,
@@ -141,17 +134,14 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                 }
             }
         } else if (storage.ddcNodes.storageNodes.v54100.is(block)) {
-            const node = await storage.ddcNodes.storageNodes.v54100.get(
-                block,
-                nodeId,
-            )
+            const node = await storage.ddcNodes.storageNodes.v54100.get(block, nodeId)
             if (node) {
                 nodeInfo = {
-                    id: nodeId,
+                    id: toCereAddress(node.pubKey),
                     providerId: node.providerId,
                     clusterId: node.clusterId,
-                    host: node.props.host,
-                    domain: node.props.domain,
+                    host: decodeAsciiStringFromScaleVecFixed(MaxHostLen, node.props.host as HexString),
+                    domain: decodeAsciiStringFromScaleVecFixed(MaxDomainLen, node.props.domain as HexString),
                     ssl: node.props.ssl,
                     httpPort: node.props.httpPort,
                     grpcPort: node.props.grpcPort,
@@ -164,17 +154,14 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                 }
             }
         } else if (storage.ddcNodes.storageNodes.v54113.is(block)) {
-            const node = await storage.ddcNodes.storageNodes.v54113.get(
-                block,
-                nodeId,
-            )
+            const node = await storage.ddcNodes.storageNodes.v54113.get(block, nodeId)
             if (node) {
                 nodeInfo = {
-                    id: nodeId,
+                    id: toCereAddress(node.pubKey),
                     providerId: node.providerId,
                     clusterId: node.clusterId,
-                    host: node.props.host,
-                    domain: node.props.domain,
+                    host: decodeAsciiStringFromScaleVecFixed(MaxHostLen, node.props.host as HexString),
+                    domain: decodeAsciiStringFromScaleVecFixed(MaxDomainLen, node.props.domain as HexString),
                     ssl: node.props.ssl,
                     httpPort: node.props.httpPort,
                     grpcPort: node.props.grpcPort,
@@ -202,69 +189,42 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
             case events.ddcClusters.clusterNodeAdded.name: {
                 let decodedEvent
                 if (events.ddcClusters.clusterNodeAdded.v48008.is(event)) {
-                    decodedEvent =
-                        events.ddcClusters.clusterNodeAdded.v48008.decode(event)
-                } else if (
-                    events.ddcClusters.clusterNodeAdded.v48017.is(event)
-                ) {
-                    decodedEvent =
-                        events.ddcClusters.clusterNodeAdded.v48017.decode(event)
+                    decodedEvent = events.ddcClusters.clusterNodeAdded.v48008.decode(event)
+                } else if (events.ddcClusters.clusterNodeAdded.v48017.is(event)) {
+                    decodedEvent = events.ddcClusters.clusterNodeAdded.v48017.decode(event)
                 } else {
                     throwUnsupportedSpec(event, block)
                 }
                 if (decodedEvent) {
-                    const nodesInCluster =
-                        this._state.addedToCluster.get(
-                            decodedEvent.clusterId,
-                        ) ?? new Set<string>()
+                    const nodesInCluster = this._state.addedToCluster.get(decodedEvent.clusterId) ?? new Set<string>()
                     nodesInCluster.add(decodedEvent.nodePubKey.value)
-                    this._state.addedToCluster.set(
-                        decodedEvent.clusterId,
-                        nodesInCluster,
-                    )
+                    this._state.addedToCluster.set(decodedEvent.clusterId, nodesInCluster)
                 }
                 break
             }
             case events.ddcClusters.clusterNodeRemoved.name: {
                 let decodedEvent
                 if (events.ddcClusters.clusterNodeRemoved.v48008.is(event)) {
-                    decodedEvent =
-                        events.ddcClusters.clusterNodeRemoved.v48008.decode(
-                            event,
-                        )
-                } else if (
-                    events.ddcClusters.clusterNodeRemoved.v48017.is(event)
-                ) {
-                    decodedEvent =
-                        events.ddcClusters.clusterNodeRemoved.v48017.decode(
-                            event,
-                        )
+                    decodedEvent = events.ddcClusters.clusterNodeRemoved.v48008.decode(event)
+                } else if (events.ddcClusters.clusterNodeRemoved.v48017.is(event)) {
+                    decodedEvent = events.ddcClusters.clusterNodeRemoved.v48017.decode(event)
                 } else {
                     throwUnsupportedSpec(event, block)
                 }
                 if (decodedEvent) {
                     const nodesRemovedFromCluster =
-                        this._state.removedFromCluster.get(
-                            decodedEvent.clusterId,
-                        ) ?? new Set<string>()
+                        this._state.removedFromCluster.get(decodedEvent.clusterId) ?? new Set<string>()
                     nodesRemovedFromCluster.add(decodedEvent.nodePubKey.value)
-                    this._state.removedFromCluster.set(
-                        decodedEvent.clusterId,
-                        nodesRemovedFromCluster,
-                    )
+                    this._state.removedFromCluster.set(decodedEvent.clusterId, nodesRemovedFromCluster)
                 }
                 break
             }
             case events.ddcNodes.nodeCreated.name: {
                 if (events.ddcNodes.nodeCreated.v48008.is(event)) {
-                    const nodeId =
-                        events.ddcNodes.nodeCreated.v48008.decode(event)
-                            .nodePubKey.value
+                    const nodeId = events.ddcNodes.nodeCreated.v48008.decode(event).nodePubKey.value
                     await this.processDdcNodesEvents(nodeId, block)
                 } else if (events.ddcNodes.nodeCreated.v48017.is(event)) {
-                    const nodeId =
-                        events.ddcNodes.nodeCreated.v48017.decode(event)
-                            .nodePubKey.value
+                    const nodeId = events.ddcNodes.nodeCreated.v48017.decode(event).nodePubKey.value
                     await this.processDdcNodesEvents(nodeId, block)
                 } else {
                     throwUnsupportedSpec(event, block)
@@ -273,14 +233,10 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
             }
             case events.ddcNodes.nodeParamsChanged.name: {
                 if (events.ddcNodes.nodeParamsChanged.v48008.is(event)) {
-                    const nodeId =
-                        events.ddcNodes.nodeParamsChanged.v48008.decode(event)
-                            .nodePubKey.value
+                    const nodeId = events.ddcNodes.nodeParamsChanged.v48008.decode(event).nodePubKey.value
                     await this.processDdcNodesEvents(nodeId, block)
                 } else if (events.ddcNodes.nodeParamsChanged.v48017.is(event)) {
-                    const nodeId =
-                        events.ddcNodes.nodeParamsChanged.v48017.decode(event)
-                            .nodePubKey.value
+                    const nodeId = events.ddcNodes.nodeParamsChanged.v48017.decode(event).nodePubKey.value
                     await this.processDdcNodesEvents(nodeId, block)
                 } else {
                     throwUnsupportedSpec(event, block)
@@ -290,13 +246,9 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
             case events.ddcNodes.nodeDeleted.name: {
                 let removedNode
                 if (events.ddcNodes.nodeDeleted.v48008.is(event)) {
-                    removedNode =
-                        events.ddcNodes.nodeDeleted.v48008.decode(event)
-                            .nodePubKey.value
+                    removedNode = events.ddcNodes.nodeDeleted.v48008.decode(event).nodePubKey.value
                 } else if (events.ddcNodes.nodeDeleted.v48017.is(event)) {
-                    removedNode =
-                        events.ddcNodes.nodeDeleted.v48017.decode(event)
-                            .nodePubKey.value
+                    removedNode = events.ddcNodes.nodeDeleted.v48017.decode(event).nodePubKey.value
                 } else {
                     throwUnsupportedSpec(event, block)
                 }
