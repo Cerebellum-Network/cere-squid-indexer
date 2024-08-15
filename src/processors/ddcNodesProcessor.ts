@@ -3,7 +3,6 @@ import { BlockHeader, Event } from '@subsquid/substrate-processor'
 import { events, storage } from '../types'
 import {
     decodeAsciiStringFromScaleVecFixed,
-    decodeCereAddressFromScaleAddress,
     logStorageError,
     throwUnsupportedSpec,
     throwUnsupportedStorageSpec,
@@ -58,7 +57,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
             const node = await storage.ddcNodes.storageNodes.v48008.get(block, nodeId)
             if (node) {
                 nodeInfo = {
-                    id: decodeCereAddressFromScaleAddress(node.pubKey as HexString),
+                    id: toCereAddress(node.pubKey),
                     providerId: node.providerId,
                     clusterId: node.clusterId,
                     host: 'localhost',
@@ -78,7 +77,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
             const node = await storage.ddcNodes.storageNodes.v48013.get(block, nodeId)
             if (node) {
                 nodeInfo = {
-                    id: decodeCereAddressFromScaleAddress(node.pubKey as HexString),
+                    id: toCereAddress(node.pubKey),
                     providerId: node.providerId,
                     clusterId: node.clusterId,
                     host: decodeAsciiStringFromScaleVecFixed(MaxHostLen, node.props.host as HexString),
@@ -98,7 +97,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
             const node = await storage.ddcNodes.storageNodes.v48017.get(block, nodeId)
             if (node) {
                 nodeInfo = {
-                    id: decodeCereAddressFromScaleAddress(node.pubKey as HexString),
+                    id: toCereAddress(node.pubKey),
                     providerId: node.providerId,
                     clusterId: node.clusterId,
                     host: decodeAsciiStringFromScaleVecFixed(MaxHostLen, node.props.host as HexString),
@@ -118,7 +117,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
             const node = await storage.ddcNodes.storageNodes.v48400.get(block, nodeId)
             if (node) {
                 nodeInfo = {
-                    id: decodeCereAddressFromScaleAddress(node.pubKey as HexString),
+                    id: toCereAddress(node.pubKey),
                     providerId: node.providerId,
                     clusterId: node.clusterId,
                     host: decodeAsciiStringFromScaleVecFixed(MaxHostLen, node.props.host as HexString),
@@ -138,7 +137,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
             const node = await storage.ddcNodes.storageNodes.v54100.get(block, nodeId)
             if (node) {
                 nodeInfo = {
-                    id: decodeCereAddressFromScaleAddress(node.pubKey as HexString),
+                    id: toCereAddress(node.pubKey),
                     providerId: node.providerId,
                     clusterId: node.clusterId,
                     host: decodeAsciiStringFromScaleVecFixed(MaxHostLen, node.props.host as HexString),
@@ -158,7 +157,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
             const node = await storage.ddcNodes.storageNodes.v54113.get(block, nodeId)
             if (node) {
                 nodeInfo = {
-                    id: decodeCereAddressFromScaleAddress(node.pubKey as HexString),
+                    id: toCereAddress(node.pubKey),
                     providerId: node.providerId,
                     clusterId: node.clusterId,
                     host: decodeAsciiStringFromScaleVecFixed(MaxHostLen, node.props.host as HexString),
