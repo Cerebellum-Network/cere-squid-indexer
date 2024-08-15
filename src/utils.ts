@@ -1,4 +1,4 @@
-import { TypeRegistry, GenericAddress, VecFixed } from '@polkadot/types'
+import { TypeRegistry, VecFixed } from '@polkadot/types'
 import { HexString } from '@polkadot/util/types'
 import { BlockHeader, Event } from '@subsquid/substrate-processor'
 import * as ss58 from '@subsquid/ss58'
@@ -21,12 +21,6 @@ export const toCereAddress = (accoutnId: string) => {
 }
 
 const registry = new TypeRegistry()
-
-export const decodeCereAddressFromScaleAddress = (data: HexString) => {
-    const decodedGenericAddress = new GenericAddress(registry, data)
-    const ss58Address = ss58.decode(decodedGenericAddress.toString())
-    return toCereAddress(ss58Address.bytes)
-}
 
 export const decodeAsciiStringFromScaleVecFixed = (vecMaxLen: number, data: HexString) => {
     // TODO(khssnv): runtime BoundedVec capacity is not available neither from typegen constants nor in the data itself
