@@ -11,8 +11,8 @@ import {
 import { DdcNodeMode } from '../model'
 import { BaseProcessor } from './processor'
 
-const MaxHostLen = 255;
-const MaxDomainLen = 255;
+const MaxHostLen = 255
+const MaxDomainLen = 255
 
 interface DdcNodeInfo {
     id: string
