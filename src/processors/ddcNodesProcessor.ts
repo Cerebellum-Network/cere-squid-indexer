@@ -4,7 +4,7 @@ import { events, storage } from '../types'
 import {
     decodeAsciiStringFromScaleVecFixed,
     logStorageError,
-    throwUnsupportedSpec,
+    logUnsupportedEventVersion,
     throwUnsupportedStorageSpec,
     toCereAddress,
 } from '../utils'
@@ -193,7 +193,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                 } else if (events.ddcClusters.clusterNodeAdded.v48017.is(event)) {
                     decodedEvent = events.ddcClusters.clusterNodeAdded.v48017.decode(event)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 if (decodedEvent) {
                     const nodesInCluster = this._state.addedToCluster.get(decodedEvent.clusterId) ?? new Set<string>()
@@ -209,7 +209,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                 } else if (events.ddcClusters.clusterNodeRemoved.v48017.is(event)) {
                     decodedEvent = events.ddcClusters.clusterNodeRemoved.v48017.decode(event)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 if (decodedEvent) {
                     const nodesRemovedFromCluster =
@@ -227,7 +227,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                     const nodeId = events.ddcNodes.nodeCreated.v48017.decode(event).nodePubKey.value
                     await this.processDdcNodesEvents(nodeId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 break
             }
@@ -239,7 +239,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                     const nodeId = events.ddcNodes.nodeParamsChanged.v48017.decode(event).nodePubKey.value
                     await this.processDdcNodesEvents(nodeId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 break
             }
@@ -250,7 +250,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                 } else if (events.ddcNodes.nodeDeleted.v48017.is(event)) {
                     removedNode = events.ddcNodes.nodeDeleted.v48017.decode(event).nodePubKey.value
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 if (removedNode) {
                     this._state.removedNodes.add(removedNode)

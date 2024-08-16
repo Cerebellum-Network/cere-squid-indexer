@@ -1,6 +1,6 @@
 import { BlockHeader, Event } from '@subsquid/substrate-processor'
 import { events, storage } from '../types'
-import { logStorageError, throwUnsupportedSpec, throwUnsupportedStorageSpec, toCereAddress } from '../utils'
+import { logStorageError, logUnsupportedEventVersion, throwUnsupportedStorageSpec, toCereAddress } from '../utils'
 import { BaseProcessor } from './processor'
 
 type State = Map<string, bigint>
@@ -34,7 +34,7 @@ export class DdcBalancesProcessor extends BaseProcessor<State> {
                     const accountId = events.ddcCustomers.deposited.v48800.decode(event).ownerId
                     await this.processDdcCustomersBalancesEvents(accountId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 break
             }
@@ -43,7 +43,7 @@ export class DdcBalancesProcessor extends BaseProcessor<State> {
                     const accountId = events.ddcCustomers.initiatDepositUnlock.v48013.decode(event)[0]
                     await this.processDdcCustomersBalancesEvents(accountId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 break
             }
@@ -55,7 +55,7 @@ export class DdcBalancesProcessor extends BaseProcessor<State> {
                     const accountId = events.ddcCustomers.withdrawn.v48800.decode(event).ownerId
                     await this.processDdcCustomersBalancesEvents(accountId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 break
             }
@@ -69,7 +69,7 @@ export class DdcBalancesProcessor extends BaseProcessor<State> {
                     const accountId = events.ddcCustomers.charged.v48800.decode(event).ownerId
                     await this.processDdcCustomersBalancesEvents(accountId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 break
             }
@@ -81,7 +81,7 @@ export class DdcBalancesProcessor extends BaseProcessor<State> {
                     const accountId = events.ddcCustomers.initialDepositUnlock.v48800.decode(event).ownerId
                     await this.processDdcCustomersBalancesEvents(accountId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 break
             }

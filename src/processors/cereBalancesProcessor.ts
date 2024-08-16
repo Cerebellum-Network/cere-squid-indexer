@@ -1,6 +1,6 @@
 import { BlockHeader, Event } from '@subsquid/substrate-processor'
 import { events, storage } from '../types'
-import { logStorageError, throwUnsupportedSpec, throwUnsupportedStorageSpec, toCereAddress } from '../utils'
+import { logStorageError, logUnsupportedEventVersion, throwUnsupportedStorageSpec, toCereAddress } from '../utils'
 import { BaseProcessor } from './processor'
 
 type State = Map<string, bigint>
@@ -46,7 +46,7 @@ export class CereBalancesProcessor extends BaseProcessor<State> {
                     const accountId = events.balances.endowed.v297.decode(event).account
                     await this.processBalancesEvent(accountId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 break
             }
@@ -58,7 +58,7 @@ export class CereBalancesProcessor extends BaseProcessor<State> {
                     const accountId = events.balances.dustLost.v297.decode(event).account
                     await this.processBalancesEvent(accountId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 break
             }
@@ -70,7 +70,7 @@ export class CereBalancesProcessor extends BaseProcessor<State> {
                     const accountId = events.balances.transfer.v297.decode(event).from
                     await this.processBalancesEvent(accountId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 break
             }
@@ -85,7 +85,7 @@ export class CereBalancesProcessor extends BaseProcessor<State> {
                     const accountId = events.balances.balanceSet.v48900.decode(event).who
                     await this.processBalancesEvent(accountId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 break
             }
@@ -97,7 +97,7 @@ export class CereBalancesProcessor extends BaseProcessor<State> {
                     const accountId = events.balances.deposit.v297.decode(event).who
                     await this.processBalancesEvent(accountId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 break
             }
@@ -109,7 +109,7 @@ export class CereBalancesProcessor extends BaseProcessor<State> {
                     const accountId = events.balances.reserved.v297.decode(event).who
                     await this.processBalancesEvent(accountId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 break
             }
@@ -121,7 +121,7 @@ export class CereBalancesProcessor extends BaseProcessor<State> {
                     const accountId = events.balances.unreserved.v297.decode(event).who
                     await this.processBalancesEvent(accountId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 break
             }
@@ -133,7 +133,7 @@ export class CereBalancesProcessor extends BaseProcessor<State> {
                     const accountId = events.balances.reserveRepatriated.v297.decode(event).from
                     await this.processBalancesEvent(accountId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 break
             }
@@ -145,7 +145,7 @@ export class CereBalancesProcessor extends BaseProcessor<State> {
                     const accountId = events.balances.withdraw.v297.decode(event).who
                     await this.processBalancesEvent(accountId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 break
             }
@@ -157,7 +157,7 @@ export class CereBalancesProcessor extends BaseProcessor<State> {
                     const accountId = events.balances.slashed.v297.decode(event).who
                     await this.processBalancesEvent(accountId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 break
             }
@@ -166,7 +166,7 @@ export class CereBalancesProcessor extends BaseProcessor<State> {
                     const accountId = events.balances.minted.v48900.decode(event).who
                     await this.processBalancesEvent(accountId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 break
             }
@@ -175,7 +175,7 @@ export class CereBalancesProcessor extends BaseProcessor<State> {
                     const accountId = events.balances.burned.v48900.decode(event).who
                     await this.processBalancesEvent(accountId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 break
             }
@@ -184,7 +184,7 @@ export class CereBalancesProcessor extends BaseProcessor<State> {
                     const accountId = events.balances.suspended.v48900.decode(event).who
                     await this.processBalancesEvent(accountId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 break
             }
@@ -193,7 +193,7 @@ export class CereBalancesProcessor extends BaseProcessor<State> {
                     const accountId = events.balances.restored.v48900.decode(event).who
                     await this.processBalancesEvent(accountId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 break
             }
@@ -202,7 +202,7 @@ export class CereBalancesProcessor extends BaseProcessor<State> {
                     const accountId = events.balances.upgraded.v48900.decode(event).who
                     await this.processBalancesEvent(accountId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 break
             }
@@ -211,7 +211,7 @@ export class CereBalancesProcessor extends BaseProcessor<State> {
                     const accountId = events.balances.locked.v48900.decode(event).who
                     await this.processBalancesEvent(accountId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 break
             }
@@ -220,7 +220,7 @@ export class CereBalancesProcessor extends BaseProcessor<State> {
                     const accountId = events.balances.unlocked.v48900.decode(event).who
                     await this.processBalancesEvent(accountId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 break
             }
@@ -229,7 +229,7 @@ export class CereBalancesProcessor extends BaseProcessor<State> {
                     const accountId = events.balances.frozen.v48900.decode(event).who
                     await this.processBalancesEvent(accountId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 break
             }
@@ -238,7 +238,7 @@ export class CereBalancesProcessor extends BaseProcessor<State> {
                     const accountId = events.balances.thawed.v48900.decode(event).who
                     await this.processBalancesEvent(accountId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 break
             }

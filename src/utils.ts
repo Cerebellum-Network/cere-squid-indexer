@@ -3,8 +3,8 @@ import { HexString } from '@polkadot/util/types'
 import { BlockHeader, Event } from '@subsquid/substrate-processor'
 import * as ss58 from '@subsquid/ss58'
 
-export const throwUnsupportedSpec = (event: Event, block: BlockHeader) => {
-    throw Error(`Unsupported spec version for event ${event.name} at block ${block.height} (${block.hash})`)
+export const logUnsupportedEventVersion = (event: Event, block: BlockHeader) => {
+    console.log(`Unsupported spec version for event ${event.name} at block ${block.height} (${block.hash})`)
 }
 
 export const throwUnsupportedStorageSpec = (block: BlockHeader) => {

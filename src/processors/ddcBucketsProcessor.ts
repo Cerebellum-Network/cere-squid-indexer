@@ -1,6 +1,6 @@
 import { BlockHeader, Event } from '@subsquid/substrate-processor'
 import { events, storage } from '../types'
-import { logStorageError, throwUnsupportedSpec, throwUnsupportedStorageSpec, toCereAddress } from '../utils'
+import { logStorageError, logUnsupportedEventVersion, throwUnsupportedStorageSpec, toCereAddress } from '../utils'
 import { BaseProcessor } from './processor'
 
 export interface DdcBucketInfo {
@@ -120,7 +120,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
                     const bucketId = events.ddcCustomers.bucketCreated.v54100.decode(event).bucketId
                     await this.processDdcBucketsEvents(bucketId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 break
             }
@@ -135,7 +135,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
                     const bucketId = events.ddcCustomers.bucketUpdated.v54100.decode(event).bucketId
                     await this.processDdcBucketsEvents(bucketId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 break
             }
@@ -144,7 +144,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
                     const bucketId = events.ddcCustomers.bucketRemoved.v50000.decode(event).bucketId
                     await this.processDdcBucketsEvents(bucketId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 break
             }
@@ -153,7 +153,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
                     const bucketId = events.ddcCustomers.bucketTotalNodesUsageUpdated.v54100.decode(event).bucketId
                     await this.processDdcBucketsEvents(bucketId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 break
             }
@@ -162,7 +162,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
                     const bucketId = events.ddcCustomers.bucketTotalCustomersUsageUpdated.v54100.decode(event).bucketId
                     await this.processDdcBucketsEvents(bucketId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event, block)
                 }
                 break
             }
