@@ -7,8 +7,8 @@ export const logUnsupportedEventVersion = (event: Event, block: BlockHeader) => 
     console.log(`Unsupported spec version for event ${event.name} at block ${block.height} (${block.hash})`)
 }
 
-export const throwUnsupportedStorageSpec = (block: BlockHeader) => {
-    throw Error(`Unsupported storage spec version at block ${block.height} (${block.hash})`)
+export const logUnsupportedStorageVersion = (block: BlockHeader) => {
+    console.log(`Unsupported storage spec version at block ${block.height} (${block.hash})`)
 }
 
 export const logStorageError = (entity: string, key: any, block: BlockHeader) => {

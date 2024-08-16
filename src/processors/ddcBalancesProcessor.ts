@@ -1,6 +1,6 @@
 import { BlockHeader, Event } from '@subsquid/substrate-processor'
 import { events, storage } from '../types'
-import { logStorageError, logUnsupportedEventVersion, throwUnsupportedStorageSpec, toCereAddress } from '../utils'
+import { logStorageError, logUnsupportedEventVersion, logUnsupportedStorageVersion, toCereAddress } from '../utils'
 import { BaseProcessor } from './processor'
 
 type State = Map<string, bigint>
@@ -15,7 +15,7 @@ export class DdcBalancesProcessor extends BaseProcessor<State> {
         if (storage.ddcCustomers.ledger.v48013.is(block)) {
             accountInStorage = await storage.ddcCustomers.ledger.v48013.get(block, accountId)
         } else {
-            throwUnsupportedStorageSpec(block)
+            logUnsupportedStorageVersion(block)
         }
         if (accountInStorage) {
             this._state.set(toCereAddress(accountId), accountInStorage.active)

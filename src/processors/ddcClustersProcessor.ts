@@ -1,6 +1,6 @@
 import { BlockHeader, Event } from '@subsquid/substrate-processor'
 import { events, storage } from '../types'
-import { logStorageError, logUnsupportedEventVersion, throwUnsupportedStorageSpec, toCereAddress } from '../utils'
+import { logStorageError, logUnsupportedEventVersion, logUnsupportedStorageVersion, toCereAddress } from '../utils'
 import { DdcClusterStatus } from '../model'
 import { BaseProcessor } from './processor'
 
@@ -98,7 +98,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
                 clusterInfo.status = DdcClusterStatus[cluster.status.__kind]
             }
         } else {
-            throwUnsupportedStorageSpec(block)
+            logUnsupportedStorageVersion(block)
         }
         if (clusterInfo) {
             clusterInfo.managerId = toCereAddress(clusterInfo.managerId)

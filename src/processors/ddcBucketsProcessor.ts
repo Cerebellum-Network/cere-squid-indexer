@@ -1,6 +1,6 @@
 import { BlockHeader, Event } from '@subsquid/substrate-processor'
 import { events, storage } from '../types'
-import { logStorageError, logUnsupportedEventVersion, throwUnsupportedStorageSpec, toCereAddress } from '../utils'
+import { logStorageError, logUnsupportedEventVersion, logUnsupportedStorageVersion, toCereAddress } from '../utils'
 import { BaseProcessor } from './processor'
 
 export interface DdcBucketInfo {
@@ -97,7 +97,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
                 }
             }
         } else {
-            throwUnsupportedStorageSpec(block)
+            logUnsupportedStorageVersion(block)
         }
         if (bucketInfo) {
             bucketInfo.ownerId = toCereAddress(bucketInfo.ownerId)

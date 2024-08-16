@@ -5,7 +5,7 @@ import {
     decodeAsciiStringFromScaleVecFixed,
     logStorageError,
     logUnsupportedEventVersion,
-    throwUnsupportedStorageSpec,
+    logUnsupportedStorageVersion,
     toCereAddress,
 } from '../utils'
 import { DdcNodeMode } from '../model'
@@ -174,7 +174,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                 }
             }
         } else {
-            throwUnsupportedStorageSpec(block)
+            logUnsupportedStorageVersion(block)
         }
         if (nodeInfo) {
             nodeInfo.providerId = toCereAddress(nodeInfo.providerId)
