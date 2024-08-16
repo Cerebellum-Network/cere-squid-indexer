@@ -128,7 +128,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
             }
             this._state.set(clusterId, clusterInfo)
         } else {
-            logEmptyStorage('DDC cluster', clusterId, block)
+            logEmptyStorage('DdcClusters.Clusters', clusterId, block)
         }
     }
 

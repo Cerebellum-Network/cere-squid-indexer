@@ -25,7 +25,7 @@ export class CereBalancesProcessor extends BaseProcessor<State> {
             if (accountInStorage) {
                 this._state.set(toCereAddress(accountId), accountInStorage.data.free)
             } else {
-                logEmptyStorage('account', accountId, block)
+                logEmptyStorage('System.Account', accountId, block)
             }
         } catch (error) {
             if (error?.toString() === 'Error: Unexpected EOF' || error?.toString() === 'Error: Unprocessed data left') {

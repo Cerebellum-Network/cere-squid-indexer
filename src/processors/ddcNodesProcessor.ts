@@ -180,7 +180,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
             nodeInfo.providerId = toCereAddress(nodeInfo.providerId)
             this._state.updatedNodes.set(nodeId, nodeInfo)
         } else {
-            logEmptyStorage('DDC node', nodeId, block)
+            logEmptyStorage('DdcNodes.StorageNodes', nodeId, block)
         }
     }
 

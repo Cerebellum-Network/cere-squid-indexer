@@ -20,7 +20,7 @@ export class DdcBalancesProcessor extends BaseProcessor<State> {
         if (accountInStorage) {
             this._state.set(toCereAddress(accountId), accountInStorage.active)
         } else {
-            logEmptyStorage('DDC Customer ledger', accountId, block)
+            logEmptyStorage('DdcCustomers.Ledger', accountId, block)
         }
     }
 

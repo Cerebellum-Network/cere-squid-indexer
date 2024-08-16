@@ -103,7 +103,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
             bucketInfo.ownerId = toCereAddress(bucketInfo.ownerId)
             this._state.set(bucketId, bucketInfo)
         } else {
-            logEmptyStorage('bucket', bucketId.toString(), block)
+            logEmptyStorage('DdcCustomers.Buckets', bucketId.toString(), block)
         }
     }
 
