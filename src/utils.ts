@@ -1,6 +1,7 @@
 import { TypeRegistry, VecFixed } from '@polkadot/types'
 import { HexString } from '@polkadot/util/types'
 import { BlockHeader, Event } from '@subsquid/substrate-processor'
+import { QualifiedName } from '@subsquid/substrate-runtime'
 import * as ss58 from '@subsquid/ss58'
 
 export const logUnsupportedEventVersion = (event: Event) => {
@@ -9,8 +10,10 @@ export const logUnsupportedEventVersion = (event: Event) => {
     )
 }
 
-export const logUnsupportedStorageVersion = (block: BlockHeader) => {
-    console.log(`Unsupported storage spec version at block ${block.height} (${block.hash}), spec ${block.specVersion}`)
+export const logUnsupportedStorageVersion = (item: QualifiedName, block: BlockHeader) => {
+    console.log(
+        `Unsupported version of storage item ${item} at block ${block.height} (${block.hash}), spec ${block.specVersion}`,
+    )
 }
 
 export const logStorageError = (entity: string, key: any, block: BlockHeader) => {

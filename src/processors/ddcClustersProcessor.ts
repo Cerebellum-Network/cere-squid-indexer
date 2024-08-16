@@ -98,7 +98,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
                 clusterInfo.status = DdcClusterStatus[cluster.status.__kind]
             }
         } else {
-            logUnsupportedStorageVersion(block)
+            logUnsupportedStorageVersion('DdcClusters.Clusters', block)
         }
         if (clusterInfo) {
             clusterInfo.managerId = toCereAddress(clusterInfo.managerId)

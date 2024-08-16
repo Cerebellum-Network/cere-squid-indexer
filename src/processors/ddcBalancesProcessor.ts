@@ -15,7 +15,7 @@ export class DdcBalancesProcessor extends BaseProcessor<State> {
         if (storage.ddcCustomers.ledger.v48013.is(block)) {
             accountInStorage = await storage.ddcCustomers.ledger.v48013.get(block, accountId)
         } else {
-            logUnsupportedStorageVersion(block)
+            logUnsupportedStorageVersion('DdcCustomers.Ledger', block)
         }
         if (accountInStorage) {
             this._state.set(toCereAddress(accountId), accountInStorage.active)

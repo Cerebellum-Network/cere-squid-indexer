@@ -20,7 +20,7 @@ export class CereBalancesProcessor extends BaseProcessor<State> {
             } else if (storage.system.account.v48900.is(block)) {
                 accountInStorage = await storage.system.account.v48900.get(block, accountId)
             } else {
-                logUnsupportedStorageVersion(block)
+                logUnsupportedStorageVersion('System.Account', block)
             }
             if (accountInStorage) {
                 this._state.set(toCereAddress(accountId), accountInStorage.data.free)

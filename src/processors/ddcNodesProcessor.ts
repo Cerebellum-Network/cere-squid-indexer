@@ -174,7 +174,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                 }
             }
         } else {
-            logUnsupportedStorageVersion(block)
+            logUnsupportedStorageVersion('DdcNodes.StorageNodes', block)
         }
         if (nodeInfo) {
             nodeInfo.providerId = toCereAddress(nodeInfo.providerId)

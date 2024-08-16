@@ -97,7 +97,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
                 }
             }
         } else {
-            logUnsupportedStorageVersion(block)
+            logUnsupportedStorageVersion('DdcCustomers.Buckets', block)
         }
         if (bucketInfo) {
             bucketInfo.ownerId = toCereAddress(bucketInfo.ownerId)
