@@ -4,7 +4,9 @@ import { BlockHeader, Event } from '@subsquid/substrate-processor'
 import * as ss58 from '@subsquid/ss58'
 
 export const logUnsupportedEventVersion = (event: Event) => {
-    console.log(`Unsupported spec version for event ${event.name} at block ${event.block.height} (${event.block.hash})`)
+    console.log(
+        `Unsupported version of event ${event.name} at block ${event.block.height} (${event.block.hash}), spec ${event.block.specVersion}`,
+    )
 }
 
 export const logUnsupportedStorageVersion = (block: BlockHeader) => {
