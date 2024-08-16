@@ -1,6 +1,6 @@
 import { BlockHeader, Event } from '@subsquid/substrate-processor'
 import { events, storage } from '../types'
-import { logStorageError, logUnsupportedEventVersion, logUnsupportedStorageVersion, toCereAddress } from '../utils'
+import { logEmptyStorage, logUnsupportedEventVersion, logUnsupportedStorageVersion, toCereAddress } from '../utils'
 import { DdcClusterStatus } from '../model'
 import { BaseProcessor } from './processor'
 
@@ -128,7 +128,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
             }
             this._state.set(clusterId, clusterInfo)
         } else {
-            logStorageError('DDC cluster', clusterId, block)
+            logEmptyStorage('DDC cluster', clusterId, block)
         }
     }
 

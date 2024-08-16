@@ -16,9 +16,10 @@ export const logUnsupportedStorageVersion = (item: QualifiedName, block: BlockHe
     )
 }
 
-export const logStorageError = (entity: string, key: any, block: BlockHeader) => {
-    // TODO throw Error(`Unable to find ${entity} by key ${key} at block ${block.height} (${block.hash})`)
-    console.log(`Unable to find ${entity} by key ${key} at block ${block.height} (${block.hash})`)
+export const logEmptyStorage = (item: QualifiedName, key: string, block: BlockHeader) => {
+    console.log(
+        `Unexpectedly empty storage value ${item} by key ${key} at block ${block.height} (${block.hash}), spec ${block.specVersion}`,
+    )
 }
 
 export const toCereAddress = (accoutnId: string) => {

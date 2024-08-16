@@ -3,7 +3,7 @@ import { BlockHeader, Event } from '@subsquid/substrate-processor'
 import { events, storage } from '../types'
 import {
     decodeAsciiStringFromScaleVecFixed,
-    logStorageError,
+    logEmptyStorage,
     logUnsupportedEventVersion,
     logUnsupportedStorageVersion,
     toCereAddress,
@@ -180,7 +180,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
             nodeInfo.providerId = toCereAddress(nodeInfo.providerId)
             this._state.updatedNodes.set(nodeId, nodeInfo)
         } else {
-            logStorageError('DDC node', nodeId, block)
+            logEmptyStorage('DDC node', nodeId, block)
         }
     }
 

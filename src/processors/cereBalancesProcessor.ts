@@ -1,6 +1,6 @@
 import { BlockHeader, Event } from '@subsquid/substrate-processor'
 import { events, storage } from '../types'
-import { logStorageError, logUnsupportedEventVersion, logUnsupportedStorageVersion, toCereAddress } from '../utils'
+import { logEmptyStorage, logUnsupportedEventVersion, logUnsupportedStorageVersion, toCereAddress } from '../utils'
 import { BaseProcessor } from './processor'
 
 type State = Map<string, bigint>
@@ -25,7 +25,7 @@ export class CereBalancesProcessor extends BaseProcessor<State> {
             if (accountInStorage) {
                 this._state.set(toCereAddress(accountId), accountInStorage.data.free)
             } else {
-                logStorageError('account', accountId, block)
+                logEmptyStorage('account', accountId, block)
             }
         } catch (error) {
             if (error?.toString() === 'Error: Unexpected EOF' || error?.toString() === 'Error: Unprocessed data left') {

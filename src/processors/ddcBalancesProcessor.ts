@@ -1,6 +1,6 @@
 import { BlockHeader, Event } from '@subsquid/substrate-processor'
 import { events, storage } from '../types'
-import { logStorageError, logUnsupportedEventVersion, logUnsupportedStorageVersion, toCereAddress } from '../utils'
+import { logEmptyStorage, logUnsupportedEventVersion, logUnsupportedStorageVersion, toCereAddress } from '../utils'
 import { BaseProcessor } from './processor'
 
 type State = Map<string, bigint>
@@ -20,7 +20,7 @@ export class DdcBalancesProcessor extends BaseProcessor<State> {
         if (accountInStorage) {
             this._state.set(toCereAddress(accountId), accountInStorage.active)
         } else {
-            logStorageError('DDC Customer ledger', accountId, block)
+            logEmptyStorage('DDC Customer ledger', accountId, block)
         }
     }
 
