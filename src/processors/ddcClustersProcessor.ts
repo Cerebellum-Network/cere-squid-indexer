@@ -1,6 +1,6 @@
 import { BlockHeader, Event } from '@subsquid/substrate-processor'
 import { events, storage } from '../types'
-import { logStorageError, throwUnsupportedSpec, throwUnsupportedStorageSpec, toCereAddress } from '../utils'
+import { logEmptyStorage, logUnsupportedEventVersion, logUnsupportedStorageVersion, toCereAddress } from '../utils'
 import { DdcClusterStatus } from '../model'
 import { BaseProcessor } from './processor'
 
@@ -98,7 +98,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
                 clusterInfo.status = DdcClusterStatus[cluster.status.__kind]
             }
         } else {
-            throwUnsupportedStorageSpec(block)
+            logUnsupportedStorageVersion('DdcClusters.Clusters', block)
         }
         if (clusterInfo) {
             clusterInfo.managerId = toCereAddress(clusterInfo.managerId)
@@ -128,7 +128,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
             }
             this._state.set(clusterId, clusterInfo)
         } else {
-            logStorageError('DDC cluster', clusterId, block)
+            logEmptyStorage('DdcClusters.Clusters', clusterId, block)
         }
     }
 
@@ -139,7 +139,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
                     const clusterId = events.ddcClusters.clusterCreated.v48008.decode(event).clusterId
                     await this.processDdcClustersEvents(clusterId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event)
                 }
                 break
             }
@@ -148,7 +148,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
                     const clusterId = events.ddcClusters.clusterParamsSet.v48008.decode(event).clusterId
                     await this.processDdcClustersEvents(clusterId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event)
                 }
                 break
             }
@@ -157,7 +157,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
                     const clusterId = events.ddcClusters.clusterGovParamsSet.v48013.decode(event).clusterId
                     await this.processDdcClustersEvents(clusterId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event)
                 }
                 break
             }
@@ -166,7 +166,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
                     const clusterId = events.ddcClusters.clusterProtocolParamsSet.v54001.decode(event).clusterId
                     await this.processDdcClustersEvents(clusterId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event)
                 }
                 break
             }
@@ -175,7 +175,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
                     const clusterId = events.ddcClusters.clusterActivated.v54001.decode(event).clusterId
                     await this.processDdcClustersEvents(clusterId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event)
                 }
                 break
             }
@@ -184,7 +184,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
                     const clusterId = events.ddcClusters.clusterBonded.v54001.decode(event).clusterId
                     await this.processDdcClustersEvents(clusterId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event)
                 }
                 break
             }
@@ -193,7 +193,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
                     const clusterId = events.ddcClusters.clusterUnbonded.v54001.decode(event).clusterId
                     await this.processDdcClustersEvents(clusterId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event)
                 }
                 break
             }
@@ -202,7 +202,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
                     const clusterId = events.ddcClusters.clusterNodeValidated.v54001.decode(event).clusterId
                     await this.processDdcClustersEvents(clusterId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event)
                 }
                 break
             }
@@ -211,7 +211,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
                     const clusterId = events.ddcClusters.clusterUnbonding.v54004.decode(event).clusterId
                     await this.processDdcClustersEvents(clusterId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event)
                 }
                 break
             }

@@ -3,16 +3,16 @@ import { BlockHeader, Event } from '@subsquid/substrate-processor'
 import { events, storage } from '../types'
 import {
     decodeAsciiStringFromScaleVecFixed,
-    logStorageError,
-    throwUnsupportedSpec,
-    throwUnsupportedStorageSpec,
+    logEmptyStorage,
+    logUnsupportedEventVersion,
+    logUnsupportedStorageVersion,
     toCereAddress,
 } from '../utils'
 import { DdcNodeMode } from '../model'
 import { BaseProcessor } from './processor'
 
-const MaxHostLen = 255;
-const MaxDomainLen = 255;
+const MaxHostLen = 255
+const MaxDomainLen = 255
 
 interface DdcNodeInfo {
     id: string
@@ -174,13 +174,13 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                 }
             }
         } else {
-            throwUnsupportedStorageSpec(block)
+            logUnsupportedStorageVersion('DdcNodes.StorageNodes', block)
         }
         if (nodeInfo) {
             nodeInfo.providerId = toCereAddress(nodeInfo.providerId)
             this._state.updatedNodes.set(nodeId, nodeInfo)
         } else {
-            logStorageError('DDC node', nodeId, block)
+            logEmptyStorage('DdcNodes.StorageNodes', nodeId, block)
         }
     }
 
@@ -193,7 +193,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                 } else if (events.ddcClusters.clusterNodeAdded.v48017.is(event)) {
                     decodedEvent = events.ddcClusters.clusterNodeAdded.v48017.decode(event)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event)
                 }
                 if (decodedEvent) {
                     const nodesInCluster = this._state.addedToCluster.get(decodedEvent.clusterId) ?? new Set<string>()
@@ -209,7 +209,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                 } else if (events.ddcClusters.clusterNodeRemoved.v48017.is(event)) {
                     decodedEvent = events.ddcClusters.clusterNodeRemoved.v48017.decode(event)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event)
                 }
                 if (decodedEvent) {
                     const nodesRemovedFromCluster =
@@ -227,7 +227,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                     const nodeId = events.ddcNodes.nodeCreated.v48017.decode(event).nodePubKey.value
                     await this.processDdcNodesEvents(nodeId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event)
                 }
                 break
             }
@@ -239,7 +239,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                     const nodeId = events.ddcNodes.nodeParamsChanged.v48017.decode(event).nodePubKey.value
                     await this.processDdcNodesEvents(nodeId, block)
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event)
                 }
                 break
             }
@@ -250,7 +250,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                 } else if (events.ddcNodes.nodeDeleted.v48017.is(event)) {
                     removedNode = events.ddcNodes.nodeDeleted.v48017.decode(event).nodePubKey.value
                 } else {
-                    throwUnsupportedSpec(event, block)
+                    logUnsupportedEventVersion(event)
                 }
                 if (removedNode) {
                     this._state.removedNodes.add(removedNode)
