@@ -139,7 +139,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
                     const clusterId = events.ddcClusters.clusterCreated.v48008.decode(event).clusterId
                     await this.processDdcClustersEvents(clusterId, block)
                 } else {
-                    logUnsupportedEventVersion(event, block)
+                    logUnsupportedEventVersion(event)
                 }
                 break
             }
@@ -148,7 +148,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
                     const clusterId = events.ddcClusters.clusterParamsSet.v48008.decode(event).clusterId
                     await this.processDdcClustersEvents(clusterId, block)
                 } else {
-                    logUnsupportedEventVersion(event, block)
+                    logUnsupportedEventVersion(event)
                 }
                 break
             }
@@ -157,7 +157,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
                     const clusterId = events.ddcClusters.clusterGovParamsSet.v48013.decode(event).clusterId
                     await this.processDdcClustersEvents(clusterId, block)
                 } else {
-                    logUnsupportedEventVersion(event, block)
+                    logUnsupportedEventVersion(event)
                 }
                 break
             }
@@ -166,7 +166,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
                     const clusterId = events.ddcClusters.clusterProtocolParamsSet.v54001.decode(event).clusterId
                     await this.processDdcClustersEvents(clusterId, block)
                 } else {
-                    logUnsupportedEventVersion(event, block)
+                    logUnsupportedEventVersion(event)
                 }
                 break
             }
@@ -175,7 +175,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
                     const clusterId = events.ddcClusters.clusterActivated.v54001.decode(event).clusterId
                     await this.processDdcClustersEvents(clusterId, block)
                 } else {
-                    logUnsupportedEventVersion(event, block)
+                    logUnsupportedEventVersion(event)
                 }
                 break
             }
@@ -184,7 +184,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
                     const clusterId = events.ddcClusters.clusterBonded.v54001.decode(event).clusterId
                     await this.processDdcClustersEvents(clusterId, block)
                 } else {
-                    logUnsupportedEventVersion(event, block)
+                    logUnsupportedEventVersion(event)
                 }
                 break
             }
@@ -193,7 +193,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
                     const clusterId = events.ddcClusters.clusterUnbonded.v54001.decode(event).clusterId
                     await this.processDdcClustersEvents(clusterId, block)
                 } else {
-                    logUnsupportedEventVersion(event, block)
+                    logUnsupportedEventVersion(event)
                 }
                 break
             }
@@ -202,7 +202,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
                     const clusterId = events.ddcClusters.clusterNodeValidated.v54001.decode(event).clusterId
                     await this.processDdcClustersEvents(clusterId, block)
                 } else {
-                    logUnsupportedEventVersion(event, block)
+                    logUnsupportedEventVersion(event)
                 }
                 break
             }
@@ -211,7 +211,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
                     const clusterId = events.ddcClusters.clusterUnbonding.v54004.decode(event).clusterId
                     await this.processDdcClustersEvents(clusterId, block)
                 } else {
-                    logUnsupportedEventVersion(event, block)
+                    logUnsupportedEventVersion(event)
                 }
                 break
             }

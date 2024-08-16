@@ -34,7 +34,7 @@ export class DdcBalancesProcessor extends BaseProcessor<State> {
                     const accountId = events.ddcCustomers.deposited.v48800.decode(event).ownerId
                     await this.processDdcCustomersBalancesEvents(accountId, block)
                 } else {
-                    logUnsupportedEventVersion(event, block)
+                    logUnsupportedEventVersion(event)
                 }
                 break
             }
@@ -43,7 +43,7 @@ export class DdcBalancesProcessor extends BaseProcessor<State> {
                     const accountId = events.ddcCustomers.initiatDepositUnlock.v48013.decode(event)[0]
                     await this.processDdcCustomersBalancesEvents(accountId, block)
                 } else {
-                    logUnsupportedEventVersion(event, block)
+                    logUnsupportedEventVersion(event)
                 }
                 break
             }
@@ -55,7 +55,7 @@ export class DdcBalancesProcessor extends BaseProcessor<State> {
                     const accountId = events.ddcCustomers.withdrawn.v48800.decode(event).ownerId
                     await this.processDdcCustomersBalancesEvents(accountId, block)
                 } else {
-                    logUnsupportedEventVersion(event, block)
+                    logUnsupportedEventVersion(event)
                 }
                 break
             }
@@ -69,7 +69,7 @@ export class DdcBalancesProcessor extends BaseProcessor<State> {
                     const accountId = events.ddcCustomers.charged.v48800.decode(event).ownerId
                     await this.processDdcCustomersBalancesEvents(accountId, block)
                 } else {
-                    logUnsupportedEventVersion(event, block)
+                    logUnsupportedEventVersion(event)
                 }
                 break
             }
@@ -81,7 +81,7 @@ export class DdcBalancesProcessor extends BaseProcessor<State> {
                     const accountId = events.ddcCustomers.initialDepositUnlock.v48800.decode(event).ownerId
                     await this.processDdcCustomersBalancesEvents(accountId, block)
                 } else {
-                    logUnsupportedEventVersion(event, block)
+                    logUnsupportedEventVersion(event)
                 }
                 break
             }
