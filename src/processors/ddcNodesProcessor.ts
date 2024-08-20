@@ -17,6 +17,8 @@ const MaxDomainLen = 255
 interface DdcNodeInfo {
     id: string
 
+    createdAtBlockHeight?: number
+
     providerId: string
     clusterId: string | undefined
 
@@ -51,13 +53,19 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
         })
     }
 
-    private async processDdcNodesEvents(nodeId: string, block: BlockHeader) {
+    private async processDdcNodesEvents(nodeId: string, block: BlockHeader, event: Event) {
+        let createdAtBlockHeight
+        if (event.name === events.ddcNodes.nodeCreated.name) {
+            createdAtBlockHeight = block.height
+        }
+
         let nodeInfo: DdcNodeInfo | undefined
         if (storage.ddcNodes.storageNodes.v54113.is(block)) {
             const node = await storage.ddcNodes.storageNodes.v54113.get(block, nodeId)
             if (node) {
                 nodeInfo = {
                     id: toCereAddress(node.pubKey),
+                    createdAtBlockHeight: createdAtBlockHeight,
                     providerId: node.providerId,
                     clusterId: node.clusterId,
                     host: decodeAsciiStringFromScaleVecFixed(MaxHostLen, node.props.host as HexString),
@@ -78,6 +86,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
             if (node) {
                 nodeInfo = {
                     id: toCereAddress(node.pubKey),
+                    createdAtBlockHeight: createdAtBlockHeight,
                     providerId: node.providerId,
                     clusterId: node.clusterId,
                     host: decodeAsciiStringFromScaleVecFixed(MaxHostLen, node.props.host as HexString),
@@ -98,6 +107,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
             if (node) {
                 nodeInfo = {
                     id: toCereAddress(node.pubKey),
+                    createdAtBlockHeight: createdAtBlockHeight,
                     providerId: node.providerId,
                     clusterId: node.clusterId,
                     host: decodeAsciiStringFromScaleVecFixed(MaxHostLen, node.props.host as HexString),
@@ -118,6 +128,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
             if (node) {
                 nodeInfo = {
                     id: toCereAddress(node.pubKey),
+                    createdAtBlockHeight: createdAtBlockHeight,
                     providerId: node.providerId,
                     clusterId: node.clusterId,
                     host: decodeAsciiStringFromScaleVecFixed(MaxHostLen, node.props.host as HexString),
@@ -138,6 +149,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
             if (node) {
                 nodeInfo = {
                     id: toCereAddress(node.pubKey),
+                    createdAtBlockHeight: createdAtBlockHeight,
                     providerId: node.providerId,
                     clusterId: node.clusterId,
                     host: decodeAsciiStringFromScaleVecFixed(MaxHostLen, node.props.host as HexString),
@@ -158,6 +170,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
             if (node) {
                 nodeInfo = {
                     id: toCereAddress(node.pubKey),
+                    createdAtBlockHeight: createdAtBlockHeight,
                     providerId: node.providerId,
                     clusterId: node.clusterId,
                     host: 'localhost',
@@ -222,10 +235,10 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
             case events.ddcNodes.nodeCreated.name: {
                 if (events.ddcNodes.nodeCreated.v48008.is(event)) {
                     const nodeId = events.ddcNodes.nodeCreated.v48008.decode(event).nodePubKey.value
-                    await this.processDdcNodesEvents(nodeId, block)
+                    await this.processDdcNodesEvents(nodeId, block, event)
                 } else if (events.ddcNodes.nodeCreated.v48017.is(event)) {
                     const nodeId = events.ddcNodes.nodeCreated.v48017.decode(event).nodePubKey.value
-                    await this.processDdcNodesEvents(nodeId, block)
+                    await this.processDdcNodesEvents(nodeId, block, event)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
@@ -234,10 +247,10 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
             case events.ddcNodes.nodeParamsChanged.name: {
                 if (events.ddcNodes.nodeParamsChanged.v48008.is(event)) {
                     const nodeId = events.ddcNodes.nodeParamsChanged.v48008.decode(event).nodePubKey.value
-                    await this.processDdcNodesEvents(nodeId, block)
+                    await this.processDdcNodesEvents(nodeId, block, event)
                 } else if (events.ddcNodes.nodeParamsChanged.v48017.is(event)) {
                     const nodeId = events.ddcNodes.nodeParamsChanged.v48017.decode(event).nodePubKey.value
-                    await this.processDdcNodesEvents(nodeId, block)
+                    await this.processDdcNodesEvents(nodeId, block, event)
                 } else {
                     logUnsupportedEventVersion(event)
                 }

@@ -6,6 +6,9 @@ import { BaseProcessor } from './processor'
 
 export interface DdcClusterInfo {
     id: string
+
+    createdAtBlockHeight?: number
+
     managerId: string
 
     treasuryShare: bigint
@@ -33,9 +36,10 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
         super(new Map<string, DdcClusterInfo>())
     }
 
-    private newClusterInfo(clusterId: string, managerId: string): DdcClusterInfo {
+    private newClusterInfo(clusterId: string, managerId: string, createdAt: number | undefined): DdcClusterInfo {
         return {
             id: clusterId,
+            createdAtBlockHeight: createdAt,
             managerId: managerId,
             clusterReserveShare: 0n,
             erasureCodingRequired: 0,
@@ -54,12 +58,17 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
         }
     }
 
-    private async processDdcClustersEvents(clusterId: string, block: BlockHeader) {
+    private async processDdcClustersEvents(clusterId: string, block: BlockHeader, event: Event) {
+        let createdAtBlockHeight
+        if (event.name === events.ddcClusters.clusterCreated.name) {
+            createdAtBlockHeight = block.height
+        }
+
         let clusterInfo: DdcClusterInfo | undefined
         if (storage.ddcClusters.clusters.v54105.is(block)) {
             const cluster = await storage.ddcClusters.clusters.v54105.get(block, clusterId)
             if (cluster) {
-                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId)
+                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId, createdAtBlockHeight)
                 clusterInfo.erasureCodingRequired = cluster.props.erasureCodingRequired
                 clusterInfo.erasureCodingTotal = cluster.props.erasureCodingTotal
                 clusterInfo.replicationTotal = cluster.props.replicationTotal
@@ -68,7 +77,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
         } else if (storage.ddcClusters.clusters.v54001.is(block)) {
             const cluster = await storage.ddcClusters.clusters.v54001.get(block, clusterId)
             if (cluster) {
-                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId)
+                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId, createdAtBlockHeight)
                 clusterInfo.erasureCodingRequired = cluster.props.erasureCodingRequired
                 clusterInfo.erasureCodingTotal = cluster.props.erasureCodingTotal
                 clusterInfo.replicationTotal = cluster.props.replicationTotal
@@ -77,7 +86,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
         } else if (storage.ddcClusters.clusters.v53003.is(block)) {
             const cluster = await storage.ddcClusters.clusters.v53003.get(block, clusterId)
             if (cluster) {
-                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId)
+                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId, createdAtBlockHeight)
                 clusterInfo.erasureCodingRequired = cluster.props.erasureCodingRequired
                 clusterInfo.erasureCodingTotal = cluster.props.erasureCodingTotal
                 clusterInfo.replicationTotal = cluster.props.replicationTotal
@@ -85,17 +94,17 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
         } else if (storage.ddcClusters.clusters.v48016.is(block)) {
             const cluster = await storage.ddcClusters.clusters.v48016.get(block, clusterId)
             if (cluster) {
-                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId)
+                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId, createdAtBlockHeight)
             }
         } else if (storage.ddcClusters.clusters.v48013.is(block)) {
             const cluster = await storage.ddcClusters.clusters.v48013.get(block, clusterId)
             if (cluster) {
-                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId)
+                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId, createdAtBlockHeight)
             }
         } else if (storage.ddcClusters.clusters.v48008.is(block)) {
             const cluster = await storage.ddcClusters.clusters.v48008.get(block, clusterId)
             if (cluster) {
-                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId)
+                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId, createdAtBlockHeight)
             }
         } else {
             logUnsupportedStorageVersion('DdcClusters.Clusters', block)
@@ -137,7 +146,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
             case events.ddcClusters.clusterCreated.name: {
                 if (events.ddcClusters.clusterCreated.v48008.is(event)) {
                     const clusterId = events.ddcClusters.clusterCreated.v48008.decode(event).clusterId
-                    await this.processDdcClustersEvents(clusterId, block)
+                    await this.processDdcClustersEvents(clusterId, block, event)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
@@ -146,7 +155,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
             case events.ddcClusters.clusterParamsSet.name: {
                 if (events.ddcClusters.clusterParamsSet.v48008.is(event)) {
                     const clusterId = events.ddcClusters.clusterParamsSet.v48008.decode(event).clusterId
-                    await this.processDdcClustersEvents(clusterId, block)
+                    await this.processDdcClustersEvents(clusterId, block, event)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
@@ -155,7 +164,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
             case events.ddcClusters.clusterGovParamsSet.name: {
                 if (events.ddcClusters.clusterGovParamsSet.v48013.is(event)) {
                     const clusterId = events.ddcClusters.clusterGovParamsSet.v48013.decode(event).clusterId
-                    await this.processDdcClustersEvents(clusterId, block)
+                    await this.processDdcClustersEvents(clusterId, block, event)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
@@ -164,7 +173,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
             case events.ddcClusters.clusterProtocolParamsSet.name: {
                 if (events.ddcClusters.clusterProtocolParamsSet.v54001.is(event)) {
                     const clusterId = events.ddcClusters.clusterProtocolParamsSet.v54001.decode(event).clusterId
-                    await this.processDdcClustersEvents(clusterId, block)
+                    await this.processDdcClustersEvents(clusterId, block, event)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
@@ -173,7 +182,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
             case events.ddcClusters.clusterActivated.name: {
                 if (events.ddcClusters.clusterActivated.v54001.is(event)) {
                     const clusterId = events.ddcClusters.clusterActivated.v54001.decode(event).clusterId
-                    await this.processDdcClustersEvents(clusterId, block)
+                    await this.processDdcClustersEvents(clusterId, block, event)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
@@ -182,7 +191,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
             case events.ddcClusters.clusterBonded.name: {
                 if (events.ddcClusters.clusterBonded.v54001.is(event)) {
                     const clusterId = events.ddcClusters.clusterBonded.v54001.decode(event).clusterId
-                    await this.processDdcClustersEvents(clusterId, block)
+                    await this.processDdcClustersEvents(clusterId, block, event)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
@@ -191,7 +200,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
             case events.ddcClusters.clusterUnbonded.name: {
                 if (events.ddcClusters.clusterUnbonded.v54001.is(event)) {
                     const clusterId = events.ddcClusters.clusterUnbonded.v54001.decode(event).clusterId
-                    await this.processDdcClustersEvents(clusterId, block)
+                    await this.processDdcClustersEvents(clusterId, block, event)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
@@ -200,7 +209,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
             case events.ddcClusters.clusterNodeValidated.name: {
                 if (events.ddcClusters.clusterNodeValidated.v54001.is(event)) {
                     const clusterId = events.ddcClusters.clusterNodeValidated.v54001.decode(event).clusterId
-                    await this.processDdcClustersEvents(clusterId, block)
+                    await this.processDdcClustersEvents(clusterId, block, event)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
@@ -209,7 +218,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
             case events.ddcClusters.clusterUnbonding.name: {
                 if (events.ddcClusters.clusterUnbonding.v54004.is(event)) {
                     const clusterId = events.ddcClusters.clusterUnbonding.v54004.decode(event).clusterId
-                    await this.processDdcClustersEvents(clusterId, block)
+                    await this.processDdcClustersEvents(clusterId, block, event)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
