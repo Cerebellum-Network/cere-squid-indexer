@@ -168,6 +168,7 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
             ddcNodesMap.get(node.id) ??
             new DdcNode({
                 id: node.id,
+                createdAt: node.createdAt,
                 providerId: accounts.get(node.providerId),
             })
         nodeEntity.host = node.host
