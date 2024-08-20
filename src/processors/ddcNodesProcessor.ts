@@ -53,28 +53,8 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
 
     private async processDdcNodesEvents(nodeId: string, block: BlockHeader) {
         let nodeInfo: DdcNodeInfo | undefined
-        if (storage.ddcNodes.storageNodes.v48008.is(block)) {
-            const node = await storage.ddcNodes.storageNodes.v48008.get(block, nodeId)
-            if (node) {
-                nodeInfo = {
-                    id: toCereAddress(node.pubKey),
-                    providerId: node.providerId,
-                    clusterId: node.clusterId,
-                    host: 'localhost',
-                    domain: null,
-                    ssl: false,
-                    httpPort: 8080,
-                    grpcPort: 9090,
-                    p2pPort: 9070,
-                    mode: DdcNodeMode.Storage,
-                    transferredBytes: 0n,
-                    storedBytes: 0n,
-                    numberOfPuts: 0n,
-                    numberOfGets: 0n,
-                }
-            }
-        } else if (storage.ddcNodes.storageNodes.v48013.is(block)) {
-            const node = await storage.ddcNodes.storageNodes.v48013.get(block, nodeId)
+        if (storage.ddcNodes.storageNodes.v54113.is(block)) {
+            const node = await storage.ddcNodes.storageNodes.v54113.get(block, nodeId)
             if (node) {
                 nodeInfo = {
                     id: toCereAddress(node.pubKey),
@@ -86,15 +66,15 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                     httpPort: node.props.httpPort,
                     grpcPort: node.props.grpcPort,
                     p2pPort: node.props.p2PPort,
-                    mode: DdcNodeMode.Storage,
-                    transferredBytes: 0n,
-                    storedBytes: 0n,
-                    numberOfPuts: 0n,
-                    numberOfGets: 0n,
+                    mode: DdcNodeMode[node.props.mode.__kind],
+                    transferredBytes: node.totalUsage?.transferredBytes ?? 0n,
+                    storedBytes: node.totalUsage?.storedBytes ?? 0n,
+                    numberOfPuts: node.totalUsage?.numberOfPuts ?? 0n,
+                    numberOfGets: node.totalUsage?.numberOfGets ?? 0n,
                 }
             }
-        } else if (storage.ddcNodes.storageNodes.v48017.is(block)) {
-            const node = await storage.ddcNodes.storageNodes.v48017.get(block, nodeId)
+        } else if (storage.ddcNodes.storageNodes.v54100.is(block)) {
+            const node = await storage.ddcNodes.storageNodes.v54100.get(block, nodeId)
             if (node) {
                 nodeInfo = {
                     id: toCereAddress(node.pubKey),
@@ -133,8 +113,8 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                     numberOfGets: 0n,
                 }
             }
-        } else if (storage.ddcNodes.storageNodes.v54100.is(block)) {
-            const node = await storage.ddcNodes.storageNodes.v54100.get(block, nodeId)
+        } else if (storage.ddcNodes.storageNodes.v48017.is(block)) {
+            const node = await storage.ddcNodes.storageNodes.v48017.get(block, nodeId)
             if (node) {
                 nodeInfo = {
                     id: toCereAddress(node.pubKey),
@@ -153,8 +133,8 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                     numberOfGets: 0n,
                 }
             }
-        } else if (storage.ddcNodes.storageNodes.v54113.is(block)) {
-            const node = await storage.ddcNodes.storageNodes.v54113.get(block, nodeId)
+        } else if (storage.ddcNodes.storageNodes.v48013.is(block)) {
+            const node = await storage.ddcNodes.storageNodes.v48013.get(block, nodeId)
             if (node) {
                 nodeInfo = {
                     id: toCereAddress(node.pubKey),
@@ -166,11 +146,31 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                     httpPort: node.props.httpPort,
                     grpcPort: node.props.grpcPort,
                     p2pPort: node.props.p2PPort,
-                    mode: DdcNodeMode[node.props.mode.__kind],
-                    transferredBytes: node.totalUsage?.transferredBytes ?? 0n,
-                    storedBytes: node.totalUsage?.storedBytes ?? 0n,
-                    numberOfPuts: node.totalUsage?.numberOfPuts ?? 0n,
-                    numberOfGets: node.totalUsage?.numberOfGets ?? 0n,
+                    mode: DdcNodeMode.Storage,
+                    transferredBytes: 0n,
+                    storedBytes: 0n,
+                    numberOfPuts: 0n,
+                    numberOfGets: 0n,
+                }
+            }
+        } else if (storage.ddcNodes.storageNodes.v48008.is(block)) {
+            const node = await storage.ddcNodes.storageNodes.v48008.get(block, nodeId)
+            if (node) {
+                nodeInfo = {
+                    id: toCereAddress(node.pubKey),
+                    providerId: node.providerId,
+                    clusterId: node.clusterId,
+                    host: 'localhost',
+                    domain: null,
+                    ssl: false,
+                    httpPort: 8080,
+                    grpcPort: 9090,
+                    p2pPort: 9070,
+                    mode: DdcNodeMode.Storage,
+                    transferredBytes: 0n,
+                    storedBytes: 0n,
+                    numberOfPuts: 0n,
+                    numberOfGets: 0n,
                 }
             }
         } else {

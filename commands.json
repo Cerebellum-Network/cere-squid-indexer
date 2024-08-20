@@ -49,6 +49,11 @@
       "deps": ["build", "migration:apply"],
       "cmd": ["node", "--require=dotenv/config", "lib/main.js"]
     },
+    "process:inspect": {
+      "description": "Load .env and start the squid processor in debug mode",
+      "deps": ["build", "migration:apply"],
+      "cmd": ["node", "--require=dotenv/config", "--inspect-brk", "lib/main.js"]
+    },
     "process:prod": {
       "description": "Start the squid processor",
       "deps": ["migration:apply"],

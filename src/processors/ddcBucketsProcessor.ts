@@ -24,48 +24,27 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
 
     private async processDdcBucketsEvents(bucketId: bigint, block: BlockHeader) {
         // TODO(khssnv)
-        // The `blockSpecVersion` is added because previously the following
-        // `storage.ddcCustomers.buckets.v48013.is(block)` returned `true` when `v54100` is
-        // expected. Remove it and return back to the `.is(block)` version selector when
-        // the problem is fixed. With `blockSpecVersion` we can't detect if incoming block has an
-        // unsupported future version of the storage.
-        const blockSpecVersion = block._runtime.specVersion
+        // We can return to ascending versions check here and in the other processors when
+        // https://github.com/subsquid/squid-sdk/issues/334 fixed, possibly with
+        // https://github.com/subsquid/squid-sdk/pull/337.
 
         let bucketInfo: DdcBucketInfo | undefined
-        // if (storage.ddcCustomers.buckets.v48013.is(block)) {
-        if (blockSpecVersion >= 48013 && blockSpecVersion < 48017) {
-            const bucket = await storage.ddcCustomers.buckets.v48013.get(block, bucketId)
-            if (bucket) {
-                bucketInfo = {
-                    ownerId: bucket.ownerId,
-                    clusterId: bucket.clusterId,
-                    bucketId: bucketId,
-                    isPublic: true,
-                    isRemoved: false,
-                    transferredBytes: 0n,
-                    storedBytes: 0n,
-                    numberOfPuts: 0n,
-                    numberOfGets: 0n,
-                }
-            }
-            // } else if (storage.ddcCustomers.buckets.v48017.is(block)) {
-        } else if (blockSpecVersion <= 48017 && blockSpecVersion < 50000) {
-            const bucket = await storage.ddcCustomers.buckets.v48017.get(block, bucketId)
+        if (storage.ddcCustomers.buckets.v54100.is(block)) {
+            const bucket = await storage.ddcCustomers.buckets.v54100.get(block, bucketId)
             if (bucket) {
                 bucketInfo = {
                     ownerId: bucket.ownerId,
                     clusterId: bucket.clusterId,
                     bucketId: bucketId,
                     isPublic: bucket.isPublic,
-                    isRemoved: false,
-                    transferredBytes: 0n,
-                    storedBytes: 0n,
-                    numberOfPuts: 0n,
-                    numberOfGets: 0n,
+                    isRemoved: bucket.isRemoved,
+                    transferredBytes: bucket.totalCustomersUsage?.transferredBytes ?? 0n,
+                    storedBytes: bucket.totalCustomersUsage?.storedBytes ?? 0n,
+                    numberOfPuts: bucket.totalCustomersUsage?.numberOfPuts ?? 0n,
+                    numberOfGets: bucket.totalCustomersUsage?.numberOfGets ?? 0n,
                 }
             }
-            // } else if (storage.ddcCustomers.buckets.v50000.is(block)) {
-        } else if (blockSpecVersion >= 50000 && blockSpecVersion < 54100) {
+        } else if (storage.ddcCustomers.buckets.v50000.is(block)) {
             const bucket = await storage.ddcCustomers.buckets.v50000.get(block, bucketId)
             if (bucket) {
                 bucketInfo = {
@@ -80,20 +59,34 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
                     numberOfGets: 0n,
                 }
             }
-            // } else if (storage.ddcCustomers.buckets.v54100.is(block)) {
-        } else if (blockSpecVersion >= 54100) {
-            const bucket = await storage.ddcCustomers.buckets.v54100.get(block, bucketId)
+        } else if (storage.ddcCustomers.buckets.v48017.is(block)) {
+            const bucket = await storage.ddcCustomers.buckets.v48017.get(block, bucketId)
             if (bucket) {
                 bucketInfo = {
                     ownerId: bucket.ownerId,
                     clusterId: bucket.clusterId,
                     bucketId: bucketId,
                     isPublic: bucket.isPublic,
-                    isRemoved: bucket.isRemoved,
-                    transferredBytes: bucket.totalCustomersUsage?.transferredBytes ?? 0n,
-                    storedBytes: bucket.totalCustomersUsage?.storedBytes ?? 0n,
-                    numberOfPuts: bucket.totalCustomersUsage?.numberOfPuts ?? 0n,
-                    numberOfGets: bucket.totalCustomersUsage?.numberOfGets ?? 0n,
+                    isRemoved: false,
+                    transferredBytes: 0n,
+                    storedBytes: 0n,
+                    numberOfPuts: 0n,
+                    numberOfGets: 0n,
+                }
+            }
+        } else if (storage.ddcCustomers.buckets.v48013.is(block)) {
+            const bucket = await storage.ddcCustomers.buckets.v48013.get(block, bucketId)
+            if (bucket) {
+                bucketInfo = {
+                    ownerId: bucket.ownerId,
+                    clusterId: bucket.clusterId,
+                    bucketId: bucketId,
+                    isPublic: true,
+                    isRemoved: false,
+                    transferredBytes: 0n,
+                    storedBytes: 0n,
+                    numberOfPuts: 0n,
+                    numberOfGets: 0n,
                 }
             }
         } else {

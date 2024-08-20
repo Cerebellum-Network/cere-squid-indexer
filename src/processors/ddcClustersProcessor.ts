@@ -56,28 +56,14 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
 
     private async processDdcClustersEvents(clusterId: string, block: BlockHeader) {
         let clusterInfo: DdcClusterInfo | undefined
-        if (storage.ddcClusters.clusters.v48008.is(block)) {
-            const cluster = await storage.ddcClusters.clusters.v48008.get(block, clusterId)
-            if (cluster) {
-                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId)
-            }
-        } else if (storage.ddcClusters.clusters.v48013.is(block)) {
-            const cluster = await storage.ddcClusters.clusters.v48013.get(block, clusterId)
-            if (cluster) {
-                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId)
-            }
-        } else if (storage.ddcClusters.clusters.v48016.is(block)) {
-            const cluster = await storage.ddcClusters.clusters.v48016.get(block, clusterId)
-            if (cluster) {
-                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId)
-            }
-        } else if (storage.ddcClusters.clusters.v53003.is(block)) {
-            const cluster = await storage.ddcClusters.clusters.v53003.get(block, clusterId)
+        if (storage.ddcClusters.clusters.v54105.is(block)) {
+            const cluster = await storage.ddcClusters.clusters.v54105.get(block, clusterId)
             if (cluster) {
                 clusterInfo = this.newClusterInfo(clusterId, cluster.managerId)
                 clusterInfo.erasureCodingRequired = cluster.props.erasureCodingRequired
                 clusterInfo.erasureCodingTotal = cluster.props.erasureCodingTotal
                 clusterInfo.replicationTotal = cluster.props.replicationTotal
+                clusterInfo.status = DdcClusterStatus[cluster.status.__kind]
             }
         } else if (storage.ddcClusters.clusters.v54001.is(block)) {
             const cluster = await storage.ddcClusters.clusters.v54001.get(block, clusterId)
@@ -88,14 +74,28 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
                 clusterInfo.replicationTotal = cluster.props.replicationTotal
                 clusterInfo.status = DdcClusterStatus[cluster.status.__kind]
             }
-        } else if (storage.ddcClusters.clusters.v54105.is(block)) {
-            const cluster = await storage.ddcClusters.clusters.v54105.get(block, clusterId)
+        } else if (storage.ddcClusters.clusters.v53003.is(block)) {
+            const cluster = await storage.ddcClusters.clusters.v53003.get(block, clusterId)
             if (cluster) {
                 clusterInfo = this.newClusterInfo(clusterId, cluster.managerId)
                 clusterInfo.erasureCodingRequired = cluster.props.erasureCodingRequired
                 clusterInfo.erasureCodingTotal = cluster.props.erasureCodingTotal
                 clusterInfo.replicationTotal = cluster.props.replicationTotal
-                clusterInfo.status = DdcClusterStatus[cluster.status.__kind]
+            }
+        } else if (storage.ddcClusters.clusters.v48016.is(block)) {
+            const cluster = await storage.ddcClusters.clusters.v48016.get(block, clusterId)
+            if (cluster) {
+                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId)
+            }
+        } else if (storage.ddcClusters.clusters.v48013.is(block)) {
+            const cluster = await storage.ddcClusters.clusters.v48013.get(block, clusterId)
+            if (cluster) {
+                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId)
+            }
+        } else if (storage.ddcClusters.clusters.v48008.is(block)) {
+            const cluster = await storage.ddcClusters.clusters.v48008.get(block, clusterId)
+            if (cluster) {
+                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId)
             }
         } else {
             logUnsupportedStorageVersion('DdcClusters.Clusters', block)
@@ -103,16 +103,16 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
         if (clusterInfo) {
             clusterInfo.managerId = toCereAddress(clusterInfo.managerId)
             let clusterGovParams
-            if (storage.ddcClusters.clustersGovParams.v48013.is(block)) {
-                clusterGovParams = await storage.ddcClusters.clustersGovParams.v48013.get(block, clusterId)
-            } else if (storage.ddcClusters.clustersGovParams.v48015.is(block)) {
-                clusterGovParams = await storage.ddcClusters.clustersGovParams.v48015.get(block, clusterId)
-            } else if (storage.ddcClusters.clustersGovParams.v48016.is(block)) {
-                clusterGovParams = await storage.ddcClusters.clustersGovParams.v48016.get(block, clusterId)
+            if (storage.ddcClusters.clustersGovParams.v48400.is(block)) {
+                clusterGovParams = await storage.ddcClusters.clustersGovParams.v48400.get(block, clusterId)
             } else if (storage.ddcClusters.clustersGovParams.v48017.is(block)) {
                 clusterGovParams = await storage.ddcClusters.clustersGovParams.v48017.get(block, clusterId)
-            } else if (storage.ddcClusters.clustersGovParams.v48400.is(block)) {
-                clusterGovParams = await storage.ddcClusters.clustersGovParams.v48400.get(block, clusterId)
+            } else if (storage.ddcClusters.clustersGovParams.v48016.is(block)) {
+                clusterGovParams = await storage.ddcClusters.clustersGovParams.v48016.get(block, clusterId)
+            } else if (storage.ddcClusters.clustersGovParams.v48015.is(block)) {
+                clusterGovParams = await storage.ddcClusters.clustersGovParams.v48015.get(block, clusterId)
+            } else if (storage.ddcClusters.clustersGovParams.v48013.is(block)) {
+                clusterGovParams = await storage.ddcClusters.clustersGovParams.v48013.get(block, clusterId)
             }
             if (clusterGovParams) {
                 clusterInfo.treasuryShare = BigInt(clusterGovParams.treasuryShare)
