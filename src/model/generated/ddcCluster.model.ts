@@ -14,7 +14,7 @@ export class DdcCluster {
     id!: string
 
     @IntColumn_({nullable: false})
-    createdAt!: number
+    createdAtBlockHeight!: number
 
     @Index_()
     @ManyToOne_(() => Account, {nullable: true})

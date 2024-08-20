@@ -17,7 +17,7 @@ const MaxDomainLen = 255
 interface DdcNodeInfo {
     id: string
 
-    createdAt?: number
+    createdAtBlockHeight?: number
 
     providerId: string
     clusterId: string | undefined
@@ -54,9 +54,9 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
     }
 
     private async processDdcNodesEvents(nodeId: string, block: BlockHeader, event: Event) {
-        let createdAt
+        let createdAtBlockHeight
         if (event.name === events.ddcNodes.nodeCreated.name) {
-            createdAt = block.height
+            createdAtBlockHeight = block.height
         }
 
         let nodeInfo: DdcNodeInfo | undefined
@@ -65,7 +65,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
             if (node) {
                 nodeInfo = {
                     id: toCereAddress(node.pubKey),
-                    createdAt,
+                    createdAtBlockHeight: createdAtBlockHeight,
                     providerId: node.providerId,
                     clusterId: node.clusterId,
                     host: decodeAsciiStringFromScaleVecFixed(MaxHostLen, node.props.host as HexString),
@@ -86,7 +86,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
             if (node) {
                 nodeInfo = {
                     id: toCereAddress(node.pubKey),
-                    createdAt,
+                    createdAtBlockHeight: createdAtBlockHeight,
                     providerId: node.providerId,
                     clusterId: node.clusterId,
                     host: decodeAsciiStringFromScaleVecFixed(MaxHostLen, node.props.host as HexString),
@@ -107,7 +107,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
             if (node) {
                 nodeInfo = {
                     id: toCereAddress(node.pubKey),
-                    createdAt,
+                    createdAtBlockHeight: createdAtBlockHeight,
                     providerId: node.providerId,
                     clusterId: node.clusterId,
                     host: decodeAsciiStringFromScaleVecFixed(MaxHostLen, node.props.host as HexString),
@@ -128,7 +128,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
             if (node) {
                 nodeInfo = {
                     id: toCereAddress(node.pubKey),
-                    createdAt,
+                    createdAtBlockHeight: createdAtBlockHeight,
                     providerId: node.providerId,
                     clusterId: node.clusterId,
                     host: decodeAsciiStringFromScaleVecFixed(MaxHostLen, node.props.host as HexString),
@@ -149,7 +149,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
             if (node) {
                 nodeInfo = {
                     id: toCereAddress(node.pubKey),
-                    createdAt,
+                    createdAtBlockHeight: createdAtBlockHeight,
                     providerId: node.providerId,
                     clusterId: node.clusterId,
                     host: decodeAsciiStringFromScaleVecFixed(MaxHostLen, node.props.host as HexString),
@@ -170,7 +170,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
             if (node) {
                 nodeInfo = {
                     id: toCereAddress(node.pubKey),
-                    createdAt,
+                    createdAtBlockHeight: createdAtBlockHeight,
                     providerId: node.providerId,
                     clusterId: node.clusterId,
                     host: 'localhost',

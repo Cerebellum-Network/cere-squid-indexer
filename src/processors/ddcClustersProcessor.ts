@@ -7,7 +7,7 @@ import { BaseProcessor } from './processor'
 export interface DdcClusterInfo {
     id: string
 
-    createdAt?: number
+    createdAtBlockHeight?: number
 
     managerId: string
 
@@ -39,7 +39,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
     private newClusterInfo(clusterId: string, managerId: string, createdAt: number | undefined): DdcClusterInfo {
         return {
             id: clusterId,
-            createdAt,
+            createdAtBlockHeight: createdAt,
             managerId: managerId,
             clusterReserveShare: 0n,
             erasureCodingRequired: 0,
@@ -59,16 +59,16 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
     }
 
     private async processDdcClustersEvents(clusterId: string, block: BlockHeader, event: Event) {
-        let createdAt
+        let createdAtBlockHeight
         if (event.name === events.ddcClusters.clusterCreated.name) {
-            createdAt = block.height
+            createdAtBlockHeight = block.height
         }
 
         let clusterInfo: DdcClusterInfo | undefined
         if (storage.ddcClusters.clusters.v54105.is(block)) {
             const cluster = await storage.ddcClusters.clusters.v54105.get(block, clusterId)
             if (cluster) {
-                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId, createdAt)
+                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId, createdAtBlockHeight)
                 clusterInfo.erasureCodingRequired = cluster.props.erasureCodingRequired
                 clusterInfo.erasureCodingTotal = cluster.props.erasureCodingTotal
                 clusterInfo.replicationTotal = cluster.props.replicationTotal
@@ -77,7 +77,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
         } else if (storage.ddcClusters.clusters.v54001.is(block)) {
             const cluster = await storage.ddcClusters.clusters.v54001.get(block, clusterId)
             if (cluster) {
-                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId, createdAt)
+                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId, createdAtBlockHeight)
                 clusterInfo.erasureCodingRequired = cluster.props.erasureCodingRequired
                 clusterInfo.erasureCodingTotal = cluster.props.erasureCodingTotal
                 clusterInfo.replicationTotal = cluster.props.replicationTotal
@@ -86,7 +86,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
         } else if (storage.ddcClusters.clusters.v53003.is(block)) {
             const cluster = await storage.ddcClusters.clusters.v53003.get(block, clusterId)
             if (cluster) {
-                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId, createdAt)
+                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId, createdAtBlockHeight)
                 clusterInfo.erasureCodingRequired = cluster.props.erasureCodingRequired
                 clusterInfo.erasureCodingTotal = cluster.props.erasureCodingTotal
                 clusterInfo.replicationTotal = cluster.props.replicationTotal
@@ -94,17 +94,17 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
         } else if (storage.ddcClusters.clusters.v48016.is(block)) {
             const cluster = await storage.ddcClusters.clusters.v48016.get(block, clusterId)
             if (cluster) {
-                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId, createdAt)
+                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId, createdAtBlockHeight)
             }
         } else if (storage.ddcClusters.clusters.v48013.is(block)) {
             const cluster = await storage.ddcClusters.clusters.v48013.get(block, clusterId)
             if (cluster) {
-                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId, createdAt)
+                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId, createdAtBlockHeight)
             }
         } else if (storage.ddcClusters.clusters.v48008.is(block)) {
             const cluster = await storage.ddcClusters.clusters.v48008.get(block, clusterId)
             if (cluster) {
-                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId, createdAt)
+                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId, createdAtBlockHeight)
             }
         } else {
             logUnsupportedStorageVersion('DdcClusters.Clusters', block)

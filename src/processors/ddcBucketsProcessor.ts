@@ -4,7 +4,7 @@ import { logEmptyStorage, logUnsupportedEventVersion, logUnsupportedStorageVersi
 import { BaseProcessor } from './processor'
 
 export interface DdcBucketInfo {
-    createdAt?: number
+    createdAtBlockHeight?: number
     ownerId: string
     clusterId: string
     bucketId: bigint
@@ -24,9 +24,9 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
     }
 
     private async processDdcBucketsEvents(bucketId: bigint, block: BlockHeader, event: Event) {
-        let createdAt;
+        let createdAtBlockHeight;
         if (event.name === events.ddcCustomers.bucketCreated.name) {
-            createdAt = block.height
+            createdAtBlockHeight = block.height
         }
 
         // TODO(khssnv)
@@ -39,7 +39,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
             const bucket = await storage.ddcCustomers.buckets.v54100.get(block, bucketId)
             if (bucket) {
                 bucketInfo = {
-                    createdAt,
+                    createdAtBlockHeight: createdAtBlockHeight,
                     ownerId: bucket.ownerId,
                     clusterId: bucket.clusterId,
                     bucketId: bucketId,
@@ -55,7 +55,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
             const bucket = await storage.ddcCustomers.buckets.v50000.get(block, bucketId)
             if (bucket) {
                 bucketInfo = {
-                    createdAt,
+                    createdAtBlockHeight: createdAtBlockHeight,
                     ownerId: bucket.ownerId,
                     clusterId: bucket.clusterId,
                     bucketId: bucketId,
@@ -71,7 +71,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
             const bucket = await storage.ddcCustomers.buckets.v48017.get(block, bucketId)
             if (bucket) {
                 bucketInfo = {
-                    createdAt,
+                    createdAtBlockHeight: createdAtBlockHeight,
                     ownerId: bucket.ownerId,
                     clusterId: bucket.clusterId,
                     bucketId: bucketId,
@@ -87,7 +87,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
             const bucket = await storage.ddcCustomers.buckets.v48013.get(block, bucketId)
             if (bucket) {
                 bucketInfo = {
-                    createdAt,
+                    createdAtBlockHeight: createdAtBlockHeight,
                     ownerId: bucket.ownerId,
                     clusterId: bucket.clusterId,
                     bucketId: bucketId,
