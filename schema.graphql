@@ -12,6 +12,8 @@ type Account @entity {
 type DdcCluster @entity {
   id: ID!
 
+  createdAt: Int!
+
   managerId: Account! @index
 
   treasuryShare: BigInt!
@@ -41,6 +43,8 @@ enum DdcClusterStatus {
 type DdcNode @entity {
   id: ID!
 
+  createdAt: Int!
+
   providerId: Account! @index
   clusterId: DdcCluster
 
@@ -64,6 +68,8 @@ enum DdcNodeMode {
 
 type DdcBucket @entity {
   id: ID!
+
+  createdAt: Int!
 
   ownerId: Account! @index
   clusterId: DdcCluster! @index
