@@ -9,3 +9,6 @@
 /.idea
 
 /data
+
+.env*
+!.env.example
