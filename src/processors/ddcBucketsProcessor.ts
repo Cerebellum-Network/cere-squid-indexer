@@ -4,6 +4,7 @@ import { logEmptyStorage, logUnsupportedEventVersion, logUnsupportedStorageVersi
 import { BaseProcessor } from './processor'
 
 export interface DdcBucketInfo {
+    createdAt?: number
     ownerId: string
     clusterId: string
     bucketId: bigint
@@ -22,7 +23,12 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
         super(new Map<bigint, DdcBucketInfo>())
     }
 
-    private async processDdcBucketsEvents(bucketId: bigint, block: BlockHeader) {
+    private async processDdcBucketsEvents(bucketId: bigint, block: BlockHeader, event: Event) {
+        let createdAt;
+        if (event.name === events.ddcCustomers.bucketCreated.name) {
+            createdAt = block.height
+        }
+
         // TODO(khssnv)
         // We can return to ascending versions check here and in the other processors when
         // https://github.com/subsquid/squid-sdk/issues/334 fixed, possibly with
@@ -33,6 +39,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
             const bucket = await storage.ddcCustomers.buckets.v54100.get(block, bucketId)
             if (bucket) {
                 bucketInfo = {
+                    createdAt,
                     ownerId: bucket.ownerId,
                     clusterId: bucket.clusterId,
                     bucketId: bucketId,
@@ -48,6 +55,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
             const bucket = await storage.ddcCustomers.buckets.v50000.get(block, bucketId)
             if (bucket) {
                 bucketInfo = {
+                    createdAt,
                     ownerId: bucket.ownerId,
                     clusterId: bucket.clusterId,
                     bucketId: bucketId,
@@ -63,6 +71,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
             const bucket = await storage.ddcCustomers.buckets.v48017.get(block, bucketId)
             if (bucket) {
                 bucketInfo = {
+                    createdAt,
                     ownerId: bucket.ownerId,
                     clusterId: bucket.clusterId,
                     bucketId: bucketId,
@@ -78,6 +87,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
             const bucket = await storage.ddcCustomers.buckets.v48013.get(block, bucketId)
             if (bucket) {
                 bucketInfo = {
+                    createdAt,
                     ownerId: bucket.ownerId,
                     clusterId: bucket.clusterId,
                     bucketId: bucketId,
@@ -105,13 +115,13 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
             case events.ddcCustomers.bucketCreated.name: {
                 if (events.ddcCustomers.bucketCreated.v48013.is(event)) {
                     const bucketId = events.ddcCustomers.bucketCreated.v48013.decode(event)
-                    await this.processDdcBucketsEvents(bucketId, block)
+                    await this.processDdcBucketsEvents(bucketId, block, event)
                 } else if (events.ddcCustomers.bucketCreated.v48800.is(event)) {
                     const bucketId = events.ddcCustomers.bucketCreated.v48800.decode(event).bucketId
-                    await this.processDdcBucketsEvents(bucketId, block)
+                    await this.processDdcBucketsEvents(bucketId, block, event)
                 } else if (events.ddcCustomers.bucketCreated.v54100.is(event)) {
                     const bucketId = events.ddcCustomers.bucketCreated.v54100.decode(event).bucketId
-                    await this.processDdcBucketsEvents(bucketId, block)
+                    await this.processDdcBucketsEvents(bucketId, block, event)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
@@ -120,13 +130,13 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
             case events.ddcCustomers.bucketUpdated.name: {
                 if (events.ddcCustomers.bucketUpdated.v48017.is(event)) {
                     const bucketId = events.ddcCustomers.bucketUpdated.v48017.decode(event)
-                    await this.processDdcBucketsEvents(bucketId, block)
+                    await this.processDdcBucketsEvents(bucketId, block, event)
                 } else if (events.ddcCustomers.bucketUpdated.v48800.is(event)) {
                     const bucketId = events.ddcCustomers.bucketUpdated.v48800.decode(event).bucketId
-                    await this.processDdcBucketsEvents(bucketId, block)
+                    await this.processDdcBucketsEvents(bucketId, block, event)
                 } else if (events.ddcCustomers.bucketUpdated.v54100.is(event)) {
                     const bucketId = events.ddcCustomers.bucketUpdated.v54100.decode(event).bucketId
-                    await this.processDdcBucketsEvents(bucketId, block)
+                    await this.processDdcBucketsEvents(bucketId, block, event)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
@@ -135,7 +145,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
             case events.ddcCustomers.bucketRemoved.name: {
                 if (events.ddcCustomers.bucketRemoved.v50000.is(event)) {
                     const bucketId = events.ddcCustomers.bucketRemoved.v50000.decode(event).bucketId
-                    await this.processDdcBucketsEvents(bucketId, block)
+                    await this.processDdcBucketsEvents(bucketId, block, event)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
@@ -144,7 +154,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
             case events.ddcCustomers.bucketTotalNodesUsageUpdated.name: {
                 if (events.ddcCustomers.bucketTotalNodesUsageUpdated.v54100.is(event)) {
                     const bucketId = events.ddcCustomers.bucketTotalNodesUsageUpdated.v54100.decode(event).bucketId
-                    await this.processDdcBucketsEvents(bucketId, block)
+                    await this.processDdcBucketsEvents(bucketId, block, event)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
@@ -153,7 +163,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
             case events.ddcCustomers.bucketTotalCustomersUsageUpdated.name: {
                 if (events.ddcCustomers.bucketTotalCustomersUsageUpdated.v54100.is(event)) {
                     const bucketId = events.ddcCustomers.bucketTotalCustomersUsageUpdated.v54100.decode(event).bucketId
-                    await this.processDdcBucketsEvents(bucketId, block)
+                    await this.processDdcBucketsEvents(bucketId, block, event)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
