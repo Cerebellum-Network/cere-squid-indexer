@@ -24,7 +24,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
     }
 
     private async processDdcBucketsEvents(bucketId: bigint, block: BlockHeader, event: Event) {
-        let createdAtBlockHeight;
+        let createdAtBlockHeight
         if (event.name === events.ddcCustomers.bucketCreated.name) {
             createdAtBlockHeight = block.height
         }
