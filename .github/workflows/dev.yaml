@@ -4,6 +4,14 @@ on:
     branches:
       - dev
   workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        required: false
+        description: 'Environment to deploy to'
+        options:
+          - squid
+          - squid-2
 
 permissions:
   id-token: write
@@ -15,6 +23,6 @@ jobs:
     with:
       environment: dev
       aws_account_id: ${{ vars.DEV_NETWORK_AWS_ACCOUNT_ID }}
-      repository: cere-squid
+      repository: cere-${{ inputs.environment }}
       file: ./Dockerfile
     secrets: inherit
