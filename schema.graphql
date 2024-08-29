@@ -56,14 +56,26 @@ type DdcNode @entity {
   p2pPort: Int!
   mode: DdcNodeMode!
 
-  transferredBytes: BigInt!
-  storedBytes: BigInt!
-  numberOfPuts: BigInt!
-  numberOfGets: BigInt!
+  usage: [DdcNodeUsage!]! @derivedFrom(field: "nodeId")
 }
 
 enum DdcNodeMode {
   Storage, Cache, Full, DAC
+}
+
+type DdcNodeUsage @entity @index(fields: ["blockHeight", "nodeId"]) @index(fields: ["blockTimestamp", "nodeId"]) {
+  # Can't avoid having id column due a lack of support for `PRIMARY KEY("blockHeight", "nodeId")`.
+  # Expected value is blockHeight || '-' || nodeId.
+  id: ID!
+
+  blockHeight: Int! @index
+  blockTimestamp: DateTime! @index
+  nodeId: DdcNode! @index
+
+  transferredBytes: BigInt!
+  storedBytes: BigInt!
+  numberOfPuts: BigInt!
+  numberOfGets: BigInt!
 }
 
 type DdcBucket @entity {
@@ -76,6 +88,19 @@ type DdcBucket @entity {
 
   isPublic: Boolean!
   isRemoved: Boolean!
+
+  usage: [DdcBucketUsage!]! @derivedFrom(field: "bucketId")
+}
+
+type DdcBucketUsage @entity @index(fields: ["blockHeight", "bucketId"]) @index(fields: ["blockTimestamp", "bucketId"]) {
+  # Can't avoid having id column due a lack of support for `PRIMARY KEY("blockHeight", "bucketId")`.
+  # Expected value is blockHeight || '-' || bucketId .
+  id: ID!
+
+  blockHeight: Int! @index
+  blockTimestamp: DateTime! @index
+  bucketId: DdcBucket! @index
+
   transferredBytes: BigInt!
   storedBytes: BigInt!
   numberOfPuts: BigInt!
