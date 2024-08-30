@@ -1,5 +1,5 @@
 import type { HexString } from '@polkadot/util/types'
-import { BlockHeader, Event } from '@subsquid/substrate-processor'
+import { Event } from '@subsquid/substrate-processor'
 import { events, storage } from '../types'
 import {
     decodeAsciiStringFromScaleVecFixed,
@@ -8,6 +8,7 @@ import {
     logUnsupportedStorageVersion,
     toCereAddress,
 } from '../utils'
+import { Block } from '../processor'
 import { DdcNodeMode } from '../model'
 import { BaseProcessor } from './processor'
 
@@ -53,7 +54,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
         })
     }
 
-    private async processDdcNodesEvents(nodeId: string, block: BlockHeader, event: Event) {
+    private async processDdcNodesEvents(nodeId: string, block: Block, event: Event) {
         let createdAtBlockHeight
         if (event.name === events.ddcNodes.nodeCreated.name) {
             createdAtBlockHeight = block.height
@@ -197,7 +198,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
         }
     }
 
-    async process(event: Event, block: BlockHeader) {
+    async process(event: Event, block: Block) {
         switch (event.name) {
             case events.ddcClusters.clusterNodeAdded.name: {
                 let decodedEvent

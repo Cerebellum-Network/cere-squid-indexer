@@ -1,6 +1,7 @@
-import { BlockHeader, Event } from '@subsquid/substrate-processor'
+import { Event } from '@subsquid/substrate-processor'
 import { events, storage } from '../types'
 import { logEmptyStorage, logUnsupportedEventVersion, logUnsupportedStorageVersion, toCereAddress } from '../utils'
+import { Block } from '../processor'
 import { BaseProcessor } from './processor'
 
 type State = Map<string, bigint>
@@ -10,7 +11,7 @@ export class CereBalancesProcessor extends BaseProcessor<State> {
         super(new Map<string, bigint>())
     }
 
-    private async processBalancesEvent(accountId: string, block: BlockHeader) {
+    private async processBalancesEvent(accountId: string, block: Block) {
         try {
             let accountInStorage
             if (storage.system.account.v266.is(block)) {
@@ -36,7 +37,7 @@ export class CereBalancesProcessor extends BaseProcessor<State> {
         }
     }
 
-    async process(event: Event, block: BlockHeader) {
+    async process(event: Event, block: Block) {
         switch (event.name) {
             case events.balances.endowed.name: {
                 if (events.balances.endowed.v266.is(event)) {

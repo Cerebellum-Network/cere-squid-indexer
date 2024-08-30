@@ -1,6 +1,7 @@
-import { BlockHeader, Event } from '@subsquid/substrate-processor'
+import { Event } from '@subsquid/substrate-processor'
 import { events, storage } from '../types'
 import { logEmptyStorage, logUnsupportedEventVersion, logUnsupportedStorageVersion, toCereAddress } from '../utils'
+import { Block } from '../processor'
 import { BaseProcessor } from './processor'
 
 export interface DdcBucketInfo {
@@ -23,7 +24,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
         super(new Map<bigint, DdcBucketInfo>())
     }
 
-    private async processDdcBucketsEvents(bucketId: bigint, block: BlockHeader, event: Event) {
+    private async processDdcBucketsEvents(bucketId: bigint, block: Block, event: Event) {
         let createdAtBlockHeight
         if (event.name === events.ddcCustomers.bucketCreated.name) {
             createdAtBlockHeight = block.height
@@ -110,7 +111,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
         }
     }
 
-    async process(event: Event, block: BlockHeader) {
+    async process(event: Event, block: Block) {
         switch (event.name) {
             case events.ddcCustomers.bucketCreated.name: {
                 if (events.ddcCustomers.bucketCreated.v48013.is(event)) {

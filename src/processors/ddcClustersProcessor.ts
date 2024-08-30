@@ -1,6 +1,7 @@
-import { BlockHeader, Event } from '@subsquid/substrate-processor'
+import { Event } from '@subsquid/substrate-processor'
 import { events, storage } from '../types'
 import { logEmptyStorage, logUnsupportedEventVersion, logUnsupportedStorageVersion, toCereAddress } from '../utils'
+import { Block } from '../processor'
 import { DdcClusterStatus } from '../model'
 import { BaseProcessor } from './processor'
 
@@ -58,7 +59,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
         }
     }
 
-    private async processDdcClustersEvents(clusterId: string, block: BlockHeader, event: Event) {
+    private async processDdcClustersEvents(clusterId: string, block: Block, event: Event) {
         let createdAtBlockHeight
         if (event.name === events.ddcClusters.clusterCreated.name) {
             createdAtBlockHeight = block.height
@@ -141,7 +142,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
         }
     }
 
-    async process(event: Event, block: BlockHeader) {
+    async process(event: Event, block: Block) {
         switch (event.name) {
             case events.ddcClusters.clusterCreated.name: {
                 if (events.ddcClusters.clusterCreated.v48008.is(event)) {
