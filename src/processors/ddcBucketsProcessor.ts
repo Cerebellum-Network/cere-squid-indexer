@@ -4,6 +4,16 @@ import { logEmptyStorage, logUnsupportedEventVersion, logUnsupportedStorageVersi
 import { Block } from '../processor'
 import { BaseProcessor } from './processor'
 
+export interface BucketUsage {
+    block: number
+    timestamp: Date
+
+    transferredBytes: bigint
+    storedBytes: bigint
+    numberOfPuts: bigint
+    numberOfGets: bigint
+}
+
 export interface DdcBucketInfo {
     createdAtBlockHeight?: number
     ownerId: string
@@ -11,10 +21,7 @@ export interface DdcBucketInfo {
     bucketId: bigint
     isPublic: boolean
     isRemoved: boolean
-    transferredBytes: bigint
-    storedBytes: bigint
-    numberOfPuts: bigint
-    numberOfGets: bigint
+    usage?: BucketUsage
 }
 
 type State = Map<bigint, DdcBucketInfo>
@@ -46,10 +53,6 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
                     bucketId: bucketId,
                     isPublic: bucket.isPublic,
                     isRemoved: bucket.isRemoved,
-                    transferredBytes: bucket.totalCustomersUsage?.transferredBytes ?? 0n,
-                    storedBytes: bucket.totalCustomersUsage?.storedBytes ?? 0n,
-                    numberOfPuts: bucket.totalCustomersUsage?.numberOfPuts ?? 0n,
-                    numberOfGets: bucket.totalCustomersUsage?.numberOfGets ?? 0n,
                 }
             }
         } else if (storage.ddcCustomers.buckets.v50000.is(block)) {
@@ -62,10 +65,6 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
                     bucketId: bucketId,
                     isPublic: bucket.isPublic,
                     isRemoved: bucket.isRemoved,
-                    transferredBytes: 0n,
-                    storedBytes: 0n,
-                    numberOfPuts: 0n,
-                    numberOfGets: 0n,
                 }
             }
         } else if (storage.ddcCustomers.buckets.v48017.is(block)) {
@@ -78,10 +77,6 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
                     bucketId: bucketId,
                     isPublic: bucket.isPublic,
                     isRemoved: false,
-                    transferredBytes: 0n,
-                    storedBytes: 0n,
-                    numberOfPuts: 0n,
-                    numberOfGets: 0n,
                 }
             }
         } else if (storage.ddcCustomers.buckets.v48013.is(block)) {
@@ -94,10 +89,6 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
                     bucketId: bucketId,
                     isPublic: true,
                     isRemoved: false,
-                    transferredBytes: 0n,
-                    storedBytes: 0n,
-                    numberOfPuts: 0n,
-                    numberOfGets: 0n,
                 }
             }
         } else {
