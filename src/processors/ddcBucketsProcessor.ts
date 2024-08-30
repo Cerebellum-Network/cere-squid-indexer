@@ -1,4 +1,5 @@
 import { Event } from '@subsquid/substrate-processor'
+import { assertNotNull } from '@subsquid/util-internal'
 import { events, storage } from '../types'
 import { logEmptyStorage, logUnsupportedEventVersion, logUnsupportedStorageVersion, toCereAddress } from '../utils'
 import { Block } from '../processor'
@@ -37,6 +38,8 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
             createdAtBlockHeight = block.height
         }
 
+        const blockTimestamp = new Date(assertNotNull(block.timestamp, `Block ${block.height} timestamp is not set`))
+
         // TODO(khssnv)
         // We can return to ascending versions check here and in the other processors when
         // https://github.com/subsquid/squid-sdk/issues/334 fixed, possibly with
@@ -53,6 +56,16 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
                     bucketId: bucketId,
                     isPublic: bucket.isPublic,
                     isRemoved: bucket.isRemoved,
+                    ...(event.name === events.ddcCustomers.bucketTotalCustomersUsageUpdated.name) && {
+                        usage: {
+                            block: block.height,
+                            timestamp: blockTimestamp,
+                            transferredBytes: bucket.totalCustomersUsage?.transferredBytes ?? 0n,
+                            storedBytes: bucket.totalCustomersUsage?.storedBytes ?? 0n,
+                            numberOfPuts: bucket.totalCustomersUsage?.numberOfPuts ?? 0n,
+                            numberOfGets: bucket.totalCustomersUsage?.numberOfGets ?? 0n,
+                        },
+                    },
                 }
             }
         } else if (storage.ddcCustomers.buckets.v50000.is(block)) {
