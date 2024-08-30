@@ -15,6 +15,16 @@ import { BaseProcessor } from './processor'
 const MaxHostLen = 255
 const MaxDomainLen = 255
 
+interface NodeUsage {
+    block: number
+    timestamp: Date
+
+    transferredBytes: bigint
+    storedBytes: bigint
+    numberOfPuts: bigint
+    numberOfGets: bigint
+}
+
 interface DdcNodeInfo {
     id: string
 
@@ -30,11 +40,7 @@ interface DdcNodeInfo {
     grpcPort: number
     p2pPort: number
     mode: DdcNodeMode
-
-    transferredBytes: bigint
-    storedBytes: bigint
-    numberOfPuts: bigint
-    numberOfGets: bigint
+    usage?: NodeUsage
 }
 
 type State = {
@@ -76,6 +82,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                     grpcPort: node.props.grpcPort,
                     p2pPort: node.props.p2PPort,
                     mode: DdcNodeMode[node.props.mode.__kind],
+                    // TODO: set usage when usage mutation is implemented on the blockchain side.
                 }
             }
         } else if (storage.ddcNodes.storageNodes.v54100.is(block)) {
