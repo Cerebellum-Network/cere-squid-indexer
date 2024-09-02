@@ -1,7 +1,19 @@
-import { BlockHeader, Event } from '@subsquid/substrate-processor'
+import { Event } from '@subsquid/substrate-processor'
+import { assertNotNull } from '@subsquid/util-internal'
 import { events, storage } from '../types'
 import { logEmptyStorage, logUnsupportedEventVersion, logUnsupportedStorageVersion, toCereAddress } from '../utils'
+import { Block } from '../processor'
 import { BaseProcessor } from './processor'
+
+export interface BucketUsage {
+    block: number
+    timestamp: Date
+
+    transferredBytes: bigint
+    storedBytes: bigint
+    numberOfPuts: bigint
+    numberOfGets: bigint
+}
 
 export interface DdcBucketInfo {
     createdAtBlockHeight?: number
@@ -10,10 +22,7 @@ export interface DdcBucketInfo {
     bucketId: bigint
     isPublic: boolean
     isRemoved: boolean
-    transferredBytes: bigint
-    storedBytes: bigint
-    numberOfPuts: bigint
-    numberOfGets: bigint
+    usage?: BucketUsage
 }
 
 type State = Map<bigint, DdcBucketInfo>
@@ -23,11 +32,13 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
         super(new Map<bigint, DdcBucketInfo>())
     }
 
-    private async processDdcBucketsEvents(bucketId: bigint, block: BlockHeader, event: Event) {
+    private async processDdcBucketsEvents(bucketId: bigint, block: Block, event: Event) {
         let createdAtBlockHeight
         if (event.name === events.ddcCustomers.bucketCreated.name) {
             createdAtBlockHeight = block.height
         }
+
+        const blockTimestamp = new Date(assertNotNull(block.timestamp, `Block ${block.height} timestamp is not set`))
 
         // TODO(khssnv)
         // We can return to ascending versions check here and in the other processors when
@@ -45,10 +56,16 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
                     bucketId: bucketId,
                     isPublic: bucket.isPublic,
                     isRemoved: bucket.isRemoved,
-                    transferredBytes: bucket.totalCustomersUsage?.transferredBytes ?? 0n,
-                    storedBytes: bucket.totalCustomersUsage?.storedBytes ?? 0n,
-                    numberOfPuts: bucket.totalCustomersUsage?.numberOfPuts ?? 0n,
-                    numberOfGets: bucket.totalCustomersUsage?.numberOfGets ?? 0n,
+                    ...(event.name === events.ddcCustomers.bucketTotalCustomersUsageUpdated.name) && {
+                        usage: {
+                            block: block.height,
+                            timestamp: blockTimestamp,
+                            transferredBytes: bucket.totalCustomersUsage?.transferredBytes ?? 0n,
+                            storedBytes: bucket.totalCustomersUsage?.storedBytes ?? 0n,
+                            numberOfPuts: bucket.totalCustomersUsage?.numberOfPuts ?? 0n,
+                            numberOfGets: bucket.totalCustomersUsage?.numberOfGets ?? 0n,
+                        },
+                    },
                 }
             }
         } else if (storage.ddcCustomers.buckets.v50000.is(block)) {
@@ -61,10 +78,6 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
                     bucketId: bucketId,
                     isPublic: bucket.isPublic,
                     isRemoved: bucket.isRemoved,
-                    transferredBytes: 0n,
-                    storedBytes: 0n,
-                    numberOfPuts: 0n,
-                    numberOfGets: 0n,
                 }
             }
         } else if (storage.ddcCustomers.buckets.v48017.is(block)) {
@@ -77,10 +90,6 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
                     bucketId: bucketId,
                     isPublic: bucket.isPublic,
                     isRemoved: false,
-                    transferredBytes: 0n,
-                    storedBytes: 0n,
-                    numberOfPuts: 0n,
-                    numberOfGets: 0n,
                 }
             }
         } else if (storage.ddcCustomers.buckets.v48013.is(block)) {
@@ -93,10 +102,6 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
                     bucketId: bucketId,
                     isPublic: true,
                     isRemoved: false,
-                    transferredBytes: 0n,
-                    storedBytes: 0n,
-                    numberOfPuts: 0n,
-                    numberOfGets: 0n,
                 }
             }
         } else {
@@ -110,7 +115,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
         }
     }
 
-    async process(event: Event, block: BlockHeader) {
+    async process(event: Event, block: Block) {
         switch (event.name) {
             case events.ddcCustomers.bucketCreated.name: {
                 if (events.ddcCustomers.bucketCreated.v48013.is(event)) {

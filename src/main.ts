@@ -1,6 +1,6 @@
 import { processor } from './processor'
 import { TypeormDatabase } from '@subsquid/typeorm-store'
-import { Account, DdcBucket, DdcCluster, DdcNode } from './model'
+import { Account, DdcBucket, DdcBucketUsage, DdcCluster, DdcNode } from './model'
 import { CereBalancesProcessor } from './processors/cereBalancesProcessor'
 import { DdcBalancesProcessor } from './processors/ddcBalancesProcessor'
 import { DdcClustersProcessor } from './processors/ddcClustersProcessor'
@@ -179,10 +179,6 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
         nodeEntity.grpcPort = node.grpcPort
         nodeEntity.p2pPort = node.p2pPort
         nodeEntity.mode = node.mode
-        nodeEntity.transferredBytes = node.transferredBytes
-        nodeEntity.storedBytes = node.storedBytes
-        nodeEntity.numberOfPuts = node.numberOfPuts
-        nodeEntity.numberOfGets = node.numberOfGets
         ddcNodesMap.set(node.id, nodeEntity)
     })
     // add to cluster
@@ -216,30 +212,43 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     await ctx.store.remove(ddcNodesToRemove)
 
     const ddcBucketEntities: DdcBucket[] = []
-    ddcBuckets.forEach((bucket) => {
-        const cluster = ddcClustersMap.get(bucket.clusterId)
+    const ddcBucketUsageEntities: DdcBucketUsage[] = []
+    ddcBuckets.forEach((bucketInfo) => {
+        const cluster = ddcClustersMap.get(bucketInfo.clusterId)
         if (!cluster) {
             logger.warn(
-                `No DDC cluster with id ${bucket.clusterId} found. Skipping bucket ${bucket.bucketId} for persistence`,
+                `No DDC cluster with id ${bucketInfo.clusterId} found. Skipping bucket ${bucketInfo.bucketId} for persistence`,
             )
             return
         }
-        ddcBucketEntities.push(
-            new DdcBucket({
-                id: bucket.bucketId.toString(),
-                createdAtBlockHeight: bucket.createdAtBlockHeight,
-                ownerId: accounts.get(bucket.ownerId),
-                clusterId: cluster,
-                isPublic: bucket.isPublic,
-                isRemoved: bucket.isRemoved,
-                transferredBytes: bucket.transferredBytes,
-                storedBytes: bucket.storedBytes,
-                numberOfPuts: bucket.numberOfPuts,
-                numberOfGets: bucket.numberOfGets,
-            }),
+        const bucketEntity = new DdcBucket({
+            id: bucketInfo.bucketId.toString(),
+            createdAtBlockHeight: bucketInfo.createdAtBlockHeight,
+            ownerId: accounts.get(bucketInfo.ownerId),
+            clusterId: cluster,
+            isPublic: bucketInfo.isPublic,
+            isRemoved: bucketInfo.isRemoved,
+        })
+        ddcBucketEntities.push(bucketEntity)
+
+        if (!bucketInfo.usage) {
+            return
+        }
+        ddcBucketUsageEntities.push(
+            new DdcBucketUsage({
+                id: `${bucketInfo.usage.block}-${bucketInfo.bucketId}`,
+                blockHeight: bucketInfo.usage.block,
+                blockTimestamp: bucketInfo.usage.timestamp,
+                bucketId: bucketEntity,
+                transferredBytes: bucketInfo.usage.transferredBytes,
+                storedBytes: bucketInfo.usage.storedBytes,
+                numberOfPuts: bucketInfo.usage.numberOfPuts,
+                numberOfGets: bucketInfo.usage.numberOfGets,
+            })
         )
     })
 
     // persist DDC Buckets
     await ctx.store.upsert(ddcBucketEntities)
+    await ctx.store.insert(ddcBucketUsageEntities)
 })

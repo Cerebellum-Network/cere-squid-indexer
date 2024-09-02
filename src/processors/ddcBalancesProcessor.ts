@@ -1,6 +1,7 @@
-import { BlockHeader, Event } from '@subsquid/substrate-processor'
+import { Event } from '@subsquid/substrate-processor'
 import { events, storage } from '../types'
 import { logEmptyStorage, logUnsupportedEventVersion, logUnsupportedStorageVersion, toCereAddress } from '../utils'
+import { Block } from '../processor'
 import { BaseProcessor } from './processor'
 
 type State = Map<string, bigint>
@@ -10,7 +11,7 @@ export class DdcBalancesProcessor extends BaseProcessor<State> {
         super(new Map<string, bigint>())
     }
 
-    private async processDdcCustomersBalancesEvents(accountId: string, block: BlockHeader) {
+    private async processDdcCustomersBalancesEvents(accountId: string, block: Block) {
         let accountInStorage
         if (storage.ddcCustomers.ledger.v48013.is(block)) {
             accountInStorage = await storage.ddcCustomers.ledger.v48013.get(block, accountId)
@@ -24,7 +25,7 @@ export class DdcBalancesProcessor extends BaseProcessor<State> {
         }
     }
 
-    async process(event: Event, block: BlockHeader) {
+    async process(event: Event, block: Block) {
         switch (event.name) {
             case events.ddcCustomers.deposited.name: {
                 if (events.ddcCustomers.deposited.v48013.is(event)) {

@@ -1,5 +1,5 @@
 import type { HexString } from '@polkadot/util/types'
-import { BlockHeader, Event } from '@subsquid/substrate-processor'
+import { Event } from '@subsquid/substrate-processor'
 import { events, storage } from '../types'
 import {
     decodeAsciiStringFromScaleVecFixed,
@@ -8,11 +8,22 @@ import {
     logUnsupportedStorageVersion,
     toCereAddress,
 } from '../utils'
+import { Block } from '../processor'
 import { DdcNodeMode } from '../model'
 import { BaseProcessor } from './processor'
 
 const MaxHostLen = 255
 const MaxDomainLen = 255
+
+interface NodeUsage {
+    block: number
+    timestamp: Date
+
+    transferredBytes: bigint
+    storedBytes: bigint
+    numberOfPuts: bigint
+    numberOfGets: bigint
+}
 
 interface DdcNodeInfo {
     id: string
@@ -29,11 +40,7 @@ interface DdcNodeInfo {
     grpcPort: number
     p2pPort: number
     mode: DdcNodeMode
-
-    transferredBytes: bigint
-    storedBytes: bigint
-    numberOfPuts: bigint
-    numberOfGets: bigint
+    usage?: NodeUsage
 }
 
 type State = {
@@ -53,7 +60,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
         })
     }
 
-    private async processDdcNodesEvents(nodeId: string, block: BlockHeader, event: Event) {
+    private async processDdcNodesEvents(nodeId: string, block: Block, event: Event) {
         let createdAtBlockHeight
         if (event.name === events.ddcNodes.nodeCreated.name) {
             createdAtBlockHeight = block.height
@@ -75,10 +82,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                     grpcPort: node.props.grpcPort,
                     p2pPort: node.props.p2PPort,
                     mode: DdcNodeMode[node.props.mode.__kind],
-                    transferredBytes: node.totalUsage?.transferredBytes ?? 0n,
-                    storedBytes: node.totalUsage?.storedBytes ?? 0n,
-                    numberOfPuts: node.totalUsage?.numberOfPuts ?? 0n,
-                    numberOfGets: node.totalUsage?.numberOfGets ?? 0n,
+                    // TODO: set usage when usage mutation is implemented on the blockchain side.
                 }
             }
         } else if (storage.ddcNodes.storageNodes.v54100.is(block)) {
@@ -96,10 +100,6 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                     grpcPort: node.props.grpcPort,
                     p2pPort: node.props.p2PPort,
                     mode: DdcNodeMode[node.props.mode.__kind],
-                    transferredBytes: 0n,
-                    storedBytes: 0n,
-                    numberOfPuts: 0n,
-                    numberOfGets: 0n,
                 }
             }
         } else if (storage.ddcNodes.storageNodes.v48400.is(block)) {
@@ -117,10 +117,6 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                     grpcPort: node.props.grpcPort,
                     p2pPort: node.props.p2PPort,
                     mode: DdcNodeMode[node.props.mode.__kind],
-                    transferredBytes: 0n,
-                    storedBytes: 0n,
-                    numberOfPuts: 0n,
-                    numberOfGets: 0n,
                 }
             }
         } else if (storage.ddcNodes.storageNodes.v48017.is(block)) {
@@ -138,10 +134,6 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                     grpcPort: node.props.grpcPort,
                     p2pPort: node.props.p2PPort,
                     mode: DdcNodeMode[node.props.mode.__kind],
-                    transferredBytes: 0n,
-                    storedBytes: 0n,
-                    numberOfPuts: 0n,
-                    numberOfGets: 0n,
                 }
             }
         } else if (storage.ddcNodes.storageNodes.v48013.is(block)) {
@@ -159,10 +151,6 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                     grpcPort: node.props.grpcPort,
                     p2pPort: node.props.p2PPort,
                     mode: DdcNodeMode.Storage,
-                    transferredBytes: 0n,
-                    storedBytes: 0n,
-                    numberOfPuts: 0n,
-                    numberOfGets: 0n,
                 }
             }
         } else if (storage.ddcNodes.storageNodes.v48008.is(block)) {
@@ -180,10 +168,6 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                     grpcPort: 9090,
                     p2pPort: 9070,
                     mode: DdcNodeMode.Storage,
-                    transferredBytes: 0n,
-                    storedBytes: 0n,
-                    numberOfPuts: 0n,
-                    numberOfGets: 0n,
                 }
             }
         } else {
@@ -197,7 +181,7 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
         }
     }
 
-    async process(event: Event, block: BlockHeader) {
+    async process(event: Event, block: Block) {
         switch (event.name) {
             case events.ddcClusters.clusterNodeAdded.name: {
                 let decodedEvent
