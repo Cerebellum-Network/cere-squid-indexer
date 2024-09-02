@@ -4,9 +4,26 @@ type Account @entity {
   cereFreeBalance: BigInt!
   ddcActiveBalance: BigInt!
 
+  ddcBucketsUsage: [DdcCustomerUsage!]! @derivedFrom(field: "accountId")
+
   ddcBuckets: [DdcBucket!] @derivedFrom(field: "ownerId")
   ddcClusters: [DdcCluster!] @derivedFrom(field: "managerId")
   ddcNodes: [DdcNode!] @derivedFrom(field: "providerId")
+}
+
+type DdcCustomerUsage @entity @index(fields: ["blockHeight", "accountId"]) @index(fields: ["blockTimestamp", "accountId"]) {
+  # Can't avoid having id column due a lack of support for `PRIMARY KEY("blockHeight", "accountId")`.
+  # Expected value is blockHeight || '-' || accountId .
+  id: ID!
+
+  blockHeight: Int! @index
+  blockTimestamp: DateTime! @index
+  accountId: Account! @index
+
+  transferredBytes: BigInt!
+  storedBytes: BigInt!
+  numberOfPuts: BigInt!
+  numberOfGets: BigInt!
 }
 
 type DdcCluster @entity {
