@@ -1,4 +1,5 @@
 export * from "./account.model"
+export * from "./ddcCustomerUsage.model"
 export * from "./ddcCluster.model"
 export * from "./_ddcClusterStatus"
 export * from "./ddcNode.model"

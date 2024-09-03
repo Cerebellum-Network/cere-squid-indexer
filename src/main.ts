@@ -1,6 +1,6 @@
 import { processor } from './processor'
 import { TypeormDatabase } from '@subsquid/typeorm-store'
-import { Account, DdcBucket, DdcBucketUsage, DdcCluster, DdcNode } from './model'
+import { Account, DdcCustomerUsage, DdcBucket, DdcBucketUsage, DdcCluster, DdcNode } from './model'
 import { CereBalancesProcessor } from './processors/cereBalancesProcessor'
 import { DdcBalancesProcessor } from './processors/ddcBalancesProcessor'
 import { DdcClustersProcessor } from './processors/ddcClustersProcessor'
@@ -251,4 +251,32 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     // persist DDC Buckets
     await ctx.store.upsert(ddcBucketEntities)
     await ctx.store.insert(ddcBucketUsageEntities)
+
+    // Update customer's buckets usage.
+    const ddcCustomerUsageEntities = new Map<[number, string], DdcCustomerUsage>()
+    for (let bucketUsage of ddcBucketUsageEntities) {
+        const key: [number, string] = [bucketUsage.blockHeight, bucketUsage.bucketId.ownerId.id]
+
+        let accountUsage = ddcCustomerUsageEntities.get(key)
+        if (!accountUsage) {
+            accountUsage = new DdcCustomerUsage({
+                id: `${bucketUsage.blockHeight}-${bucketUsage.bucketId.ownerId.id}`,
+                blockHeight: bucketUsage.blockHeight,
+                blockTimestamp: bucketUsage.blockTimestamp,
+                accountId: bucketUsage.bucketId.ownerId,
+                transferredBytes: bucketUsage.transferredBytes,
+                storedBytes: bucketUsage.storedBytes,
+                numberOfPuts: bucketUsage.numberOfPuts,
+                numberOfGets: bucketUsage.numberOfGets,
+            })
+            ddcCustomerUsageEntities.set(key, accountUsage)
+            return
+        }
+
+        accountUsage.transferredBytes += bucketUsage.transferredBytes
+        accountUsage.storedBytes += bucketUsage.storedBytes
+        accountUsage.numberOfPuts += bucketUsage.numberOfPuts
+        accountUsage.numberOfGets += bucketUsage.numberOfGets
+    }
+    await ctx.store.insert(Array.from(ddcCustomerUsageEntities.values()))
 })
