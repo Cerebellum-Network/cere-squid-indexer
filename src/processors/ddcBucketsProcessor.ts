@@ -17,6 +17,7 @@ export interface BucketUsage {
 
 export interface DdcBucketInfo {
     createdAtBlockHeight?: number
+    createdAtBlockTimestamp?: Date
     ownerId: string
     clusterId: string
     bucketId: bigint
@@ -51,6 +52,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
             if (bucket) {
                 bucketInfo = {
                     createdAtBlockHeight: createdAtBlockHeight,
+                    createdAtBlockTimestamp: blockTimestamp,
                     ownerId: bucket.ownerId,
                     clusterId: bucket.clusterId,
                     bucketId: bucketId,
@@ -73,6 +75,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
             if (bucket) {
                 bucketInfo = {
                     createdAtBlockHeight: createdAtBlockHeight,
+                    createdAtBlockTimestamp: blockTimestamp,
                     ownerId: bucket.ownerId,
                     clusterId: bucket.clusterId,
                     bucketId: bucketId,
@@ -85,6 +88,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
             if (bucket) {
                 bucketInfo = {
                     createdAtBlockHeight: createdAtBlockHeight,
+                    createdAtBlockTimestamp: blockTimestamp,
                     ownerId: bucket.ownerId,
                     clusterId: bucket.clusterId,
                     bucketId: bucketId,
@@ -97,6 +101,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
             if (bucket) {
                 bucketInfo = {
                     createdAtBlockHeight: createdAtBlockHeight,
+                    createdAtBlockTimestamp: blockTimestamp,
                     ownerId: bucket.ownerId,
                     clusterId: bucket.clusterId,
                     bucketId: bucketId,

@@ -95,10 +95,11 @@ type DdcNodeUsage @entity @index(fields: ["blockHeight", "nodeId"]) @index(field
   numberOfGets: BigInt!
 }
 
-type DdcBucket @entity {
+type DdcBucket @entity @index(fields: ["createdAtBlockTimestamp", "id"]) {
   id: ID!
 
   createdAtBlockHeight: Int!
+  createdAtBlockTimestamp: DateTime @index
 
   ownerId: Account! @index
   clusterId: DdcCluster! @index
