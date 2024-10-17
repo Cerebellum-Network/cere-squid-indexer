@@ -16,8 +16,8 @@ export class DdcBucket {
     @IntColumn_({nullable: false})
     createdAtBlockHeight!: number
 
-    @DateTimeColumn_({nullable: true})
-    createdAtBlockTimestamp!: Date | undefined | null
+    @DateTimeColumn_({nullable: false})
+    createdAtBlockTimestamp!: Date
 
     @Index_()
     @ManyToOne_(() => Account, {nullable: true})

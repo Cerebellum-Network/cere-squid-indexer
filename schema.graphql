@@ -99,7 +99,7 @@ type DdcBucket @entity @index(fields: ["createdAtBlockTimestamp", "id"]) {
   id: ID!
 
   createdAtBlockHeight: Int!
-  createdAtBlockTimestamp: DateTime @index
+  createdAtBlockTimestamp: DateTime! @index
 
   ownerId: Account! @index
   clusterId: DdcCluster! @index
