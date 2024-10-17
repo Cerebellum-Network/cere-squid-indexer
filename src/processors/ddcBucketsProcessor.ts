@@ -17,6 +17,7 @@ export interface BucketUsage {
 
 export interface DdcBucketInfo {
     createdAtBlockHeight?: number
+    createdAtBlockTimestamp?: Date
     ownerId: string
     clusterId: string
     bucketId: bigint
@@ -33,12 +34,15 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
     }
 
     private async processDdcBucketsEvents(bucketId: bigint, block: Block, event: Event) {
+        const blockTimestamp = new Date(assertNotNull(block.timestamp, `Block ${block.height} timestamp is not set`))
+
         let createdAtBlockHeight
+        let createdAtBlockTimestamp
         if (event.name === events.ddcCustomers.bucketCreated.name) {
             createdAtBlockHeight = block.height
+            createdAtBlockTimestamp = blockTimestamp
         }
 
-        const blockTimestamp = new Date(assertNotNull(block.timestamp, `Block ${block.height} timestamp is not set`))
 
         // TODO(khssnv)
         // We can return to ascending versions check here and in the other processors when
@@ -51,6 +55,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
             if (bucket) {
                 bucketInfo = {
                     createdAtBlockHeight: createdAtBlockHeight,
+                    createdAtBlockTimestamp: createdAtBlockTimestamp,
                     ownerId: bucket.ownerId,
                     clusterId: bucket.clusterId,
                     bucketId: bucketId,
@@ -73,6 +78,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
             if (bucket) {
                 bucketInfo = {
                     createdAtBlockHeight: createdAtBlockHeight,
+                    createdAtBlockTimestamp: createdAtBlockTimestamp,
                     ownerId: bucket.ownerId,
                     clusterId: bucket.clusterId,
                     bucketId: bucketId,
@@ -85,6 +91,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
             if (bucket) {
                 bucketInfo = {
                     createdAtBlockHeight: createdAtBlockHeight,
+                    createdAtBlockTimestamp: createdAtBlockTimestamp,
                     ownerId: bucket.ownerId,
                     clusterId: bucket.clusterId,
                     bucketId: bucketId,
@@ -97,6 +104,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
             if (bucket) {
                 bucketInfo = {
                     createdAtBlockHeight: createdAtBlockHeight,
+                    createdAtBlockTimestamp: createdAtBlockTimestamp,
                     ownerId: bucket.ownerId,
                     clusterId: bucket.clusterId,
                     bucketId: bucketId,

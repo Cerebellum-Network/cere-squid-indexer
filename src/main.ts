@@ -224,6 +224,7 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
         const bucketEntity = new DdcBucket({
             id: bucketInfo.bucketId.toString(),
             createdAtBlockHeight: bucketInfo.createdAtBlockHeight,
+            createdAtBlockTimestamp: bucketInfo.createdAtBlockTimestamp,
             ownerId: accounts.get(bucketInfo.ownerId),
             clusterId: cluster,
             isPublic: bucketInfo.isPublic,
