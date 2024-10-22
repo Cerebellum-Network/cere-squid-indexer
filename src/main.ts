@@ -1,6 +1,15 @@
 import { processor } from './processor'
 import { TypeormDatabase } from '@subsquid/typeorm-store'
-import { Account, DdcCustomerUsage, DdcBucket, DdcBucketUsage, DdcCluster, DdcNode } from './model'
+import {
+    Account,
+    DdcCustomerUsage,
+    DdcBucket,
+    DdcBucketUsage,
+    DdcCluster,
+    DdcNode,
+    DdcCustomerDeposit,
+    DdcCustomerCharge
+} from './model'
 import { CereBalancesProcessor } from './processors/cereBalancesProcessor'
 import { DdcBalancesProcessor } from './processors/ddcBalancesProcessor'
 import { DdcClustersProcessor } from './processors/ddcClustersProcessor'
@@ -8,6 +17,8 @@ import { DdcNodesProcessor } from './processors/ddcNodesProcessor'
 import { DdcBucketsProcessor } from './processors/ddcBucketsProcessor'
 import { In } from 'typeorm'
 import { assertNotNull } from '@subsquid/util-internal'
+import {DdcCustomerDepositsProcessor} from "./processors/ddcCustomerDepositsProcessor";
+import {DdcCustomerChargesProcessor} from "./processors/ddcCustomerChargesProcessor";
 
 processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     const logger = ctx.log
@@ -18,6 +29,8 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     const ddcClustersProcessor = new DdcClustersProcessor()
     const ddcNodesProcessor = new DdcNodesProcessor()
     const ddcBucketsProcessor = new DdcBucketsProcessor()
+    const ddcCustomerDepositsProcessor = new DdcCustomerDepositsProcessor()
+    const ddcCustomerChargesProcessor = new DdcCustomerChargesProcessor()
 
     // process events
     for (let b of ctx.blocks) {
@@ -31,6 +44,8 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
                 ddcClustersProcessor.process(event, block),
                 ddcNodesProcessor.process(event, block),
                 ddcBucketsProcessor.process(event, block),
+                ddcCustomerDepositsProcessor.process(event, block),
+                ddcCustomerChargesProcessor.process(event, block),
             ])
         }
     }
@@ -41,6 +56,8 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     const ddcClusters = ddcClustersProcessor.state
     const ddcNodes = ddcNodesProcessor.state
     const ddcBuckets = ddcBucketsProcessor.state
+    const ddcCustomerDeposits = ddcCustomerDepositsProcessor.state
+    const ddcCustomerCharges = ddcCustomerChargesProcessor.state
 
     // create missing accounts
     const accounts = new Map<string, Account>()
@@ -280,4 +297,26 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
         accountUsage.numberOfGets += bucketUsage.numberOfGets
     }
     await ctx.store.insert(Array.from(ddcCustomerUsageEntities.values()))
+
+    const ddcCustomerDepositEntities: DdcCustomerDeposit[] = []
+    ddcCustomerDeposits.forEach((deposit, accountId) => {
+        ddcCustomerDepositEntities.push(new DdcCustomerDeposit({
+            id: `${deposit.blockHeight}-${accountId}`,
+            accountId: accounts.get(accountId),
+            blockTimestamp: deposit.blockTimestamp,
+            amount: deposit.amount
+        }))
+    })
+    await ctx.store.insert(ddcCustomerDepositEntities)
+
+    const ddcCustomerChargeEntities: DdcCustomerCharge[] = []
+    ddcCustomerCharges.forEach((charge, accountId) => {
+        ddcCustomerChargeEntities.push(new DdcCustomerCharge({
+            id: `${charge.blockHeight}-${accountId}`,
+            accountId: accounts.get(accountId),
+            blockTimestamp: charge.blockTimestamp,
+            amount: charge.amount
+        }))
+    })
+    await ctx.store.insert(ddcCustomerChargeEntities)
 })

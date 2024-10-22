@@ -1,5 +1,7 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, BigIntColumn as BigIntColumn_, OneToMany as OneToMany_} from "@subsquid/typeorm-store"
 import {DdcCustomerUsage} from "./ddcCustomerUsage.model"
+import {DdcCustomerDeposit} from "./ddcCustomerDeposit.model"
+import {DdcCustomerCharge} from "./ddcCustomerCharge.model"
 import {DdcBucket} from "./ddcBucket.model"
 import {DdcCluster} from "./ddcCluster.model"
 import {DdcNode} from "./ddcNode.model"
@@ -21,6 +23,12 @@ export class Account {
 
     @OneToMany_(() => DdcCustomerUsage, e => e.accountId)
     ddcBucketsUsage!: DdcCustomerUsage[]
+
+    @OneToMany_(() => DdcCustomerDeposit, e => e.accountId)
+    ddcCustomerDeposits!: DdcCustomerDeposit[]
+
+    @OneToMany_(() => DdcCustomerCharge, e => e.accountId)
+    ddcCustomerCharges!: DdcCustomerCharge[]
 
     @OneToMany_(() => DdcBucket, e => e.ownerId)
     ddcBuckets!: DdcBucket[]
