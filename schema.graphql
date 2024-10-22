@@ -6,6 +6,9 @@ type Account @entity {
 
   ddcBucketsUsage: [DdcCustomerUsage!]! @derivedFrom(field: "accountId")
 
+  ddcCustomerDeposits: [DdcCustomerDeposit!]! @derivedFrom(field: "accountId")
+  ddcCustomerCharges: [DdcCustomerCharge!]! @derivedFrom(field: "accountId")
+
   ddcBuckets: [DdcBucket!] @derivedFrom(field: "ownerId")
   ddcClusters: [DdcCluster!] @derivedFrom(field: "managerId")
   ddcNodes: [DdcNode!] @derivedFrom(field: "providerId")
@@ -24,6 +27,24 @@ type DdcCustomerUsage @entity @index(fields: ["blockHeight", "accountId"]) @inde
   storedBytes: BigInt!
   numberOfPuts: BigInt!
   numberOfGets: BigInt!
+}
+
+type DdcCustomerDeposit @entity  @index(fields: ["blockTimestamp", "amount"]) {
+  id: ID!
+
+  blockTimestamp: DateTime! @index
+  accountId: Account! @index
+
+  amount: BigInt!
+}
+
+type DdcCustomerCharge @entity  @index(fields: ["blockTimestamp", "amount"]) {
+  id: ID!
+
+  blockTimestamp: DateTime! @index
+  accountId: Account! @index
+
+  amount: BigInt!
 }
 
 type DdcCluster @entity {
