@@ -90,16 +90,31 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     }
 
     await createAccounts([...accountToCereBalance.keys()])
+    if (ddcCustomerCharges.size > 0) {
+        console.log("Operation 1")
+    }
     await createAccounts([...accountToDdcBalance.keys()])
+    if (ddcCustomerCharges.size > 0) {
+        console.log("Operation 2")
+    }
 
     const ddcClusterAccounts = [...ddcClusters.values()].map((c) => c.managerId)
     await createAccounts(ddcClusterAccounts)
+    if (ddcCustomerCharges.size > 0) {
+        console.log("Operation 3")
+    }
 
     const ddcNodesAccounts = [...ddcNodes.updatedNodes.values()].map((c) => c.providerId)
     await createAccounts(ddcNodesAccounts)
+    if (ddcCustomerCharges.size > 0) {
+        console.log("Operation 4")
+    }
 
     const ddcBucketsAccounts = [...ddcBuckets.values()].map((c) => c.ownerId)
     await createAccounts(ddcBucketsAccounts)
+    if (ddcCustomerCharges.size > 0) {
+        console.log("Operation 5")
+    }
 
     // update Cere balances
     accountToCereBalance.forEach((balance, id) => {
@@ -107,14 +122,24 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
         account.cereFreeBalance = balance
         accounts.set(id, account)
     })
+    if (ddcCustomerCharges.size > 0) {
+        console.log("Operation 6")
+    }
+
     // update DDC balances
     accountToDdcBalance.forEach((balance, id) => {
         const account = assertNotNull(accounts.get(id))
         account.ddcActiveBalance = balance
         accounts.set(id, account)
     })
+    if (ddcCustomerCharges.size > 0) {
+        console.log("Operation 7")
+    }
     // persist accounts
     await ctx.store.upsert([...accounts.values()])
+    if (ddcCustomerCharges.size > 0) {
+        console.log("Operation 8")
+    }
 
     // map DDC Clusters to entities
     const ddcClusterEntities: DdcCluster[] = []
@@ -143,6 +168,9 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     })
     // persist DDC Clusters
     await ctx.store.upsert(ddcClusterEntities)
+    if (ddcCustomerCharges.size > 0) {
+        console.log("Operation 9")
+    }
 
     // Find clusters for nodes and buckets mapping
     const clusterIdsToFind: Set<String> = new Set<String>()
@@ -152,6 +180,9 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     ddcBuckets.forEach((bucket) => {
         clusterIdsToFind.add(bucket.clusterId)
     })
+    if (ddcCustomerCharges.size > 0) {
+        console.log("Operation 10")
+    }
 
     const existingClusters = await ctx.store.findBy(DdcCluster, {
         id: In([...clusterIdsToFind.values()]),
@@ -222,8 +253,16 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
             }
         })
     })
+    if (ddcCustomerCharges.size > 0) {
+        console.log("Operation 11")
+    }
+
     // persist DDC Nodes
     await ctx.store.upsert([...ddcNodesMap.values()])
+    if (ddcCustomerCharges.size > 0) {
+        console.log("Operation 12")
+    }
+
     // remove deleted nodes
     const ddcNodesToRemove: DdcNode[] = []
     ddcNodes.removedNodes.forEach((nodeId) => {
@@ -233,6 +272,9 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
         }
     })
     await ctx.store.remove(ddcNodesToRemove)
+    if (ddcCustomerCharges.size > 0) {
+        console.log("Operation 13")
+    }
 
     const ddcBucketEntities: DdcBucket[] = []
     const ddcBucketUsageEntities: DdcBucketUsage[] = []
@@ -271,10 +313,20 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
             })
         )
     })
+    if (ddcCustomerCharges.size > 0) {
+        console.log("Operation 14")
+    }
 
     // persist DDC Buckets
     await ctx.store.upsert(ddcBucketEntities)
+    if (ddcCustomerCharges.size > 0) {
+        console.log("Operation 15")
+    }
+
     await ctx.store.insert(ddcBucketUsageEntities)
+    if (ddcCustomerCharges.size > 0) {
+        console.log("Operation 16")
+    }
 
     // Update customer's buckets usage.
     const ddcCustomerUsageEntities = new Map<[number, string], DdcCustomerUsage>()
@@ -302,7 +354,14 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
         accountUsage.numberOfPuts += bucketUsage.numberOfPuts
         accountUsage.numberOfGets += bucketUsage.numberOfGets
     }
+    if (ddcCustomerCharges.size > 0) {
+        console.log("Operation 17")
+    }
+
     await ctx.store.insert(Array.from(ddcCustomerUsageEntities.values()))
+    if (ddcCustomerCharges.size > 0) {
+        console.log("Operation 18")
+    }
 
     const ddcCustomerDepositEntities: DdcCustomerDeposit[] = []
     ddcCustomerDeposits.forEach((deposit, accountId) => {
