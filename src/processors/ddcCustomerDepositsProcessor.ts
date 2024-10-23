@@ -24,7 +24,9 @@ export class DdcCustomerDepositsProcessor extends BaseProcessor<State> {
 
         switch (event.name) {
             case events.ddcCustomers.deposited.name: {
+                console.log("Got customer deposited event")
                 if (events.ddcCustomers.deposited.v48013.is(event)) {
+                    console.log("Event version v48013")
                     const decoded = events.ddcCustomers.deposited.v48013.decode(event)
                     const accountId = decoded[0]
                     const amount = decoded[1]
@@ -34,6 +36,7 @@ export class DdcCustomerDepositsProcessor extends BaseProcessor<State> {
                         amount: amount
                     })
                 } else if (events.ddcCustomers.deposited.v48800.is(event)) {
+                    console.log("Event version v48800")
                     const decoded = events.ddcCustomers.deposited.v48800.decode(event)
                     const accountId = decoded.ownerId
                     const amount = decoded.amount

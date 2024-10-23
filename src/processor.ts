@@ -8,6 +8,9 @@ import {
 } from '@subsquid/substrate-processor'
 import { events } from './types'
 
+console.info("Start squid indexer")
+
+
 export const processor = new SubstrateBatchProcessor()
     .setRpcEndpoint({
         url: assertNotNull(process.env.RPC_CERE_HTTP, 'No RPC endpoint supplied'),

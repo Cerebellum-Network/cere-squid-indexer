@@ -21,8 +21,8 @@ import {DdcCustomerDepositsProcessor} from "./processors/ddcCustomerDepositsProc
 import {DdcCustomerChargesProcessor} from "./processors/ddcCustomerChargesProcessor";
 
 processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
+    console.log("Got " + ctx.blocks.length + " blocks")
     const logger = ctx.log
-
     // set up processors
     const cereBalancesProcessor = new CereBalancesProcessor()
     const ddcBalancesProcessor = new DdcBalancesProcessor()
@@ -307,6 +307,7 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
             amount: deposit.amount
         }))
     })
+    console.log("Storing customer deposits " + ddcCustomerDepositEntities.length)
     await ctx.store.insert(ddcCustomerDepositEntities)
 
     const ddcCustomerChargeEntities: DdcCustomerCharge[] = []
@@ -318,5 +319,6 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
             amount: charge.amount
         }))
     })
+    console.log("Storing customer charges " + ddcCustomerChargeEntities.length)
     await ctx.store.insert(ddcCustomerChargeEntities)
 })

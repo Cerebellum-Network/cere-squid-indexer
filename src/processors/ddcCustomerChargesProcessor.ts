@@ -24,9 +24,12 @@ export class DdcCustomerChargesProcessor extends BaseProcessor<State> {
 
         switch (event.name) {
             case events.ddcCustomers.charged.name: {
+                console.log("Got customer charged event")
                 if (events.ddcCustomers.charged.v48013.is(event)) {
+                    console.log("Event version v48013")
                     // unsupported version, just skip
                 } else if (events.ddcCustomers.charged.v48014.is(event)) {
+                    console.log("Event version v48014")
                     const decoded = events.ddcCustomers.charged.v48014.decode(event)
                     const accountId = decoded[0]
                     const amount = decoded[1]
@@ -36,6 +39,7 @@ export class DdcCustomerChargesProcessor extends BaseProcessor<State> {
                         amount: amount
                     })
                 } else if (events.ddcCustomers.charged.v48800.is(event)) {
+                    console.log("Event version v48800")
                     const decoded = events.ddcCustomers.charged.v48800.decode(event)
                     const accountId = decoded.ownerId
                     const amount = decoded.charged
