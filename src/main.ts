@@ -288,7 +288,7 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
                 numberOfGets: bucketUsage.numberOfGets,
             })
             ddcCustomerUsageEntities.set(key, accountUsage)
-            return
+            continue
         }
 
         accountUsage.transferredBytes += bucketUsage.transferredBytes
