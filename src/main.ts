@@ -50,6 +50,8 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
         }
     }
 
+    console.log("Events processing finished")
+
     // retrieving state from processors
     const accountToCereBalance = cereBalancesProcessor.state
     const accountToDdcBalance = ddcBalancesProcessor.state
@@ -58,6 +60,10 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     const ddcBuckets = ddcBucketsProcessor.state
     const ddcCustomerDeposits = ddcCustomerDepositsProcessor.state
     const ddcCustomerCharges = ddcCustomerChargesProcessor.state
+
+    console.log("Got " + ddcCustomerDeposits.size + " customer deposits")
+    console.log("Got " + ddcCustomerCharges.size + " customer charges")
+
 
     // create missing accounts
     const accounts = new Map<string, Account>()
