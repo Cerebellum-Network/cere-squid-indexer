@@ -69,6 +69,19 @@ export const processor = new SubstrateBatchProcessor()
             events.ddcNodes.nodeCreated.name,
             events.ddcNodes.nodeDeleted.name,
             events.ddcNodes.nodeParamsChanged.name,
+
+            events.ddcVerification.eraValidationRootsPosted.name,
+            events.ddcPayouts.billingReportFinalized.name,
+            // events.ddcPayouts.charged.name,
+            // events.ddcPayouts.chargeFailed.name,
+            events.ddcPayouts.rewarded.name,
+            // TODO: To be implemented, see https://www.notion.so/cere/Token-Utility-Dashboards-112d800083d680668b6ec23eae6b32c7
+            // events.ddcPayouts.rewardFailed.name,
+            events.ddcPayouts.validatorRewarded.name,
+            // TODO: To be implemented, see https://www.notion.so/cere/Token-Utility-Dashboards-112d800083d680668b6ec23eae6b32c7
+            // events.ddcPayouts.validatorRewardFailed.name,
+            events.ddcPayouts.clusterReserveFeesCollected.name,
+            events.ddcPayouts.treasuryFeesCollected.name,
         ],
         extrinsic: true,
     })

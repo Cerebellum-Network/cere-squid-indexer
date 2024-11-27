@@ -128,7 +128,9 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                     providerId: node.providerId,
                     clusterId: node.clusterId,
                     host: decodeAsciiStringFromScaleVecFixed(MaxHostLen, node.props.host as HexString),
+                    // @ts-expect-error no domain field in v48017
                     domain: decodeAsciiStringFromScaleVecFixed(MaxDomainLen, node.props.domain as HexString),
+                    // @ts-expect-error no ssl field in v48017
                     ssl: node.props.ssl,
                     httpPort: node.props.httpPort,
                     grpcPort: node.props.grpcPort,
@@ -145,7 +147,9 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
                     providerId: node.providerId,
                     clusterId: node.clusterId,
                     host: decodeAsciiStringFromScaleVecFixed(MaxHostLen, node.props.host as HexString),
+                    // @ts-expect-error no domain field in v48013
                     domain: decodeAsciiStringFromScaleVecFixed(MaxDomainLen, node.props.domain as HexString),
+                    // @ts-expect-error no ssl field in v48013
                     ssl: node.props.ssl,
                     httpPort: node.props.httpPort,
                     grpcPort: node.props.grpcPort,
