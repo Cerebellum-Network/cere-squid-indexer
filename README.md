@@ -8,11 +8,26 @@ Example commands below use [sqd](https://docs.subsquid.io/squid-cli/).
 Please [install](https://docs.subsquid.io/squid-cli/installation/) it before proceeding.
 
 ```bash
+# 0. Clone the repository.
+git clone git@github.com:Cerebellum-Network/cere-squid-indexer.git && cd cere-squid-indexer
+
 # 1. Install dependencies
 npm ci
 
-# 2. Start target Postgres database, processor, and GraphQL server from `docker-compose.yml` and detach
-sqd up
+# 2. Create `.env` file with environment variables. Example file values start Devnet indexing from the first block.
+cp .env.example .env
+
+# 3. Start target Postgres database.
+sqd up:db
+
+# 4. Apply database migrations and start indexing processor.
+sqd process
+
+# 5. Start GraphQL server.
+sqd serve
+
+# 7. Open GraphQL playground in a browser.
+sqd open
 ```
 
 A GraphiQL playground will be available at [127.0.0.1:4350/graphql](http://localhost:4350/graphql).
