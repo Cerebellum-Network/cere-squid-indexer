@@ -11,11 +11,15 @@
       "cmd": ["tsc"]
     },
     "up": {
-      "description": "Start a PG database",
+      "description": "Start database, processor and API server",
       "cmd": ["docker", "compose", "up", "-d"]
     },
+    "up:db": {
+      "description": "Start a PG database",
+      "cmd": ["docker", "compose", "up", "db", "-d"]
+    },
     "down": {
-      "description": "Drop a PG database",
+      "description": "Drop a PG database and terminate the processor and API server",
       "cmd": ["docker", "compose", "down"]
     },
     "migration:apply": {
