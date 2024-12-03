@@ -8,7 +8,8 @@ import {
     DdcCluster,
     DdcNode,
     DdcCustomerDeposit,
-    DdcCustomerCharge
+    DdcCustomerCharge,
+    DdcTokenUtilityDashboardView,
 } from './model'
 import { CereBalancesProcessor } from './processors/cereBalancesProcessor'
 import { DdcBalancesProcessor } from './processors/ddcBalancesProcessor'
@@ -17,8 +18,10 @@ import { DdcNodesProcessor } from './processors/ddcNodesProcessor'
 import { DdcBucketsProcessor } from './processors/ddcBucketsProcessor'
 import { In } from 'typeorm'
 import { assertNotNull } from '@subsquid/util-internal'
-import {DdcCustomerDepositsProcessor} from "./processors/ddcCustomerDepositsProcessor";
-import {DdcCustomerChargesProcessor} from "./processors/ddcCustomerChargesProcessor";
+import { DdcCustomerDepositsProcessor } from './processors/ddcCustomerDepositsProcessor'
+import { DdcCustomerChargesProcessor } from './processors/ddcCustomerChargesProcessor'
+
+let i = 1
 
 processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     const logger = ctx.log
@@ -262,7 +265,7 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
                 storedBytes: bucketInfo.usage.storedBytes,
                 numberOfPuts: bucketInfo.usage.numberOfPuts,
                 numberOfGets: bucketInfo.usage.numberOfGets,
-            })
+            }),
         )
     })
 
@@ -300,23 +303,52 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
 
     const ddcCustomerDepositEntities: DdcCustomerDeposit[] = []
     ddcCustomerDeposits.forEach((deposit, accountId) => {
-        ddcCustomerDepositEntities.push(new DdcCustomerDeposit({
-            id: `${deposit.blockHeight}-${accountId}`,
-            accountId: accounts.get(accountId),
-            blockTimestamp: deposit.blockTimestamp,
-            amount: deposit.amount
-        }))
+        ddcCustomerDepositEntities.push(
+            new DdcCustomerDeposit({
+                id: `${deposit.blockHeight}-${accountId}`,
+                accountId: accounts.get(accountId),
+                blockTimestamp: deposit.blockTimestamp,
+                amount: deposit.amount,
+            }),
+        )
     })
     await ctx.store.insert(ddcCustomerDepositEntities)
 
     const ddcCustomerChargeEntities: DdcCustomerCharge[] = []
     ddcCustomerCharges.forEach((charge, accountId) => {
-        ddcCustomerChargeEntities.push(new DdcCustomerCharge({
-            id: `${charge.blockHeight}-${accountId}`,
-            accountId: accounts.get(accountId),
-            blockTimestamp: charge.blockTimestamp,
-            amount: charge.amount
-        }))
+        ddcCustomerChargeEntities.push(
+            new DdcCustomerCharge({
+                id: `${charge.blockHeight}-${accountId}`,
+                accountId: accounts.get(accountId),
+                blockTimestamp: charge.blockTimestamp,
+                amount: charge.amount,
+            }),
+        )
     })
     await ctx.store.insert(ddcCustomerChargeEntities)
+
+    if (i < 100) {
+        const ddcTokenUtilityDashboardView = new DdcTokenUtilityDashboardView({
+            id: `cluster${i}-era${i}`,
+            clusterId: `cluster${i}`,
+            eraId: i,
+            startTime: new Date(),
+            endTime: new Date(),
+            dataStored: BigInt(1000 * i),
+            dataStreamed: BigInt(2000 * i),
+            numberOfPuts: BigInt(10 * i),
+            numberOfGets: BigInt(20 * i),
+            nodesRewards: BigInt(100 * i),
+            validatorsRewards: BigInt(50 * i),
+            cmRevards: BigInt(25 * i),
+            treasuryRewards: BigInt(25 * i),
+            status: null,
+        })
+
+        // inserting the records here because the TypeOrm store is defined 
+        // only inside the processor.run callback
+        await ctx.store.insert(ddcTokenUtilityDashboardView)
+
+        i += 1
+    }
 })
