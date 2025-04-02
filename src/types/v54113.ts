@@ -87,10 +87,6 @@ export const StorageNodeMode: sts.Type<StorageNodeMode> = sts.closedEnum(() => {
     }
 })
 
-export const H160 = sts.bytes()
-
-export const AccountId32 = sts.bytes()
-
 export interface EventRecord {
     phase: Type_344
     event: Event
@@ -4797,12 +4793,6 @@ export const DdcVerificationEvent: sts.Type<DdcVerificationEvent> = sts.closedEn
     }
 })
 
-export const NodePubKey: sts.Type<NodePubKey> = sts.closedEnum(() => {
-    return  {
-        StoragePubKey: AccountId32,
-    }
-})
-
 /**
  * The `Event` enum of this pallet
  */
@@ -5349,3 +5339,13 @@ export const Type_344: sts.Type<Type_344> = sts.closedEnum(() => {
         Initialization: sts.unit(),
     }
 })
+
+export const AccountId32 = sts.bytes()
+
+export const NodePubKey: sts.Type<NodePubKey> = sts.closedEnum(() => {
+    return  {
+        StoragePubKey: AccountId32,
+    }
+})
+
+export const H160 = sts.bytes()

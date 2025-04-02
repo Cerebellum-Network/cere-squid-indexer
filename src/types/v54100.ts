@@ -1,5 +1,61 @@
 import {sts, Result, Option, Bytes, BitSequence} from './support'
 
+export const PalletId = sts.bytes()
+
+export type H160 = Bytes
+
+export interface EraValidation {
+    validators: [[Bytes, Bytes], AccountId32[]][]
+    startEra: bigint
+    endEra: bigint
+    payersMerkleRootHash: Bytes
+    payeesMerkleRootHash: Bytes
+    status: EraValidationStatus
+}
+
+export type EraValidationStatus = EraValidationStatus_PayoutFailed | EraValidationStatus_PayoutInProgress | EraValidationStatus_PayoutSuccess | EraValidationStatus_ReadyForPayout | EraValidationStatus_ValidatingData
+
+export interface EraValidationStatus_PayoutFailed {
+    __kind: 'PayoutFailed'
+}
+
+export interface EraValidationStatus_PayoutInProgress {
+    __kind: 'PayoutInProgress'
+}
+
+export interface EraValidationStatus_PayoutSuccess {
+    __kind: 'PayoutSuccess'
+}
+
+export interface EraValidationStatus_ReadyForPayout {
+    __kind: 'ReadyForPayout'
+}
+
+export interface EraValidationStatus_ValidatingData {
+    __kind: 'ValidatingData'
+}
+
+export const EraValidation: sts.Type<EraValidation> = sts.struct(() => {
+    return  {
+        validators: sts.array(() => sts.tuple(() => [sts.tuple(() => [sts.bytes(), sts.bytes()]), sts.array(() => AccountId32)])),
+        startEra: sts.bigint(),
+        endEra: sts.bigint(),
+        payersMerkleRootHash: sts.bytes(),
+        payeesMerkleRootHash: sts.bytes(),
+        status: EraValidationStatus,
+    }
+})
+
+export const EraValidationStatus: sts.Type<EraValidationStatus> = sts.closedEnum(() => {
+    return  {
+        PayoutFailed: sts.unit(),
+        PayoutInProgress: sts.unit(),
+        PayoutSuccess: sts.unit(),
+        ReadyForPayout: sts.unit(),
+        ValidatingData: sts.unit(),
+    }
+})
+
 export interface Bucket {
     bucketId: bigint
     ownerId: AccountId32
@@ -15,8 +71,6 @@ export interface CustomerUsage {
     numberOfPuts: bigint
     numberOfGets: bigint
 }
-
-export type H160 = Bytes
 
 export const Bucket: sts.Type<Bucket> = sts.struct(() => {
     return  {
@@ -4765,12 +4819,6 @@ export const DdcVerificationEvent: sts.Type<DdcVerificationEvent> = sts.closedEn
     }
 })
 
-export const NodePubKey: sts.Type<NodePubKey> = sts.closedEnum(() => {
-    return  {
-        StoragePubKey: AccountId32,
-    }
-})
-
 /**
  * The `Event` enum of this pallet
  */
@@ -5311,6 +5359,12 @@ export const Type_344: sts.Type<Type_344> = sts.closedEnum(() => {
         ApplyExtrinsic: sts.number(),
         Finalization: sts.unit(),
         Initialization: sts.unit(),
+    }
+})
+
+export const NodePubKey: sts.Type<NodePubKey> = sts.closedEnum(() => {
+    return  {
+        StoragePubKey: AccountId32,
     }
 })
 

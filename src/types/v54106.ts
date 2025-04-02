@@ -3664,8 +3664,6 @@ export const VoterListEvent: sts.Type<VoterListEvent> = sts.closedEnum(() => {
     }
 })
 
-export const AccountId32 = sts.bytes()
-
 /**
  * The `Event` enum of this pallet
  */
@@ -5234,3 +5232,5 @@ export const Type_344: sts.Type<Type_344> = sts.closedEnum(() => {
         Initialization: sts.unit(),
     }
 })
+
+export const AccountId32 = sts.bytes()

@@ -3,7 +3,7 @@ import { Event } from '@subsquid/substrate-processor'
 import { Block } from '../processor'
 
 export abstract class BaseProcessor<
-    State extends Map<any, any> | Set<any> | { [key: string]: Map<any, any> | Set<any> },
+    State extends Map<any, any> | Set<any> | { [key: string]: Map<any, any> | Set<any> } | any[],
 > {
     constructor(protected _state: State) {}
 

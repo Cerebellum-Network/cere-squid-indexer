@@ -29,7 +29,7 @@ type DdcCustomerUsage @entity @index(fields: ["blockHeight", "accountId"]) @inde
   numberOfGets: BigInt!
 }
 
-type DdcCustomerDeposit @entity  @index(fields: ["blockTimestamp", "amount"]) {
+type DdcCustomerDeposit @entity @index(fields: ["blockTimestamp", "amount"]) {
   id: ID!
 
   blockTimestamp: DateTime! @index
@@ -43,7 +43,6 @@ type DdcCustomerCharge @entity  @index(fields: ["blockTimestamp", "amount"]) {
 
   blockTimestamp: DateTime! @index
   accountId: Account! @index
-
   amount: BigInt!
 }
 
@@ -75,7 +74,10 @@ type DdcCluster @entity {
 }
 
 enum DdcClusterStatus {
-  Activated, Bonded, Unbonded, Unbonding
+  Activated
+  Bonded
+  Unbonded
+  Unbonding
 }
 
 type DdcNode @entity {
@@ -98,11 +100,14 @@ type DdcNode @entity {
 }
 
 enum DdcNodeMode {
-  Storage, Cache, Full, DAC
+  Storage
+  Cache
+  Full
+  DAC
 }
 
 type DdcNodeUsage @entity @index(fields: ["blockHeight", "nodeId"]) @index(fields: ["blockTimestamp", "nodeId"]) {
-  # Can't avoid having id column due a lack of support for `PRIMARY KEY("blockHeight", "nodeId")`.
+  # Can't avoid having id column due to a lack of support for composite keys.
   # Expected value is blockHeight || '-' || nodeId.
   id: ID!
 
@@ -144,4 +149,157 @@ type DdcBucketUsage @entity @index(fields: ["blockHeight", "bucketId"]) @index(f
   storedBytes: BigInt!
   numberOfPuts: BigInt!
   numberOfGets: BigInt!
+}
+
+type DdcEraValidationRootsPosted @entity {
+  # Expected value is clusterId || '-' || eraId || '-' || validatorId.
+  id: ID!
+
+  blockNumber: Int @index
+  blockTimestamp: DateTime! @index
+
+  clusterId: String! @index
+  eraId: Int! @index
+  validatorId: String @index
+
+  payersMerkleRootHash: String
+  payeesMerkleRootHash: String
+  payersBatchMerkleRootHashes: [String!]
+  payeesBatchMerkleRootHashes: [String!]
+}
+
+type DdcBillingReportFinalized @entity {
+  id: ID!
+
+  blockNumber: Int @index
+  blockTimestamp: DateTime @index
+
+  clusterId: String! @index
+  eraId: Int! @index
+}
+
+type DdcRewarded @entity {
+  id: ID!
+
+  blockNumber: Int @index
+  blockTimestamp: DateTime! @index
+
+  clusterId: String! @index
+  eraId: Int! @index
+  batchIndex: Int @index
+
+  nodeProviderId: String @index
+
+  rewarded: BigInt
+  expectedToReward: BigInt
+}
+
+type DdcCharged @entity {
+  id: ID!
+  
+  blockNumber: Int @index
+  blockTimestamp: DateTime! @index
+
+  clusterId: String! @index
+  era: Int! @index
+  batchIndex: Int! @index
+  customerId: String! @index
+  bucketId: BigInt
+  amount: BigInt!
+}
+
+type DdcCustomerChargeFailed @entity {
+  id: ID!
+  
+  blockNumber: Int @index
+  blockTimestamp: DateTime! @index
+
+  clusterId: String! @index
+  eraId: Int! @index
+  batchIndex: Int @index
+  customerId: String! @index
+  bucketId: String @index
+  
+  charged: BigInt
+  expectedToCharge: BigInt
+}
+
+type DdcProviderRewarded @entity {
+  id: ID!
+
+  blockNumber: Int @index
+  blockTimestamp: DateTime! @index
+
+  clusterId: String! @index
+  eraId: Int! @index
+  batchIndex: Int @index
+  storedBytes: BigInt!
+  transferredBytes: BigInt!
+  numberOfPuts: BigInt!
+  numberOfGets: BigInt!
+  nodeProviderId: String @index
+  rewarded: BigInt!
+  expectedToReward: BigInt!
+}
+
+type DdcValidatorRewarded @entity {
+  id: ID!
+
+  blockNumber: Int @index
+  blockTimestamp: DateTime! @index
+
+  clusterId: String @index
+  eraId: Int @index
+  validatorId: String @index
+  amount: BigInt!
+}
+
+type DdcClusterReserveFeesCollected @entity {
+  id: ID!
+
+  blockNumber: Int @index
+  blockTimestamp: DateTime! @index
+
+  clusterId: String @index
+  eraId: Int! @index
+  amount: BigInt!
+}
+
+type DdcTreasuryFeesCollected @entity {
+  id: ID!
+
+  blockNumber: Int @index
+  blockTimestamp: DateTime! @index
+
+  clusterId: String @index
+  eraId: Int! @index
+  amount: BigInt!
+}
+
+enum TokenUtilityViewStatus {
+  Validating
+  ValidationFailed
+  ReadyToPayout
+  PayoutInProcess
+  PayoutPartiallySucceeded
+  PayoutSucceeded
+  PayoutFailed
+}
+
+type DdcTokenUtilityDashboardView @entity @index(fields: ["clusterId", "eraId"], unique: true) @index(fields: ["eraId", "clusterId"], unique: true) {
+  id: ID! # Composite ID from clusterId and eraId
+
+  clusterId: String! @index
+  eraId: Int! @index
+  startTime: DateTime @index
+  endTime: DateTime @index
+  dataStored: BigInt!
+  dataStreamed: BigInt!
+  numberOfPuts: BigInt!
+  numberOfGets: BigInt!
+  nodesRewards: BigInt!
+  validatorsRewards: BigInt!
+  cmRewards: BigInt!
+  treasuryRewards: BigInt!
+  status: TokenUtilityViewStatus
 }
