@@ -145,3 +145,31 @@ type DdcBucketUsage @entity @index(fields: ["blockHeight", "bucketId"]) @index(f
   numberOfPuts: BigInt!
   numberOfGets: BigInt!
 }
+
+enum TokenUtilityViewStatus {
+  Validating
+  ValidationFailed
+  ReadyToPayout
+  PayoutInProcess
+  PayoutPartiallySucceeded
+  PayoutSucceeded
+  PayoutFailed
+}
+
+type DdcTokenUtilityDashboardView @entity @index(fields: ["clusterId", "eraId"], unique: true) @index(fields: ["eraId", "clusterId"], unique: true) {
+  id: ID! # Composite ID from clusterId and eraId
+
+  clusterId: String! @index
+  eraId: Int! @index
+  startTime: DateTime! @index
+  endTime: DateTime! @index
+  dataStored: BigInt!
+  dataStreamed: BigInt!
+  numberOfPuts: BigInt!
+  numberOfGets: BigInt!
+  nodesRewards: BigInt!
+  validatorsRewards: BigInt!
+  cmRevards: BigInt!
+  treasuryRewards: BigInt!
+  status: TokenUtilityViewStatus
+}
