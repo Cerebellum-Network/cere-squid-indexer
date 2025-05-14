@@ -179,7 +179,6 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
         nodeEntity.grpcPort = node.grpcPort
         nodeEntity.p2pPort = node.p2pPort
         nodeEntity.mode = node.mode
-        // Эти поля отсутствуют в продакшн-базе данных, закомментируем их
         // nodeEntity.transferredBytes = node.transferredBytes
         // nodeEntity.storedBytes = node.storedBytes
         // nodeEntity.numberOfPuts = node.numberOfPuts
