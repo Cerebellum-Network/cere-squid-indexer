@@ -16,6 +16,9 @@ export class DdcCluster {
     @IntColumn_({nullable: false})
     createdAtBlockHeight!: number
 
+    @IntColumn_({nullable: false})
+    createdAtBlockTimestamp!: number
+
     @Index_()
     @ManyToOne_(() => Account, {nullable: true})
     managerId!: Account

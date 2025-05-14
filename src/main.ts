@@ -100,6 +100,7 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
             new DdcCluster({
                 id: c.id,
                 createdAtBlockHeight: c.createdAtBlockHeight ?? ctx.blocks[ctx.blocks.length - 1].header.height,
+                createdAtBlockTimestamp: Math.floor(Date.now() / 1000),
                 managerId: accounts.get(c.managerId),
                 treasuryShare: c.treasuryShare,
                 validatorsShare: c.validatorsShare,
@@ -170,6 +171,7 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
             new DdcNode({
                 id: node.id,
                 createdAtBlockHeight: node.createdAtBlockHeight,
+                createdAtBlockTimestamp: Math.floor(Date.now() / 1000),
                 providerId: accounts.get(node.providerId),
             })
         nodeEntity.host = node.host
@@ -228,6 +230,7 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
             new DdcBucket({
                 id: bucket.bucketId.toString(),
                 createdAtBlockHeight: bucket.createdAtBlockHeight,
+                createdAtBlockTimestamp: Math.floor(Date.now() / 1000),
                 ownerId: accounts.get(bucket.ownerId),
                 clusterId: cluster,
                 isPublic: bucket.isPublic,
