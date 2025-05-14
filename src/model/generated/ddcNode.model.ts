@@ -44,15 +44,15 @@ export class DdcNode {
     @Column_("varchar", {length: 7, nullable: false})
     mode!: DdcNodeMode
 
-    @BigIntColumn_({nullable: false})
-    transferredBytes!: bigint
+    // @BigIntColumn_({nullable: false})
+    // transferredBytes!: bigint
 
-    @BigIntColumn_({nullable: false})
-    storedBytes!: bigint
+    // @BigIntColumn_({nullable: false})
+    // storedBytes!: bigint
 
-    @BigIntColumn_({nullable: false})
-    numberOfPuts!: bigint
+    // @BigIntColumn_({nullable: false})
+    // numberOfPuts!: bigint
 
-    @BigIntColumn_({nullable: false})
-    numberOfGets!: bigint
+    // @BigIntColumn_({nullable: false})
+    // numberOfGets!: bigint
 }
