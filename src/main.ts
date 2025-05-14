@@ -99,7 +99,7 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
         ddcClusterEntities.push(
             new DdcCluster({
                 id: c.id,
-                createdAtBlockHeight: c.createdAtBlockHeight,
+                createdAtBlockHeight: c.createdAtBlockHeight ?? ctx.blocks[ctx.blocks.length - 1].header.height,
                 managerId: accounts.get(c.managerId),
                 treasuryShare: c.treasuryShare,
                 validatorsShare: c.validatorsShare,
