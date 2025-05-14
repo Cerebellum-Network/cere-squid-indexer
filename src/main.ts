@@ -232,10 +232,10 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
                 clusterId: cluster,
                 isPublic: bucket.isPublic,
                 isRemoved: bucket.isRemoved,
-                transferredBytes: bucket.transferredBytes,
-                storedBytes: bucket.storedBytes,
-                numberOfPuts: bucket.numberOfPuts,
-                numberOfGets: bucket.numberOfGets,
+                // transferredBytes: bucket.transferredBytes,
+                // storedBytes: bucket.storedBytes,
+                // numberOfPuts: bucket.numberOfPuts,
+                // numberOfGets: bucket.numberOfGets,
             }),
         )
     })

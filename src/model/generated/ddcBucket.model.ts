@@ -28,15 +28,15 @@ export class DdcBucket {
     @BooleanColumn_({nullable: false})
     isRemoved!: boolean
 
-    @BigIntColumn_({nullable: false})
-    transferredBytes!: bigint
+    // @BigIntColumn_({nullable: false})
+    // transferredBytes!: bigint
 
-    @BigIntColumn_({nullable: false})
-    storedBytes!: bigint
+    // @BigIntColumn_({nullable: false})
+    // storedBytes!: bigint
 
-    @BigIntColumn_({nullable: false})
-    numberOfPuts!: bigint
+    // @BigIntColumn_({nullable: false})
+    // numberOfPuts!: bigint
 
-    @BigIntColumn_({nullable: false})
-    numberOfGets!: bigint
+    // @BigIntColumn_({nullable: false})
+    // numberOfGets!: bigint
 }
