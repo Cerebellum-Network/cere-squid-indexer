@@ -3,6 +3,7 @@ import * as v48013 from '../v48013'
 import * as v48017 from '../v48017'
 import * as v50000 from '../v50000'
 import * as v54100 from '../v54100'
+import * as v73115 from '../v73115'
 
 export const ledger =  {
     /**
@@ -55,6 +56,10 @@ export const buckets =  {
      *  Map from bucket ID to the bucket structure
      */
     v54100: new StorageType('DdcCustomers.Buckets', 'Optional', [sts.bigint()], v54100.Bucket) as BucketsV54100,
+    /**
+     *  Map from bucket ID to the bucket structure
+     */
+    v73115: new StorageType('DdcCustomers.Buckets', 'Optional', [sts.bigint()], v73115.Bucket) as BucketsV73115,
 }
 
 /**
@@ -123,4 +128,21 @@ export interface BucketsV54100  {
     getPairs(block: Block, key: bigint): Promise<[k: bigint, v: (v54100.Bucket | undefined)][]>
     getPairsPaged(pageSize: number, block: Block): AsyncIterable<[k: bigint, v: (v54100.Bucket | undefined)][]>
     getPairsPaged(pageSize: number, block: Block, key: bigint): AsyncIterable<[k: bigint, v: (v54100.Bucket | undefined)][]>
+}
+
+/**
+ *  Map from bucket ID to the bucket structure
+ */
+export interface BucketsV73115  {
+    is(block: RuntimeCtx): boolean
+    get(block: Block, key: bigint): Promise<(v73115.Bucket | undefined)>
+    getMany(block: Block, keys: bigint[]): Promise<(v73115.Bucket | undefined)[]>
+    getKeys(block: Block): Promise<bigint[]>
+    getKeys(block: Block, key: bigint): Promise<bigint[]>
+    getKeysPaged(pageSize: number, block: Block): AsyncIterable<bigint[]>
+    getKeysPaged(pageSize: number, block: Block, key: bigint): AsyncIterable<bigint[]>
+    getPairs(block: Block): Promise<[k: bigint, v: (v73115.Bucket | undefined)][]>
+    getPairs(block: Block, key: bigint): Promise<[k: bigint, v: (v73115.Bucket | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block): AsyncIterable<[k: bigint, v: (v73115.Bucket | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block, key: bigint): AsyncIterable<[k: bigint, v: (v73115.Bucket | undefined)][]>
 }

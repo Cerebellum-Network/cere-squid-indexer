@@ -48,6 +48,7 @@ import * as v54105 from '../v54105'
 import * as v54106 from '../v54106'
 import * as v54112 from '../v54112'
 import * as v54113 from '../v54113'
+import * as v73115 from '../v73115'
 
 export const account =  {
     /**
@@ -777,6 +778,16 @@ export const events =  {
      *  just in case someone still reads them from within the runtime.
      */
     v54113: new StorageType('System.Events', 'Default', [], sts.array(() => v54113.EventRecord)) as EventsV54113,
+    /**
+     *  Events deposited for the current block.
+     * 
+     *  NOTE: The item is unbound and should therefore never be read on chain.
+     *  It could otherwise inflate the PoV size of a block.
+     * 
+     *  Events have a large in-memory size. Box the events to not go out-of-memory
+     *  just in case someone still reads them from within the runtime.
+     */
+    v73115: new StorageType('System.Events', 'Default', [], sts.array(() => v73115.EventRecord)) as EventsV73115,
 }
 
 /**
@@ -1457,6 +1468,21 @@ export interface EventsV54113  {
     get(block: Block): Promise<(v54113.EventRecord[] | undefined)>
 }
 
+/**
+ *  Events deposited for the current block.
+ * 
+ *  NOTE: The item is unbound and should therefore never be read on chain.
+ *  It could otherwise inflate the PoV size of a block.
+ * 
+ *  Events have a large in-memory size. Box the events to not go out-of-memory
+ *  just in case someone still reads them from within the runtime.
+ */
+export interface EventsV73115  {
+    is(block: RuntimeCtx): boolean
+    getDefault(block: Block): v73115.EventRecord[]
+    get(block: Block): Promise<(v73115.EventRecord[] | undefined)>
+}
+
 export const eventCount =  {
     /**
      *  The number of events in the `Events<T>` list.
@@ -1596,4 +1622,35 @@ export interface UpgradedToTripleRefCountV285  {
     is(block: RuntimeCtx): boolean
     getDefault(block: Block): boolean
     get(block: Block): Promise<(boolean | undefined)>
+}
+
+export const inherentsApplied =  {
+    /**
+     *  Whether all inherents have been applied.
+     */
+    v73115: new StorageType('System.InherentsApplied', 'Default', [], sts.boolean()) as InherentsAppliedV73115,
+}
+
+/**
+ *  Whether all inherents have been applied.
+ */
+export interface InherentsAppliedV73115  {
+    is(block: RuntimeCtx): boolean
+    getDefault(block: Block): boolean
+    get(block: Block): Promise<(boolean | undefined)>
+}
+
+export const authorizedUpgrade =  {
+    /**
+     *  `Some` if a code upgrade has been authorized.
+     */
+    v73115: new StorageType('System.AuthorizedUpgrade', 'Optional', [], v73115.CodeUpgradeAuthorization) as AuthorizedUpgradeV73115,
+}
+
+/**
+ *  `Some` if a code upgrade has been authorized.
+ */
+export interface AuthorizedUpgradeV73115  {
+    is(block: RuntimeCtx): boolean
+    get(block: Block): Promise<(v73115.CodeUpgradeAuthorization | undefined)>
 }

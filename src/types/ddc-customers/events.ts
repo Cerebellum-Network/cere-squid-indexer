@@ -122,6 +122,15 @@ export const bucketCreated =  {
             bucketId: sts.bigint(),
         })
     ),
+    /**
+     * Bucket with specific id created
+     */
+    v73115: new EventType(
+        'DdcCustomers.BucketCreated',
+        sts.struct({
+            bucketId: sts.bigint(),
+        })
+    ),
 }
 
 export const initialDepositUnlock =  {
@@ -170,6 +179,15 @@ export const bucketUpdated =  {
         'DdcCustomers.BucketUpdated',
         sts.struct({
             clusterId: v54100.H160,
+            bucketId: sts.bigint(),
+        })
+    ),
+    /**
+     * Bucket with specific id updated
+     */
+    v73115: new EventType(
+        'DdcCustomers.BucketUpdated',
+        sts.struct({
             bucketId: sts.bigint(),
         })
     ),

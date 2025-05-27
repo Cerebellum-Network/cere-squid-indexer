@@ -5,6 +5,7 @@ import * as v48017 from '../v48017'
 import * as v48400 from '../v48400'
 import * as v54100 from '../v54100'
 import * as v54113 from '../v54113'
+import * as v73115 from '../v73115'
 
 export const storageNodes =  {
     v48008: new StorageType('DdcNodes.StorageNodes', 'Optional', [v48008.AccountId32], v48008.StorageNode) as StorageNodesV48008,
@@ -13,6 +14,7 @@ export const storageNodes =  {
     v48400: new StorageType('DdcNodes.StorageNodes', 'Optional', [v48400.AccountId32], v48400.StorageNode) as StorageNodesV48400,
     v54100: new StorageType('DdcNodes.StorageNodes', 'Optional', [v54100.AccountId32], v54100.StorageNode) as StorageNodesV54100,
     v54113: new StorageType('DdcNodes.StorageNodes', 'Optional', [v54113.AccountId32], v54113.StorageNode) as StorageNodesV54113,
+    v73115: new StorageType('DdcNodes.StorageNodes', 'Optional', [v73115.AccountId32], v73115.StorageNode) as StorageNodesV73115,
 }
 
 export interface StorageNodesV48008  {
@@ -97,6 +99,20 @@ export interface StorageNodesV54113  {
     getPairs(block: Block, key: v54113.AccountId32): Promise<[k: v54113.AccountId32, v: (v54113.StorageNode | undefined)][]>
     getPairsPaged(pageSize: number, block: Block): AsyncIterable<[k: v54113.AccountId32, v: (v54113.StorageNode | undefined)][]>
     getPairsPaged(pageSize: number, block: Block, key: v54113.AccountId32): AsyncIterable<[k: v54113.AccountId32, v: (v54113.StorageNode | undefined)][]>
+}
+
+export interface StorageNodesV73115  {
+    is(block: RuntimeCtx): boolean
+    get(block: Block, key: v73115.AccountId32): Promise<(v73115.StorageNode | undefined)>
+    getMany(block: Block, keys: v73115.AccountId32[]): Promise<(v73115.StorageNode | undefined)[]>
+    getKeys(block: Block): Promise<v73115.AccountId32[]>
+    getKeys(block: Block, key: v73115.AccountId32): Promise<v73115.AccountId32[]>
+    getKeysPaged(pageSize: number, block: Block): AsyncIterable<v73115.AccountId32[]>
+    getKeysPaged(pageSize: number, block: Block, key: v73115.AccountId32): AsyncIterable<v73115.AccountId32[]>
+    getPairs(block: Block): Promise<[k: v73115.AccountId32, v: (v73115.StorageNode | undefined)][]>
+    getPairs(block: Block, key: v73115.AccountId32): Promise<[k: v73115.AccountId32, v: (v73115.StorageNode | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block): AsyncIterable<[k: v73115.AccountId32, v: (v73115.StorageNode | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block, key: v73115.AccountId32): AsyncIterable<[k: v73115.AccountId32, v: (v73115.StorageNode | undefined)][]>
 }
 
 export const cdnNodes =  {
