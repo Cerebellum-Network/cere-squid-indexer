@@ -5,6 +5,7 @@ import * as v283 from '../v283'
 import * as v299 from '../v299'
 import * as v47000 from '../v47000'
 import * as v48016 from '../v48016'
+import * as v73115 from '../v73115'
 
 export const blockHashCount =  {
     /**
@@ -114,6 +115,13 @@ export const version =  {
     v299: new ConstantType(
         'System.Version',
         v299.RuntimeVersion
+    ),
+    /**
+     *  Get the chain's in-code version.
+     */
+    v73115: new ConstantType(
+        'System.Version',
+        v73115.RuntimeVersion
     ),
 }
 

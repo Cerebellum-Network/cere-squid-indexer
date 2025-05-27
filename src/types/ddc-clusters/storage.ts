@@ -8,6 +8,7 @@ import * as v48400 from '../v48400'
 import * as v53003 from '../v53003'
 import * as v54001 from '../v54001'
 import * as v54105 from '../v54105'
+import * as v73115 from '../v73115'
 
 export const clusters =  {
     v48008: new StorageType('DdcClusters.Clusters', 'Optional', [v48008.H160], v48008.Cluster) as ClustersV48008,
@@ -16,6 +17,7 @@ export const clusters =  {
     v53003: new StorageType('DdcClusters.Clusters', 'Optional', [v53003.H160], v53003.Cluster) as ClustersV53003,
     v54001: new StorageType('DdcClusters.Clusters', 'Optional', [v54001.H160], v54001.Cluster) as ClustersV54001,
     v54105: new StorageType('DdcClusters.Clusters', 'Optional', [v54105.H160], v54105.Cluster) as ClustersV54105,
+    v73115: new StorageType('DdcClusters.Clusters', 'Optional', [v73115.H160], v73115.Cluster) as ClustersV73115,
 }
 
 export interface ClustersV48008  {
@@ -100,6 +102,20 @@ export interface ClustersV54105  {
     getPairs(block: Block, key: v54105.H160): Promise<[k: v54105.H160, v: (v54105.Cluster | undefined)][]>
     getPairsPaged(pageSize: number, block: Block): AsyncIterable<[k: v54105.H160, v: (v54105.Cluster | undefined)][]>
     getPairsPaged(pageSize: number, block: Block, key: v54105.H160): AsyncIterable<[k: v54105.H160, v: (v54105.Cluster | undefined)][]>
+}
+
+export interface ClustersV73115  {
+    is(block: RuntimeCtx): boolean
+    get(block: Block, key: v73115.H160): Promise<(v73115.Cluster | undefined)>
+    getMany(block: Block, keys: v73115.H160[]): Promise<(v73115.Cluster | undefined)[]>
+    getKeys(block: Block): Promise<v73115.H160[]>
+    getKeys(block: Block, key: v73115.H160): Promise<v73115.H160[]>
+    getKeysPaged(pageSize: number, block: Block): AsyncIterable<v73115.H160[]>
+    getKeysPaged(pageSize: number, block: Block, key: v73115.H160): AsyncIterable<v73115.H160[]>
+    getPairs(block: Block): Promise<[k: v73115.H160, v: (v73115.Cluster | undefined)][]>
+    getPairs(block: Block, key: v73115.H160): Promise<[k: v73115.H160, v: (v73115.Cluster | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block): AsyncIterable<[k: v73115.H160, v: (v73115.Cluster | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block, key: v73115.H160): AsyncIterable<[k: v73115.H160, v: (v73115.Cluster | undefined)][]>
 }
 
 export const clustersNodes =  {

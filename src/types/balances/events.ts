@@ -384,3 +384,17 @@ export const thawed =  {
         })
     ),
 }
+
+export const totalIssuanceForced =  {
+    name: 'Balances.TotalIssuanceForced',
+    /**
+     * The `TotalIssuance` was forcefully changed.
+     */
+    v73115: new EventType(
+        'Balances.TotalIssuanceForced',
+        sts.struct({
+            old: sts.bigint(),
+            new: sts.bigint(),
+        })
+    ),
+}

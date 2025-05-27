@@ -7,6 +7,7 @@ import * as v48901 from '../v48901'
 import * as v50000 from '../v50000'
 import * as v54001 from '../v54001'
 import * as v54100 from '../v54100'
+import * as v73115 from '../v73115'
 
 export const billingReportInitialized =  {
     name: 'DdcPayouts.BillingReportInitialized',
@@ -53,6 +54,16 @@ export const charged =  {
             amount: sts.bigint(),
         })
     ),
+    v73115: new EventType(
+        'DdcPayouts.Charged',
+        sts.struct({
+            clusterId: v73115.H160,
+            era: sts.number(),
+            batchIndex: sts.number(),
+            customerId: v73115.AccountId32,
+            amount: sts.bigint(),
+        })
+    ),
 }
 
 export const chargeFailed =  {
@@ -90,6 +101,17 @@ export const chargeFailed =  {
             expectedToCharge: sts.bigint(),
         })
     ),
+    v73115: new EventType(
+        'DdcPayouts.ChargeFailed',
+        sts.struct({
+            clusterId: v73115.H160,
+            era: sts.number(),
+            batchIndex: sts.number(),
+            customerId: v73115.AccountId32,
+            charged: sts.bigint(),
+            expectedToCharge: sts.bigint(),
+        })
+    ),
 }
 
 export const indebted =  {
@@ -112,6 +134,16 @@ export const indebted =  {
             batchIndex: sts.number(),
             customerId: v54100.AccountId32,
             bucketId: sts.bigint(),
+            amount: sts.bigint(),
+        })
+    ),
+    v73115: new EventType(
+        'DdcPayouts.Indebted',
+        sts.struct({
+            clusterId: v73115.H160,
+            era: sts.number(),
+            batchIndex: sts.number(),
+            customerId: v73115.AccountId32,
             amount: sts.bigint(),
         })
     ),
@@ -301,6 +333,17 @@ export const chargeError =  {
             customerId: v50000.AccountId32,
             amount: sts.bigint(),
             error: v50000.DispatchError,
+        })
+    ),
+    v73115: new EventType(
+        'DdcPayouts.ChargeError',
+        sts.struct({
+            clusterId: v73115.H160,
+            era: sts.number(),
+            batchIndex: sts.number(),
+            customerId: v73115.AccountId32,
+            amount: sts.bigint(),
+            error: v73115.DispatchError,
         })
     ),
 }
