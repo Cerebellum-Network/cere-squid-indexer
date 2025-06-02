@@ -1,0 +1,53 @@
+version: "3"
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: squid
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-U", "postgres", "-d", "squid" ]
+      interval: 5s
+      timeout: 60s
+      retries: 5
+
+  processor:
+    build:
+      context: .
+    environment:
+      - DB_NAME=squid
+      - DB_PORT=5432
+      - DB_HOST=db
+      - DB_PASS=postgres
+      - RPC_CERE_HTTP=wss://archive.devnet.cere.network/ws
+      - SQD_RATE_LIMIT=5000
+      - SQD_CAPACITY=100
+      - SQD_FIRST_BLOCK=14909
+      - TYPES_BUNDLE=/squid/cere-types-bundle.json
+    command: ["sqd", "process:prod"]
+    depends_on:
+      - db
+
+  api:
+    build:
+      context: .
+    environment:
+      - DB_NAME=squid
+      - DB_PORT=5432
+      - DB_HOST=db
+      - DB_PASS=postgres
+      - GQL_PORT=4350
+    ports:
+      - "4350:4350"
+    command: ["sqd", "serve:prod"]
+    depends_on:
+      - db
+
+volumes:
+  pgdata:

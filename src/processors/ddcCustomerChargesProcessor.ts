@@ -1,9 +1,9 @@
-import {Event} from '@subsquid/substrate-processor'
-import {events} from '../types'
-import {logUnsupportedEventVersion, toCereAddress} from '../utils'
-import {Block} from '../processor'
-import {BaseProcessor} from './processor'
-import {assertNotNull} from "@subsquid/util-internal";
+import { Event } from '@subsquid/substrate-processor'
+import { events } from '../types'
+import { logUnsupportedEventVersion, toCereAddress } from '../utils'
+import { Block } from '../processor'
+import { BaseProcessor } from './processor'
+import { assertNotNull } from '@subsquid/util-internal'
 
 export interface DdcCustomerCharge {
     blockHeight?: number
@@ -33,7 +33,7 @@ export class DdcCustomerChargesProcessor extends BaseProcessor<State> {
                     await this._state.set(toCereAddress(accountId), {
                         blockTimestamp: blockTimestamp,
                         blockHeight: block.height,
-                        amount: amount
+                        amount: amount,
                     })
                 } else if (events.ddcCustomers.charged.v48800.is(event)) {
                     const decoded = events.ddcCustomers.charged.v48800.decode(event)
@@ -42,7 +42,7 @@ export class DdcCustomerChargesProcessor extends BaseProcessor<State> {
                     await this._state.set(toCereAddress(accountId), {
                         blockTimestamp: blockTimestamp,
                         blockHeight: block.height,
-                        amount: amount
+                        amount: amount,
                     })
                 } else {
                     logUnsupportedEventVersion(event)

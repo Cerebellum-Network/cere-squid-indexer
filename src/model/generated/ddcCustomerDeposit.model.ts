@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_, DateTimeColumn as DateTimeColumn_, ManyToOne as ManyToOne_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_, DateTimeColumn as DateTimeColumn_, ManyToOne as ManyToOne_, BigIntColumn as BigIntColumn_, StringColumn as StringColumn_} from "@subsquid/typeorm-store"
 import {Account} from "./account.model"
 
 @Index_(["blockTimestamp", "amount"], {unique: false})
@@ -20,4 +20,16 @@ export class DdcCustomerDeposit {
 
     @BigIntColumn_({nullable: false})
     amount!: bigint
+
+    @Index_()
+    @StringColumn_({nullable: true})
+    clusterId!: string | undefined | null
+
+    @Index_()
+    @ManyToOne_(() => Account, {nullable: true})
+    fromAccountId!: Account | undefined | null
+
+    @Index_()
+    @ManyToOne_(() => Account, {nullable: true})
+    toAccountId!: Account | undefined | null
 }

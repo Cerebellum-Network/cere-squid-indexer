@@ -36,6 +36,13 @@ type DdcCustomerDeposit @entity  @index(fields: ["blockTimestamp", "amount"]) {
   accountId: Account! @index
 
   amount: BigInt!
+
+  # Cluster-specific fields
+  clusterId: String @index
+
+  # For DepositedFor events
+  fromAccountId: Account
+  toAccountId: Account
 }
 
 type DdcCustomerCharge @entity  @index(fields: ["blockTimestamp", "amount"]) {

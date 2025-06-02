@@ -1,3 +1,4 @@
+import path from 'path'
 import { assertNotNull } from '@subsquid/util-internal'
 import {
     BlockHeader,
@@ -7,6 +8,8 @@ import {
     SubstrateBatchProcessorFields,
 } from '@subsquid/substrate-processor'
 import { events } from './types'
+
+const typesBundlePath = process.env.TYPES_BUNDLE || path.resolve(__dirname, '../specs/cere-types-bundle.json')
 
 export const processor = new SubstrateBatchProcessor()
     .setRpcEndpoint({
@@ -18,7 +21,7 @@ export const processor = new SubstrateBatchProcessor()
         from: parseInt(process.env.SQD_FIRST_BLOCK || '0'),
         to: parseInt(process.env.SQD_LAST_BLOCK || '0') || undefined,
     })
-    .setTypesBundle(process.env.TYPES_BUNDLE || '../specs/cere-types-bundle.json')
+    .setTypesBundle(typesBundlePath)
     .addEvent({
         name: [
             events.balances.endowed.name,
@@ -65,10 +68,7 @@ export const processor = new SubstrateBatchProcessor()
             events.ddcCustomers.bucketRemoved.name,
             events.ddcCustomers.bucketTotalNodesUsageUpdated.name,
             events.ddcCustomers.bucketTotalCustomersUsageUpdated.name,
-
-            events.ddcNodes.nodeCreated.name,
-            events.ddcNodes.nodeDeleted.name,
-            events.ddcNodes.nodeParamsChanged.name,
+            events.ddcCustomers.depositedFor.name,
         ],
         extrinsic: true,
     })

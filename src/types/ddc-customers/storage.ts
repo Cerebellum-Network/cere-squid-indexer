@@ -4,6 +4,7 @@ import * as v48017 from '../v48017'
 import * as v50000 from '../v50000'
 import * as v54100 from '../v54100'
 import * as v73115 from '../v73115'
+import * as v54114 from '../v54114'
 
 export const ledger =  {
     /**
@@ -27,6 +28,34 @@ export interface LedgerV48013  {
     getPairs(block: Block, key: v48013.AccountId32): Promise<[k: v48013.AccountId32, v: (v48013.AccountsLedger | undefined)][]>
     getPairsPaged(pageSize: number, block: Block): AsyncIterable<[k: v48013.AccountId32, v: (v48013.AccountsLedger | undefined)][]>
     getPairsPaged(pageSize: number, block: Block, key: v48013.AccountId32): AsyncIterable<[k: v48013.AccountId32, v: (v48013.AccountsLedger | undefined)][]>
+}
+
+export const clusterLedger =  {
+    /**
+     *  Map from cluster_id and owner account to the info regarding the staking.
+     */
+    v54114: new StorageType('DdcCustomers.ClusterLedger', 'Optional', [v54114.H160, v54114.AccountId32], v54114.AccountsLedger) as ClusterLedgerV54114,
+}
+
+/**
+ *  Map from cluster_id and owner account to the info regarding the staking.
+ */
+export interface ClusterLedgerV54114  {
+    is(block: RuntimeCtx): boolean
+    get(block: Block, key1: v54114.H160, key2: v54114.AccountId32): Promise<(v54114.AccountsLedger | undefined)>
+    getMany(block: Block, keys: [v54114.H160, v54114.AccountId32][]): Promise<(v54114.AccountsLedger | undefined)[]>
+    getKeys(block: Block): Promise<[v54114.H160, v54114.AccountId32][]>
+    getKeys(block: Block, key1: v54114.H160): Promise<[v54114.H160, v54114.AccountId32][]>
+    getKeys(block: Block, key1: v54114.H160, key2: v54114.AccountId32): Promise<[v54114.H160, v54114.AccountId32][]>
+    getKeysPaged(pageSize: number, block: Block): AsyncIterable<[v54114.H160, v54114.AccountId32][]>
+    getKeysPaged(pageSize: number, block: Block, key1: v54114.H160): AsyncIterable<[v54114.H160, v54114.AccountId32][]>
+    getKeysPaged(pageSize: number, block: Block, key1: v54114.H160, key2: v54114.AccountId32): AsyncIterable<[v54114.H160, v54114.AccountId32][]>
+    getPairs(block: Block): Promise<[k: [v54114.H160, v54114.AccountId32], v: (v54114.AccountsLedger | undefined)][]>
+    getPairs(block: Block, key1: v54114.H160): Promise<[k: [v54114.H160, v54114.AccountId32], v: (v54114.AccountsLedger | undefined)][]>
+    getPairs(block: Block, key1: v54114.H160, key2: v54114.AccountId32): Promise<[k: [v54114.H160, v54114.AccountId32], v: (v54114.AccountsLedger | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block): AsyncIterable<[k: [v54114.H160, v54114.AccountId32], v: (v54114.AccountsLedger | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block, key1: v54114.H160): AsyncIterable<[k: [v54114.H160, v54114.AccountId32], v: (v54114.AccountsLedger | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block, key1: v54114.H160, key2: v54114.AccountId32): AsyncIterable<[k: [v54114.H160, v54114.AccountId32], v: (v54114.AccountsLedger | undefined)][]>
 }
 
 export const bucketsCount =  {

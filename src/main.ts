@@ -8,7 +8,7 @@ import {
     DdcCluster,
     DdcNode,
     DdcCustomerDeposit,
-    DdcCustomerCharge
+    DdcCustomerCharge,
 } from './model'
 import { CereBalancesProcessor } from './processors/cereBalancesProcessor'
 import { DdcBalancesProcessor } from './processors/ddcBalancesProcessor'
@@ -17,8 +17,8 @@ import { DdcNodesProcessor } from './processors/ddcNodesProcessor'
 import { DdcBucketsProcessor } from './processors/ddcBucketsProcessor'
 import { In } from 'typeorm'
 import { assertNotNull } from '@subsquid/util-internal'
-import {DdcCustomerDepositsProcessor} from "./processors/ddcCustomerDepositsProcessor";
-import {DdcCustomerChargesProcessor} from "./processors/ddcCustomerChargesProcessor";
+import { DdcCustomerDepositsProcessor } from './processors/ddcCustomerDepositsProcessor'
+import { DdcCustomerChargesProcessor } from './processors/ddcCustomerChargesProcessor'
 
 processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     const logger = ctx.log
@@ -84,7 +84,14 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     }
 
     await createAccounts([...accountToCereBalance.keys()])
-    await createAccounts([...accountToDdcBalance.keys()])
+
+    // Extract account IDs from DDC balance keys (which may include cluster info)
+    const ddcAccountIds = [...accountToDdcBalance.keys()].map((key) => {
+        // If key contains cluster info (format: accountId-clusterId), extract just the accountId
+        const parts = key.split('-')
+        return parts.length > 1 && parts[1].length === 42 ? parts[0] : key // 42 is typical length of H160 cluster ID
+    })
+    await createAccounts(ddcAccountIds)
 
     const ddcClusterAccounts = [...ddcClusters.values()].map((c) => c.managerId)
     await createAccounts(ddcClusterAccounts)
@@ -101,11 +108,19 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
         account.cereFreeBalance = balance
         accounts.set(id, account)
     })
-    // update DDC balances
-    accountToDdcBalance.forEach((balance, id) => {
-        const account = assertNotNull(accounts.get(id))
-        account.ddcActiveBalance = balance
-        accounts.set(id, account)
+
+    // update DDC balances - handle both legacy and cluster-based balances
+    accountToDdcBalance.forEach((balanceInfo, key) => {
+        const parts = key.split('-')
+        const accountId = parts.length > 1 && parts[1].length === 42 ? parts[0] : key
+        const account = assertNotNull(accounts.get(accountId))
+
+        // For now, we'll use the balance from the first cluster or legacy balance
+        // In the future, this might need to be aggregated across clusters
+        if (!balanceInfo.clusterId || account.ddcActiveBalance === 0n) {
+            account.ddcActiveBalance = balanceInfo.balance
+        }
+        accounts.set(accountId, account)
     })
     // persist accounts
     await ctx.store.upsert([...accounts.values()])
@@ -262,7 +277,7 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
                 storedBytes: bucketInfo.usage.storedBytes,
                 numberOfPuts: bucketInfo.usage.numberOfPuts,
                 numberOfGets: bucketInfo.usage.numberOfGets,
-            })
+            }),
         )
     })
 
@@ -299,24 +314,63 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     await ctx.store.insert(Array.from(ddcCustomerUsageEntities.values()))
 
     const ddcCustomerDepositEntities: DdcCustomerDeposit[] = []
-    ddcCustomerDeposits.forEach((deposit, accountId) => {
-        ddcCustomerDepositEntities.push(new DdcCustomerDeposit({
-            id: `${deposit.blockHeight}-${accountId}`,
-            accountId: accounts.get(accountId),
+    ddcCustomerDeposits.forEach((deposit, key) => {
+        // Extract account ID from key (may include cluster info)
+        const parts = key.split('-')
+        let accountId: string
+        let clusterId: string | undefined
+
+        if (parts.length > 1 && parts[1].length === 42) {
+            // Format: accountId-clusterId
+            accountId = parts[0]
+            clusterId = parts[1]
+        } else if (key.endsWith('-depositedFor')) {
+            // Format: clusterId-accountId-depositedFor
+            clusterId = parts[0]
+            accountId = parts[1]
+        } else {
+            // Legacy format: just accountId
+            accountId = key
+        }
+
+        const account = accounts.get(accountId)
+        if (!account) {
+            logger.warn(`Account ${accountId} not found for deposit`)
+            return
+        }
+
+        const depositEntity = new DdcCustomerDeposit({
+            id: `${deposit.blockHeight}-${key}`,
+            accountId: account,
             blockTimestamp: deposit.blockTimestamp,
-            amount: deposit.amount
-        }))
+            amount: deposit.amount,
+            clusterId: clusterId,
+        })
+
+        // Handle DepositedFor events
+        if (deposit.from && deposit.to) {
+            const fromAccount = accounts.get(deposit.from)
+            const toAccount = accounts.get(deposit.to)
+            if (fromAccount && toAccount) {
+                depositEntity.fromAccountId = fromAccount
+                depositEntity.toAccountId = toAccount
+            }
+        }
+
+        ddcCustomerDepositEntities.push(depositEntity)
     })
     await ctx.store.insert(ddcCustomerDepositEntities)
 
     const ddcCustomerChargeEntities: DdcCustomerCharge[] = []
     ddcCustomerCharges.forEach((charge, accountId) => {
-        ddcCustomerChargeEntities.push(new DdcCustomerCharge({
-            id: `${charge.blockHeight}-${accountId}`,
-            accountId: accounts.get(accountId),
-            blockTimestamp: charge.blockTimestamp,
-            amount: charge.amount
-        }))
+        ddcCustomerChargeEntities.push(
+            new DdcCustomerCharge({
+                id: `${charge.blockHeight}-${accountId}`,
+                accountId: accounts.get(accountId),
+                blockTimestamp: charge.blockTimestamp,
+                amount: charge.amount,
+            }),
+        )
     })
     await ctx.store.insert(ddcCustomerChargeEntities)
 })

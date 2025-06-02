@@ -43,7 +43,6 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
             createdAtBlockTimestamp = blockTimestamp
         }
 
-
         // TODO(khssnv)
         // We can return to ascending versions check here and in the other processors when
         // https://github.com/subsquid/squid-sdk/issues/334 fixed, possibly with
@@ -61,7 +60,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
                     bucketId: bucketId,
                     isPublic: bucket.isPublic,
                     isRemoved: bucket.isRemoved,
-                    ...(event.name === events.ddcCustomers.bucketTotalCustomersUsageUpdated.name) && {
+                    ...(event.name === events.ddcCustomers.bucketTotalCustomersUsageUpdated.name && {
                         usage: {
                             block: block.height,
                             timestamp: blockTimestamp,
@@ -70,7 +69,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
                             numberOfPuts: bucket.totalCustomersUsage?.numberOfPuts ?? 0n,
                             numberOfGets: bucket.totalCustomersUsage?.numberOfGets ?? 0n,
                         },
-                    },
+                    }),
                 }
             }
         } else if (storage.ddcCustomers.buckets.v50000.is(block)) {

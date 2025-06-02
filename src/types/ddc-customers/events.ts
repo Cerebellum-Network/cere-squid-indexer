@@ -3,12 +3,13 @@ import * as v48013 from '../v48013'
 import * as v48014 from '../v48014'
 import * as v48800 from '../v48800'
 import * as v54100 from '../v54100'
+import * as v54114 from '../v54114'
 
 export const deposited =  {
     name: 'DdcCustomers.Deposited',
     /**
      * An account has deposited this amount. \[owner, amount\]
-     * 
+     *
      * NOTE: This event is only emitted when funds are deposited via a dispatchable. Notably,
      * it will not be emitted for staking rewards when they are added to stake.
      */
@@ -18,7 +19,7 @@ export const deposited =  {
     ),
     /**
      * An account has deposited this amount. \[owner, amount\]
-     * 
+     *
      * NOTE: This event is only emitted when funds are deposited via a dispatchable. Notably,
      * it will not be emitted for staking rewards when they are added to stake.
      */
@@ -26,6 +27,36 @@ export const deposited =  {
         'DdcCustomers.Deposited',
         sts.struct({
             ownerId: v48800.AccountId32,
+            amount: sts.bigint(),
+        })
+    ),
+    /**
+     * An account has deposited this amount to a specific cluster. \[cluster_id, owner, amount\]
+     *
+     * NOTE: This event is only emitted when funds are deposited via a dispatchable. Notably,
+     * it will not be emitted for staking rewards when they are added to stake.
+     */
+    v54114: new EventType(
+        'DdcCustomers.Deposited',
+        sts.struct({
+            clusterId: v54114.H160,
+            ownerId: v54114.AccountId32,
+            amount: sts.bigint(),
+        })
+    ),
+}
+
+export const depositedFor =  {
+    name: 'DdcCustomers.DepositedFor',
+    /**
+     * An account has deposited this amount for another account to a specific cluster. \[cluster_id, from, to, amount\]
+     */
+    v54114: new EventType(
+        'DdcCustomers.DepositedFor',
+        sts.struct({
+            clusterId: v54114.H160,
+            from: v54114.AccountId32,
+            to: v54114.AccountId32,
             amount: sts.bigint(),
         })
     ),
@@ -39,6 +70,17 @@ export const initiatDepositUnlock =  {
     v48013: new EventType(
         'DdcCustomers.InitiatDepositUnlock',
         sts.tuple([v48013.AccountId32, sts.bigint()])
+    ),
+    /**
+     * An account has initiated unlock for amount to a specific cluster. \[cluster_id, owner, amount\]
+     */
+    v54114: new EventType(
+        'DdcCustomers.InitiatDepositUnlock',
+        sts.struct({
+            clusterId: v54114.H160,
+            ownerId: v54114.AccountId32,
+            amount: sts.bigint(),
+        })
     ),
 }
 
@@ -60,6 +102,18 @@ export const withdrawn =  {
         'DdcCustomers.Withdrawn',
         sts.struct({
             ownerId: v48800.AccountId32,
+            amount: sts.bigint(),
+        })
+    ),
+    /**
+     * An account has called `withdraw_unlocked_deposit` and removed unlocking chunks worth
+     * `Balance` from the unlocking queue for a specific cluster. \[cluster_id, owner, amount\]
+     */
+    v54114: new EventType(
+        'DdcCustomers.Withdrawn',
+        sts.struct({
+            clusterId: v54114.H160,
+            ownerId: v54114.AccountId32,
             amount: sts.bigint(),
         })
     ),
@@ -88,6 +142,18 @@ export const charged =  {
         'DdcCustomers.Charged',
         sts.struct({
             ownerId: v48800.AccountId32,
+            charged: sts.bigint(),
+            expectedToCharge: sts.bigint(),
+        })
+    ),
+    /**
+     * The account has been charged for the usage in a specific cluster
+     */
+    v54114: new EventType(
+        'DdcCustomers.Charged',
+        sts.struct({
+            clusterId: v54114.H160,
+            ownerId: v54114.AccountId32,
             charged: sts.bigint(),
             expectedToCharge: sts.bigint(),
         })
@@ -149,6 +215,17 @@ export const initialDepositUnlock =  {
         'DdcCustomers.InitialDepositUnlock',
         sts.struct({
             ownerId: v48800.AccountId32,
+            amount: sts.bigint(),
+        })
+    ),
+    /**
+     * An account has initiated unlock for amount for a specific cluster. \[cluster_id, owner, amount\]
+     */
+    v54114: new EventType(
+        'DdcCustomers.InitialDepositUnlock',
+        sts.struct({
+            clusterId: v54114.H160,
+            ownerId: v54114.AccountId32,
             amount: sts.bigint(),
         })
     ),
