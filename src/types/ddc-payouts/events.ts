@@ -1,20 +1,16 @@
 import {sts, Block, Bytes, Option, Result, EventType, RuntimeCtx} from '../support'
-import * as v48015 from '../v48015'
-import * as v48400 from '../v48400'
-import * as v48800 from '../v48800'
-import * as v48900 from '../v48900'
-import * as v48901 from '../v48901'
-import * as v50000 from '../v50000'
-import * as v54001 from '../v54001'
-import * as v54100 from '../v54100'
-import * as v73115 from '../v73115'
+import * as v63002 from '../v63002'
+import * as v64000 from '../v64000'
+import * as v72000 from '../v72000'
+import * as v73007 from '../v73007'
+import * as v73038 from '../v73038'
 
 export const billingReportInitialized =  {
     name: 'DdcPayouts.BillingReportInitialized',
-    v48015: new EventType(
+    v63002: new EventType(
         'DdcPayouts.BillingReportInitialized',
         sts.struct({
-            clusterId: v48015.H160,
+            clusterId: v63002.H160,
             era: sts.number(),
         })
     ),
@@ -22,10 +18,10 @@ export const billingReportInitialized =  {
 
 export const chargingStarted =  {
     name: 'DdcPayouts.ChargingStarted',
-    v48015: new EventType(
+    v63002: new EventType(
         'DdcPayouts.ChargingStarted',
         sts.struct({
-            clusterId: v48015.H160,
+            clusterId: v63002.H160,
             era: sts.number(),
         })
     ),
@@ -33,34 +29,24 @@ export const chargingStarted =  {
 
 export const charged =  {
     name: 'DdcPayouts.Charged',
-    v48015: new EventType(
+    v63002: new EventType(
         'DdcPayouts.Charged',
         sts.struct({
-            clusterId: v48015.H160,
+            clusterId: v63002.H160,
             era: sts.number(),
             batchIndex: sts.number(),
-            customerId: v48015.AccountId32,
-            amount: sts.bigint(),
-        })
-    ),
-    v54100: new EventType(
-        'DdcPayouts.Charged',
-        sts.struct({
-            clusterId: v54100.H160,
-            era: sts.number(),
-            batchIndex: sts.number(),
-            customerId: v54100.AccountId32,
+            customerId: v63002.AccountId32,
             bucketId: sts.bigint(),
             amount: sts.bigint(),
         })
     ),
-    v73115: new EventType(
+    v72000: new EventType(
         'DdcPayouts.Charged',
         sts.struct({
-            clusterId: v73115.H160,
+            clusterId: v72000.H160,
             era: sts.number(),
             batchIndex: sts.number(),
-            customerId: v73115.AccountId32,
+            customerId: v72000.AccountId32,
             amount: sts.bigint(),
         })
     ),
@@ -68,46 +54,14 @@ export const charged =  {
 
 export const chargeFailed =  {
     name: 'DdcPayouts.ChargeFailed',
-    v48015: new EventType(
+    v63002: new EventType(
         'DdcPayouts.ChargeFailed',
         sts.struct({
-            clusterId: v48015.H160,
+            clusterId: v63002.H160,
             era: sts.number(),
             batchIndex: sts.number(),
-            customerId: v48015.AccountId32,
-            amount: sts.bigint(),
-        })
-    ),
-    v48800: new EventType(
-        'DdcPayouts.ChargeFailed',
-        sts.struct({
-            clusterId: v48800.H160,
-            era: sts.number(),
-            batchIndex: sts.number(),
-            customerId: v48800.AccountId32,
-            charged: sts.bigint(),
-            expectedToCharge: sts.bigint(),
-        })
-    ),
-    v54100: new EventType(
-        'DdcPayouts.ChargeFailed',
-        sts.struct({
-            clusterId: v54100.H160,
-            era: sts.number(),
-            batchIndex: sts.number(),
-            customerId: v54100.AccountId32,
+            customerId: v63002.AccountId32,
             bucketId: sts.bigint(),
-            charged: sts.bigint(),
-            expectedToCharge: sts.bigint(),
-        })
-    ),
-    v73115: new EventType(
-        'DdcPayouts.ChargeFailed',
-        sts.struct({
-            clusterId: v73115.H160,
-            era: sts.number(),
-            batchIndex: sts.number(),
-            customerId: v73115.AccountId32,
             charged: sts.bigint(),
             expectedToCharge: sts.bigint(),
         })
@@ -116,34 +70,24 @@ export const chargeFailed =  {
 
 export const indebted =  {
     name: 'DdcPayouts.Indebted',
-    v48015: new EventType(
+    v63002: new EventType(
         'DdcPayouts.Indebted',
         sts.struct({
-            clusterId: v48015.H160,
+            clusterId: v63002.H160,
             era: sts.number(),
             batchIndex: sts.number(),
-            customerId: v48015.AccountId32,
-            amount: sts.bigint(),
-        })
-    ),
-    v54100: new EventType(
-        'DdcPayouts.Indebted',
-        sts.struct({
-            clusterId: v54100.H160,
-            era: sts.number(),
-            batchIndex: sts.number(),
-            customerId: v54100.AccountId32,
+            customerId: v63002.AccountId32,
             bucketId: sts.bigint(),
             amount: sts.bigint(),
         })
     ),
-    v73115: new EventType(
+    v72000: new EventType(
         'DdcPayouts.Indebted',
         sts.struct({
-            clusterId: v73115.H160,
+            clusterId: v72000.H160,
             era: sts.number(),
             batchIndex: sts.number(),
-            customerId: v73115.AccountId32,
+            customerId: v72000.AccountId32,
             amount: sts.bigint(),
         })
     ),
@@ -151,10 +95,10 @@ export const indebted =  {
 
 export const chargingFinished =  {
     name: 'DdcPayouts.ChargingFinished',
-    v48015: new EventType(
+    v63002: new EventType(
         'DdcPayouts.ChargingFinished',
         sts.struct({
-            clusterId: v48015.H160,
+            clusterId: v63002.H160,
             era: sts.number(),
         })
     ),
@@ -162,10 +106,10 @@ export const chargingFinished =  {
 
 export const treasuryFeesCollected =  {
     name: 'DdcPayouts.TreasuryFeesCollected',
-    v48015: new EventType(
+    v63002: new EventType(
         'DdcPayouts.TreasuryFeesCollected',
         sts.struct({
-            clusterId: v48015.H160,
+            clusterId: v63002.H160,
             era: sts.number(),
             amount: sts.bigint(),
         })
@@ -174,10 +118,10 @@ export const treasuryFeesCollected =  {
 
 export const clusterReserveFeesCollected =  {
     name: 'DdcPayouts.ClusterReserveFeesCollected',
-    v48015: new EventType(
+    v63002: new EventType(
         'DdcPayouts.ClusterReserveFeesCollected',
         sts.struct({
-            clusterId: v48015.H160,
+            clusterId: v63002.H160,
             era: sts.number(),
             amount: sts.bigint(),
         })
@@ -186,10 +130,10 @@ export const clusterReserveFeesCollected =  {
 
 export const validatorFeesCollected =  {
     name: 'DdcPayouts.ValidatorFeesCollected',
-    v48015: new EventType(
+    v63002: new EventType(
         'DdcPayouts.ValidatorFeesCollected',
         sts.struct({
-            clusterId: v48015.H160,
+            clusterId: v63002.H160,
             era: sts.number(),
             amount: sts.bigint(),
         })
@@ -198,10 +142,10 @@ export const validatorFeesCollected =  {
 
 export const rewardingStarted =  {
     name: 'DdcPayouts.RewardingStarted',
-    v48015: new EventType(
+    v63002: new EventType(
         'DdcPayouts.RewardingStarted',
         sts.struct({
-            clusterId: v48015.H160,
+            clusterId: v63002.H160,
             era: sts.number(),
         })
     ),
@@ -209,158 +153,13 @@ export const rewardingStarted =  {
 
 export const rewarded =  {
     name: 'DdcPayouts.Rewarded',
-    v48015: new EventType(
+    v63002: new EventType(
         'DdcPayouts.Rewarded',
         sts.struct({
-            clusterId: v48015.H160,
-            era: sts.number(),
-            nodeProviderId: v48015.AccountId32,
-            amount: sts.bigint(),
-        })
-    ),
-    v48800: new EventType(
-        'DdcPayouts.Rewarded',
-        sts.struct({
-            clusterId: v48800.H160,
-            era: sts.number(),
-            nodeProviderId: v48800.AccountId32,
-            rewarded: sts.bigint(),
-            expectedToReward: sts.bigint(),
-        })
-    ),
-    v48900: new EventType(
-        'DdcPayouts.Rewarded',
-        sts.struct({
-            clusterId: v48900.H160,
+            clusterId: v63002.H160,
             era: sts.number(),
             batchIndex: sts.number(),
-            nodeProviderId: v48900.AccountId32,
-            rewarded: sts.bigint(),
-            expectedToReward: sts.bigint(),
-        })
-    ),
-}
-
-export const rewardingFinished =  {
-    name: 'DdcPayouts.RewardingFinished',
-    v48015: new EventType(
-        'DdcPayouts.RewardingFinished',
-        sts.struct({
-            clusterId: v48015.H160,
-            era: sts.number(),
-        })
-    ),
-}
-
-export const billingReportFinalized =  {
-    name: 'DdcPayouts.BillingReportFinalized',
-    v48015: new EventType(
-        'DdcPayouts.BillingReportFinalized',
-        sts.struct({
-            clusterId: v48015.H160,
-            era: sts.number(),
-        })
-    ),
-}
-
-export const authorisedCaller =  {
-    name: 'DdcPayouts.AuthorisedCaller',
-    v48015: new EventType(
-        'DdcPayouts.AuthorisedCaller',
-        sts.struct({
-            authorisedCaller: v48015.AccountId32,
-        })
-    ),
-}
-
-export const notDistributedReward =  {
-    name: 'DdcPayouts.NotDistributedReward',
-    v48400: new EventType(
-        'DdcPayouts.NotDistributedReward',
-        sts.struct({
-            clusterId: v48400.H160,
-            era: sts.number(),
-            nodeProviderId: v48400.AccountId32,
-            expectedReward: sts.bigint(),
-            distributedReward: sts.bigint(),
-        })
-    ),
-    v48900: new EventType(
-        'DdcPayouts.NotDistributedReward',
-        sts.struct({
-            clusterId: v48900.H160,
-            era: sts.number(),
-            batchIndex: sts.number(),
-            nodeProviderId: v48900.AccountId32,
-            expectedReward: sts.bigint(),
-            distributedReward: sts.bigint(),
-        })
-    ),
-}
-
-export const notDistributedOverallReward =  {
-    name: 'DdcPayouts.NotDistributedOverallReward',
-    v48400: new EventType(
-        'DdcPayouts.NotDistributedOverallReward',
-        sts.struct({
-            clusterId: v48400.H160,
-            era: sts.number(),
-            expectedReward: sts.bigint(),
-            totalDistributedReward: sts.bigint(),
-        })
-    ),
-}
-
-export const chargeError =  {
-    name: 'DdcPayouts.ChargeError',
-    v48901: new EventType(
-        'DdcPayouts.ChargeError',
-        sts.struct({
-            clusterId: v48901.H160,
-            era: sts.number(),
-            batchIndex: sts.number(),
-            customerId: v48901.AccountId32,
-            amount: sts.bigint(),
-            error: v48901.DispatchError,
-        })
-    ),
-    v50000: new EventType(
-        'DdcPayouts.ChargeError',
-        sts.struct({
-            clusterId: v50000.H160,
-            era: sts.number(),
-            batchIndex: sts.number(),
-            customerId: v50000.AccountId32,
-            amount: sts.bigint(),
-            error: v50000.DispatchError,
-        })
-    ),
-    v73115: new EventType(
-        'DdcPayouts.ChargeError',
-        sts.struct({
-            clusterId: v73115.H160,
-            era: sts.number(),
-            batchIndex: sts.number(),
-            customerId: v73115.AccountId32,
-            amount: sts.bigint(),
-            error: v73115.DispatchError,
-        })
-    ),
-}
-
-export const providerRewarded =  {
-    name: 'DdcPayouts.ProviderRewarded',
-    v54001: new EventType(
-        'DdcPayouts.ProviderRewarded',
-        sts.struct({
-            clusterId: v54001.H160,
-            era: sts.number(),
-            batchIndex: sts.number(),
-            storedBytes: sts.bigint(),
-            transferredBytes: sts.bigint(),
-            numberOfPuts: sts.bigint(),
-            numberOfGets: sts.bigint(),
-            nodeProviderId: v54001.AccountId32,
+            nodeProviderId: v63002.AccountId32,
             rewarded: sts.bigint(),
             expectedToReward: sts.bigint(),
         })
@@ -369,13 +168,173 @@ export const providerRewarded =  {
 
 export const validatorRewarded =  {
     name: 'DdcPayouts.ValidatorRewarded',
-    v54001: new EventType(
+    v63002: new EventType(
         'DdcPayouts.ValidatorRewarded',
         sts.struct({
-            clusterId: v54001.H160,
+            clusterId: v63002.H160,
             era: sts.number(),
-            validatorId: v54001.AccountId32,
+            validatorId: v63002.AccountId32,
             amount: sts.bigint(),
+        })
+    ),
+}
+
+export const notDistributedReward =  {
+    name: 'DdcPayouts.NotDistributedReward',
+    v63002: new EventType(
+        'DdcPayouts.NotDistributedReward',
+        sts.struct({
+            clusterId: v63002.H160,
+            era: sts.number(),
+            batchIndex: sts.number(),
+            nodeProviderId: v63002.AccountId32,
+            expectedReward: sts.bigint(),
+            distributedReward: sts.bigint(),
+        })
+    ),
+}
+
+export const notDistributedOverallReward =  {
+    name: 'DdcPayouts.NotDistributedOverallReward',
+    v63002: new EventType(
+        'DdcPayouts.NotDistributedOverallReward',
+        sts.struct({
+            clusterId: v63002.H160,
+            era: sts.number(),
+            expectedReward: sts.bigint(),
+            totalDistributedReward: sts.bigint(),
+        })
+    ),
+    v72000: new EventType(
+        'DdcPayouts.NotDistributedOverallReward',
+        sts.struct({
+            clusterId: v72000.H160,
+            era: sts.number(),
+            expectedReward: sts.bigint(),
+            totalDistributedRewards: sts.bigint(),
+        })
+    ),
+}
+
+export const rewardingFinished =  {
+    name: 'DdcPayouts.RewardingFinished',
+    v63002: new EventType(
+        'DdcPayouts.RewardingFinished',
+        sts.struct({
+            clusterId: v63002.H160,
+            era: sts.number(),
+        })
+    ),
+}
+
+export const billingReportFinalized =  {
+    name: 'DdcPayouts.BillingReportFinalized',
+    v63002: new EventType(
+        'DdcPayouts.BillingReportFinalized',
+        sts.struct({
+            clusterId: v63002.H160,
+            era: sts.number(),
+        })
+    ),
+}
+
+export const chargeError =  {
+    name: 'DdcPayouts.ChargeError',
+    v63002: new EventType(
+        'DdcPayouts.ChargeError',
+        sts.struct({
+            clusterId: v63002.H160,
+            era: sts.number(),
+            batchIndex: sts.number(),
+            customerId: v63002.AccountId32,
+            amount: sts.bigint(),
+            error: v63002.DispatchError,
+        })
+    ),
+    v73038: new EventType(
+        'DdcPayouts.ChargeError',
+        sts.struct({
+            clusterId: v73038.H160,
+            era: sts.number(),
+            batchIndex: sts.number(),
+            customerId: v73038.AccountId32,
+            amount: sts.bigint(),
+            error: v73038.DispatchError,
+        })
+    ),
+}
+
+export const billingFingerprintCommited =  {
+    name: 'DdcPayouts.BillingFingerprintCommited',
+    v64000: new EventType(
+        'DdcPayouts.BillingFingerprintCommited',
+        sts.struct({
+            validatorId: v64000.AccountId32,
+            clusterId: v64000.H160,
+            eraId: sts.number(),
+            startEra: sts.bigint(),
+            endEra: sts.bigint(),
+            payersMerkleRoot: v64000.H256,
+            payeesMerkleRoot: v64000.H256,
+        })
+    ),
+}
+
+export const payoutInitialized =  {
+    name: 'DdcPayouts.PayoutInitialized',
+    v72000: new EventType(
+        'DdcPayouts.PayoutInitialized',
+        sts.struct({
+            clusterId: v72000.H160,
+            era: sts.number(),
+        })
+    ),
+}
+
+export const chargedPartially =  {
+    name: 'DdcPayouts.ChargedPartially',
+    v72000: new EventType(
+        'DdcPayouts.ChargedPartially',
+        sts.struct({
+            clusterId: v72000.H160,
+            era: sts.number(),
+            batchIndex: sts.number(),
+            customerId: v72000.AccountId32,
+            charged: sts.bigint(),
+            expectedToCharge: sts.bigint(),
+        })
+    ),
+}
+
+export const payoutReceiptFinalized =  {
+    name: 'DdcPayouts.PayoutReceiptFinalized',
+    v72000: new EventType(
+        'DdcPayouts.PayoutReceiptFinalized',
+        sts.struct({
+            clusterId: v72000.H160,
+            era: sts.number(),
+        })
+    ),
+    v73007: new EventType(
+        'DdcPayouts.PayoutReceiptFinalized',
+        sts.struct({
+            clusterId: v73007.H160,
+            era: sts.number(),
+            finalizedAt: sts.number(),
+        })
+    ),
+}
+
+export const payoutFingerprintCommited =  {
+    name: 'DdcPayouts.PayoutFingerprintCommited',
+    v72000: new EventType(
+        'DdcPayouts.PayoutFingerprintCommited',
+        sts.struct({
+            validatorId: v72000.AccountId32,
+            clusterId: v72000.H160,
+            eraId: sts.number(),
+            payersMerkleRoot: v72000.H256,
+            payeesMerkleRoot: v72000.H256,
         })
     ),
 }

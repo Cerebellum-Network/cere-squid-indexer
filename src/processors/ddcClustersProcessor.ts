@@ -59,75 +59,49 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
         }
     }
 
-    private async processDdcClustersEvents(clusterId: string, block: Block, event: Event) {
-        let createdAtBlockHeight
-        if (event.name === events.ddcClusters.clusterCreated.name) {
-            createdAtBlockHeight = block.height
-        }
-
-        let clusterInfo: DdcClusterInfo | undefined
-        if (storage.ddcClusters.clusters.v54105.is(block)) {
-            const cluster = await storage.ddcClusters.clusters.v54105.get(block, clusterId)
+    private async processDdcClustersEvents(clusterId: string, block: Block) {
+        let clusterInfo
+        if (storage.ddcClusters.clusters.v63002.is(block)) {
+            const cluster = await storage.ddcClusters.clusters.v63002.get(block, clusterId)
             if (cluster) {
-                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId, createdAtBlockHeight)
-                clusterInfo.erasureCodingRequired = cluster.props.erasureCodingRequired
-                clusterInfo.erasureCodingTotal = cluster.props.erasureCodingTotal
-                clusterInfo.replicationTotal = cluster.props.replicationTotal
-                clusterInfo.status = DdcClusterStatus[cluster.status.__kind]
-            }
-        } else if (storage.ddcClusters.clusters.v54001.is(block)) {
-            const cluster = await storage.ddcClusters.clusters.v54001.get(block, clusterId)
-            if (cluster) {
-                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId, createdAtBlockHeight)
-                clusterInfo.erasureCodingRequired = cluster.props.erasureCodingRequired
-                clusterInfo.erasureCodingTotal = cluster.props.erasureCodingTotal
-                clusterInfo.replicationTotal = cluster.props.replicationTotal
-                clusterInfo.status = DdcClusterStatus[cluster.status.__kind]
-            }
-        } else if (storage.ddcClusters.clusters.v53003.is(block)) {
-            const cluster = await storage.ddcClusters.clusters.v53003.get(block, clusterId)
-            if (cluster) {
-                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId, createdAtBlockHeight)
-                clusterInfo.erasureCodingRequired = cluster.props.erasureCodingRequired
-                clusterInfo.erasureCodingTotal = cluster.props.erasureCodingTotal
-                clusterInfo.replicationTotal = cluster.props.replicationTotal
-            }
-        } else if (storage.ddcClusters.clusters.v48016.is(block)) {
-            const cluster = await storage.ddcClusters.clusters.v48016.get(block, clusterId)
-            if (cluster) {
-                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId, createdAtBlockHeight)
-            }
-        } else if (storage.ddcClusters.clusters.v48013.is(block)) {
-            const cluster = await storage.ddcClusters.clusters.v48013.get(block, clusterId)
-            if (cluster) {
-                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId, createdAtBlockHeight)
-            }
-        } else if (storage.ddcClusters.clusters.v48008.is(block)) {
-            const cluster = await storage.ddcClusters.clusters.v48008.get(block, clusterId)
-            if (cluster) {
-                clusterInfo = this.newClusterInfo(clusterId, cluster.managerId, createdAtBlockHeight)
+                clusterInfo = {
+                    id: clusterId,
+                    createdAtBlockHeight: block.height,
+                    managerId: cluster.managerId,
+                    treasuryShare: 0n, // Default values - to be updated from gov params
+                    validatorsShare: 0n,
+                    clusterReserveShare: 0n,
+                    storageBondSize: 0n,
+                    storageChillDelay: 0,
+                    storageUnbondingDelay: 0,
+                    unitPerMbStored: 0n,
+                    unitPerMbStreamed: 0n,
+                    unitPerPutRequest: 0n,
+                    unitPerGetRequest: 0n,
+                    erasureCodingRequired: cluster.props.erasureCodingRequired,
+                    erasureCodingTotal: cluster.props.erasureCodingTotal,
+                    replicationTotal: cluster.props.replicationTotal,
+                    status: cluster.status.__kind === 'Activated' ? DdcClusterStatus.Activated :
+                           cluster.status.__kind === 'Bonded' ? DdcClusterStatus.Bonded :
+                           cluster.status.__kind === 'Unbonded' ? DdcClusterStatus.Unbonded :
+                           DdcClusterStatus.Unbonding,
+                }
             }
         } else {
             logUnsupportedStorageVersion('DdcClusters.Clusters', block)
         }
+        
         if (clusterInfo) {
-            clusterInfo.managerId = toCereAddress(clusterInfo.managerId)
+            // Try to get cluster gov params
             let clusterGovParams
-            if (storage.ddcClusters.clustersGovParams.v48400.is(block)) {
-                clusterGovParams = await storage.ddcClusters.clustersGovParams.v48400.get(block, clusterId)
-            } else if (storage.ddcClusters.clustersGovParams.v48017.is(block)) {
-                clusterGovParams = await storage.ddcClusters.clustersGovParams.v48017.get(block, clusterId)
-            } else if (storage.ddcClusters.clustersGovParams.v48016.is(block)) {
-                clusterGovParams = await storage.ddcClusters.clustersGovParams.v48016.get(block, clusterId)
-            } else if (storage.ddcClusters.clustersGovParams.v48015.is(block)) {
-                clusterGovParams = await storage.ddcClusters.clustersGovParams.v48015.get(block, clusterId)
-            } else if (storage.ddcClusters.clustersGovParams.v48013.is(block)) {
-                clusterGovParams = await storage.ddcClusters.clustersGovParams.v48013.get(block, clusterId)
+            if (storage.ddcClusters.clustersGovParams.v63002.is(block)) {
+                clusterGovParams = await storage.ddcClusters.clustersGovParams.v63002.get(block, clusterId)
             }
+            
             if (clusterGovParams) {
-                clusterInfo.treasuryShare = BigInt(clusterGovParams.treasuryShare)
-                clusterInfo.validatorsShare = BigInt(clusterGovParams.validatorsShare)
-                clusterInfo.clusterReserveShare = BigInt(clusterGovParams.clusterReserveShare)
+                clusterInfo.treasuryShare = clusterGovParams.treasuryShare
+                clusterInfo.validatorsShare = clusterGovParams.validatorsShare
+                clusterInfo.clusterReserveShare = clusterGovParams.clusterReserveShare
                 clusterInfo.storageBondSize = clusterGovParams.storageBondSize
                 clusterInfo.storageChillDelay = clusterGovParams.storageChillDelay
                 clusterInfo.storageUnbondingDelay = clusterGovParams.storageUnbondingDelay
@@ -136,6 +110,8 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
                 clusterInfo.unitPerPutRequest = clusterGovParams.unitPerPutRequest
                 clusterInfo.unitPerGetRequest = clusterGovParams.unitPerGetRequest
             }
+            
+            clusterInfo.managerId = toCereAddress(clusterInfo.managerId)
             this._state.set(clusterId, clusterInfo)
         } else {
             logEmptyStorage('DdcClusters.Clusters', clusterId, block)
@@ -145,81 +121,80 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
     async process(event: Event, block: Block) {
         switch (event.name) {
             case events.ddcClusters.clusterCreated.name: {
-                if (events.ddcClusters.clusterCreated.v48008.is(event)) {
-                    const clusterId = events.ddcClusters.clusterCreated.v48008.decode(event).clusterId
-                    await this.processDdcClustersEvents(clusterId, block, event)
+                if (events.ddcClusters.clusterCreated.v63002.is(event)) {
+                    const decoded = events.ddcClusters.clusterCreated.v63002.decode(event)
+                    const clusterId = decoded.clusterId
+                    await this.processDdcClustersEvents(clusterId, block)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
                 break
             }
             case events.ddcClusters.clusterParamsSet.name: {
-                if (events.ddcClusters.clusterParamsSet.v48008.is(event)) {
-                    const clusterId = events.ddcClusters.clusterParamsSet.v48008.decode(event).clusterId
-                    await this.processDdcClustersEvents(clusterId, block, event)
-                } else {
-                    logUnsupportedEventVersion(event)
-                }
-                break
-            }
-            case events.ddcClusters.clusterGovParamsSet.name: {
-                if (events.ddcClusters.clusterGovParamsSet.v48013.is(event)) {
-                    const clusterId = events.ddcClusters.clusterGovParamsSet.v48013.decode(event).clusterId
-                    await this.processDdcClustersEvents(clusterId, block, event)
+                if (events.ddcClusters.clusterParamsSet.v63002.is(event)) {
+                    const decoded = events.ddcClusters.clusterParamsSet.v63002.decode(event)
+                    const clusterId = decoded.clusterId
+                    await this.processDdcClustersEvents(clusterId, block)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
                 break
             }
             case events.ddcClusters.clusterProtocolParamsSet.name: {
-                if (events.ddcClusters.clusterProtocolParamsSet.v54001.is(event)) {
-                    const clusterId = events.ddcClusters.clusterProtocolParamsSet.v54001.decode(event).clusterId
-                    await this.processDdcClustersEvents(clusterId, block, event)
+                if (events.ddcClusters.clusterProtocolParamsSet.v63002.is(event)) {
+                    const decoded = events.ddcClusters.clusterProtocolParamsSet.v63002.decode(event)
+                    const clusterId = decoded.clusterId
+                    await this.processDdcClustersEvents(clusterId, block)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
                 break
             }
             case events.ddcClusters.clusterActivated.name: {
-                if (events.ddcClusters.clusterActivated.v54001.is(event)) {
-                    const clusterId = events.ddcClusters.clusterActivated.v54001.decode(event).clusterId
-                    await this.processDdcClustersEvents(clusterId, block, event)
+                if (events.ddcClusters.clusterActivated.v63002.is(event)) {
+                    const decoded = events.ddcClusters.clusterActivated.v63002.decode(event)
+                    const clusterId = decoded.clusterId
+                    await this.processDdcClustersEvents(clusterId, block)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
                 break
             }
             case events.ddcClusters.clusterBonded.name: {
-                if (events.ddcClusters.clusterBonded.v54001.is(event)) {
-                    const clusterId = events.ddcClusters.clusterBonded.v54001.decode(event).clusterId
-                    await this.processDdcClustersEvents(clusterId, block, event)
+                if (events.ddcClusters.clusterBonded.v63002.is(event)) {
+                    const decoded = events.ddcClusters.clusterBonded.v63002.decode(event)
+                    const clusterId = decoded.clusterId
+                    await this.processDdcClustersEvents(clusterId, block)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
                 break
             }
             case events.ddcClusters.clusterUnbonded.name: {
-                if (events.ddcClusters.clusterUnbonded.v54001.is(event)) {
-                    const clusterId = events.ddcClusters.clusterUnbonded.v54001.decode(event).clusterId
-                    await this.processDdcClustersEvents(clusterId, block, event)
+                if (events.ddcClusters.clusterUnbonded.v63002.is(event)) {
+                    const decoded = events.ddcClusters.clusterUnbonded.v63002.decode(event)
+                    const clusterId = decoded.clusterId
+                    await this.processDdcClustersEvents(clusterId, block)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
                 break
             }
             case events.ddcClusters.clusterNodeValidated.name: {
-                if (events.ddcClusters.clusterNodeValidated.v54001.is(event)) {
-                    const clusterId = events.ddcClusters.clusterNodeValidated.v54001.decode(event).clusterId
-                    await this.processDdcClustersEvents(clusterId, block, event)
+                if (events.ddcClusters.clusterNodeValidated.v63002.is(event)) {
+                    const decoded = events.ddcClusters.clusterNodeValidated.v63002.decode(event)
+                    const clusterId = decoded.clusterId
+                    await this.processDdcClustersEvents(clusterId, block)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
                 break
             }
             case events.ddcClusters.clusterUnbonding.name: {
-                if (events.ddcClusters.clusterUnbonding.v54004.is(event)) {
-                    const clusterId = events.ddcClusters.clusterUnbonding.v54004.decode(event).clusterId
-                    await this.processDdcClustersEvents(clusterId, block, event)
+                if (events.ddcClusters.clusterUnbonding.v63002.is(event)) {
+                    const decoded = events.ddcClusters.clusterUnbonding.v63002.decode(event)
+                    const clusterId = decoded.clusterId
+                    await this.processDdcClustersEvents(clusterId, block)
                 } else {
                     logUnsupportedEventVersion(event)
                 }

@@ -33,90 +33,26 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
         super(new Map<bigint, DdcBucketInfo>())
     }
 
-    private async processDdcBucketsEvents(bucketId: bigint, block: Block, event: Event) {
-        const blockTimestamp = new Date(assertNotNull(block.timestamp, `Block ${block.height} timestamp is not set`))
-
-        let createdAtBlockHeight
-        let createdAtBlockTimestamp
-        if (event.name === events.ddcCustomers.bucketCreated.name) {
-            createdAtBlockHeight = block.height
-            createdAtBlockTimestamp = blockTimestamp
-        }
-
-
-        // TODO(khssnv)
-        // We can return to ascending versions check here and in the other processors when
-        // https://github.com/subsquid/squid-sdk/issues/334 fixed, possibly with
-        // https://github.com/subsquid/squid-sdk/pull/337.
-
-        let bucketInfo: DdcBucketInfo | undefined
-        if (storage.ddcCustomers.buckets.v54100.is(block)) {
-            const bucket = await storage.ddcCustomers.buckets.v54100.get(block, bucketId)
-            if (bucket) {
-                bucketInfo = {
-                    createdAtBlockHeight: createdAtBlockHeight,
-                    createdAtBlockTimestamp: createdAtBlockTimestamp,
-                    ownerId: bucket.ownerId,
-                    clusterId: bucket.clusterId,
-                    bucketId: bucketId,
-                    isPublic: bucket.isPublic,
-                    isRemoved: bucket.isRemoved,
-                    ...(event.name === events.ddcCustomers.bucketTotalCustomersUsageUpdated.name) && {
-                        usage: {
-                            block: block.height,
-                            timestamp: blockTimestamp,
-                            transferredBytes: bucket.totalCustomersUsage?.transferredBytes ?? 0n,
-                            storedBytes: bucket.totalCustomersUsage?.storedBytes ?? 0n,
-                            numberOfPuts: bucket.totalCustomersUsage?.numberOfPuts ?? 0n,
-                            numberOfGets: bucket.totalCustomersUsage?.numberOfGets ?? 0n,
-                        },
-                    },
-                }
-            }
-        } else if (storage.ddcCustomers.buckets.v50000.is(block)) {
-            const bucket = await storage.ddcCustomers.buckets.v50000.get(block, bucketId)
-            if (bucket) {
-                bucketInfo = {
-                    createdAtBlockHeight: createdAtBlockHeight,
-                    createdAtBlockTimestamp: createdAtBlockTimestamp,
-                    ownerId: bucket.ownerId,
-                    clusterId: bucket.clusterId,
-                    bucketId: bucketId,
-                    isPublic: bucket.isPublic,
-                    isRemoved: bucket.isRemoved,
-                }
-            }
-        } else if (storage.ddcCustomers.buckets.v48017.is(block)) {
-            const bucket = await storage.ddcCustomers.buckets.v48017.get(block, bucketId)
-            if (bucket) {
-                bucketInfo = {
-                    createdAtBlockHeight: createdAtBlockHeight,
-                    createdAtBlockTimestamp: createdAtBlockTimestamp,
-                    ownerId: bucket.ownerId,
-                    clusterId: bucket.clusterId,
-                    bucketId: bucketId,
-                    isPublic: bucket.isPublic,
-                    isRemoved: false,
-                }
-            }
-        } else if (storage.ddcCustomers.buckets.v48013.is(block)) {
-            const bucket = await storage.ddcCustomers.buckets.v48013.get(block, bucketId)
-            if (bucket) {
-                bucketInfo = {
-                    createdAtBlockHeight: createdAtBlockHeight,
-                    createdAtBlockTimestamp: createdAtBlockTimestamp,
-                    ownerId: bucket.ownerId,
-                    clusterId: bucket.clusterId,
-                    bucketId: bucketId,
-                    isPublic: true,
-                    isRemoved: false,
-                }
-            }
+    private async processBucketInfo(bucketId: bigint, block: Block) {
+        let bucket
+        if (storage.ddcCustomers.buckets.v73047.is(block)) {
+            bucket = await storage.ddcCustomers.buckets.v73047.get(block, bucketId)
+        } else if (storage.ddcCustomers.buckets.v63002.is(block)) {
+            bucket = await storage.ddcCustomers.buckets.v63002.get(block, bucketId)
         } else {
             logUnsupportedStorageVersion('DdcCustomers.Buckets', block)
         }
-        if (bucketInfo) {
-            bucketInfo.ownerId = toCereAddress(bucketInfo.ownerId)
+        
+        if (bucket) {
+            const bucketInfo: DdcBucketInfo = {
+                bucketId: bucketId,
+                createdAtBlockHeight: block.height,
+                createdAtBlockTimestamp: new Date(assertNotNull(block.timestamp, `Block ${block.height} timestamp is not set`)),
+                ownerId: toCereAddress(bucket.ownerId),
+                clusterId: bucket.clusterId,
+                isPublic: bucket.isPublic,
+                isRemoved: bucket.isRemoved,
+            }
             this._state.set(bucketId, bucketInfo)
         } else {
             logEmptyStorage('DdcCustomers.Buckets', bucketId.toString(), block)
@@ -126,57 +62,74 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
     async process(event: Event, block: Block) {
         switch (event.name) {
             case events.ddcCustomers.bucketCreated.name: {
-                if (events.ddcCustomers.bucketCreated.v48013.is(event)) {
-                    const bucketId = events.ddcCustomers.bucketCreated.v48013.decode(event)
-                    await this.processDdcBucketsEvents(bucketId, block, event)
-                } else if (events.ddcCustomers.bucketCreated.v48800.is(event)) {
-                    const bucketId = events.ddcCustomers.bucketCreated.v48800.decode(event).bucketId
-                    await this.processDdcBucketsEvents(bucketId, block, event)
-                } else if (events.ddcCustomers.bucketCreated.v54100.is(event)) {
-                    const bucketId = events.ddcCustomers.bucketCreated.v54100.decode(event).bucketId
-                    await this.processDdcBucketsEvents(bucketId, block, event)
+                if (events.ddcCustomers.bucketCreated.v63002.is(event)) {
+                    const decoded = events.ddcCustomers.bucketCreated.v63002.decode(event)
+                    const bucketId = decoded.bucketId
+                    await this.processBucketInfo(bucketId, block)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
                 break
             }
             case events.ddcCustomers.bucketUpdated.name: {
-                if (events.ddcCustomers.bucketUpdated.v48017.is(event)) {
-                    const bucketId = events.ddcCustomers.bucketUpdated.v48017.decode(event)
-                    await this.processDdcBucketsEvents(bucketId, block, event)
-                } else if (events.ddcCustomers.bucketUpdated.v48800.is(event)) {
-                    const bucketId = events.ddcCustomers.bucketUpdated.v48800.decode(event).bucketId
-                    await this.processDdcBucketsEvents(bucketId, block, event)
-                } else if (events.ddcCustomers.bucketUpdated.v54100.is(event)) {
-                    const bucketId = events.ddcCustomers.bucketUpdated.v54100.decode(event).bucketId
-                    await this.processDdcBucketsEvents(bucketId, block, event)
+                if (events.ddcCustomers.bucketUpdated.v63002.is(event)) {
+                    const decoded = events.ddcCustomers.bucketUpdated.v63002.decode(event)
+                    const bucketId = decoded.bucketId
+                    await this.processBucketInfo(bucketId, block)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
                 break
             }
             case events.ddcCustomers.bucketRemoved.name: {
-                if (events.ddcCustomers.bucketRemoved.v50000.is(event)) {
-                    const bucketId = events.ddcCustomers.bucketRemoved.v50000.decode(event).bucketId
-                    await this.processDdcBucketsEvents(bucketId, block, event)
+                if (events.ddcCustomers.bucketRemoved.v63002.is(event)) {
+                    const decoded = events.ddcCustomers.bucketRemoved.v63002.decode(event)
+                    const bucketId = decoded.bucketId
+                    await this.processBucketInfo(bucketId, block)
+                } else if (events.ddcCustomers.bucketRemoved.v73047.is(event)) {
+                    const decoded = events.ddcCustomers.bucketRemoved.v73047.decode(event)
+                    const bucketId = decoded.bucketId
+                    await this.processBucketInfo(bucketId, block)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
                 break
             }
             case events.ddcCustomers.bucketTotalNodesUsageUpdated.name: {
-                if (events.ddcCustomers.bucketTotalNodesUsageUpdated.v54100.is(event)) {
-                    const bucketId = events.ddcCustomers.bucketTotalNodesUsageUpdated.v54100.decode(event).bucketId
-                    await this.processDdcBucketsEvents(bucketId, block, event)
+                if (events.ddcCustomers.bucketTotalNodesUsageUpdated.v63002.is(event)) {
+                    const decoded = events.ddcCustomers.bucketTotalNodesUsageUpdated.v63002.decode(event)
+                    const bucketId = decoded.bucketId
+                    const bucketInfo = this._state.get(bucketId)
+                    if (bucketInfo) {
+                        bucketInfo.usage = {
+                            block: block.height,
+                            timestamp: new Date(assertNotNull(block.timestamp, `Block ${block.height} timestamp is not set`)),
+                            transferredBytes: decoded.transferredBytes,
+                            storedBytes: decoded.storedBytes,
+                            numberOfPuts: decoded.numberOfPuts,
+                            numberOfGets: decoded.numberOfGets,
+                        }
+                    }
                 } else {
                     logUnsupportedEventVersion(event)
                 }
                 break
             }
             case events.ddcCustomers.bucketTotalCustomersUsageUpdated.name: {
-                if (events.ddcCustomers.bucketTotalCustomersUsageUpdated.v54100.is(event)) {
-                    const bucketId = events.ddcCustomers.bucketTotalCustomersUsageUpdated.v54100.decode(event).bucketId
-                    await this.processDdcBucketsEvents(bucketId, block, event)
+                if (events.ddcCustomers.bucketTotalCustomersUsageUpdated.v63002.is(event)) {
+                    const decoded = events.ddcCustomers.bucketTotalCustomersUsageUpdated.v63002.decode(event)
+                    const bucketId = decoded.bucketId
+                    const bucketInfo = this._state.get(bucketId)
+                    if (bucketInfo) {
+                        bucketInfo.usage = {
+                            block: block.height,
+                            timestamp: new Date(assertNotNull(block.timestamp, `Block ${block.height} timestamp is not set`)),
+                            transferredBytes: decoded.transferredBytes,
+                            storedBytes: decoded.storedBytes,
+                            numberOfPuts: decoded.numberOfPuts,
+                            numberOfGets: decoded.numberOfGets,
+                        }
+                    }
                 } else {
                     logUnsupportedEventVersion(event)
                 }

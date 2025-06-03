@@ -1,7 +1,9 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_, DateTimeColumn as DateTimeColumn_, ManyToOne as ManyToOne_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
 import {Account} from "./account.model"
+import {DdcCluster} from "./ddcCluster.model"
 
 @Index_(["blockTimestamp", "amount"], {unique: false})
+@Index_(["clusterId", "accountId"], {unique: false})
 @Entity_()
 export class DdcCustomerCharge {
     constructor(props?: Partial<DdcCustomerCharge>) {
@@ -18,6 +20,12 @@ export class DdcCustomerCharge {
     @ManyToOne_(() => Account, {nullable: true})
     accountId!: Account
 
+    @ManyToOne_(() => DdcCluster, {nullable: true})
+    clusterId!: DdcCluster
+
     @BigIntColumn_({nullable: false})
     amount!: bigint
+
+    @BigIntColumn_({nullable: true})
+    expectedToCharge!: bigint | undefined | null
 }

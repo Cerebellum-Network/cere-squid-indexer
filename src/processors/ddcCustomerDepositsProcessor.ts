@@ -9,6 +9,7 @@ export interface DdcCustomerDeposit {
     blockHeight?: number
     blockTimestamp?: Date
 
+    clusterId: string
     amount: bigint
 }
 
@@ -24,22 +25,29 @@ export class DdcCustomerDepositsProcessor extends BaseProcessor<State> {
 
         switch (event.name) {
             case events.ddcCustomers.deposited.name: {
-                if (events.ddcCustomers.deposited.v48013.is(event)) {
-                    const decoded = events.ddcCustomers.deposited.v48013.decode(event)
-                    const accountId = decoded[0]
-                    const amount = decoded[1]
-                    await this._state.set(toCereAddress(accountId), {
-                        blockTimestamp: blockTimestamp,
-                        blockHeight: block.height,
-                        amount: amount
-                    })
-                } else if (events.ddcCustomers.deposited.v48800.is(event)) {
-                    const decoded = events.ddcCustomers.deposited.v48800.decode(event)
+                if (events.ddcCustomers.deposited.v63002.is(event)) {
+                    const decoded = events.ddcCustomers.deposited.v63002.decode(event)
                     const accountId = decoded.ownerId
                     const amount = decoded.amount
-                    await this._state.set(toCereAddress(accountId), {
+                    // Use combination of accountId and blockHeight for unique key since there's no cluster
+                    const key = `${toCereAddress(accountId)}-${block.height}`
+                    await this._state.set(key, {
                         blockTimestamp: blockTimestamp,
                         blockHeight: block.height,
+                        clusterId: '0x0000000000000000000000000000000000000000', // Default cluster for legacy events
+                        amount: amount
+                    })
+                } else if (events.ddcCustomers.deposited.v73047.is(event)) {
+                    const decoded = events.ddcCustomers.deposited.v73047.decode(event)
+                    const accountId = decoded.ownerId
+                    const clusterId = decoded.clusterId
+                    const amount = decoded.amount
+                    // Use combination of accountId, clusterId and blockHeight for unique key
+                    const key = `${toCereAddress(accountId)}-${clusterId}-${block.height}`
+                    await this._state.set(key, {
+                        blockTimestamp: blockTimestamp,
+                        blockHeight: block.height,
+                        clusterId: clusterId,
                         amount: amount
                     })
                 } else {

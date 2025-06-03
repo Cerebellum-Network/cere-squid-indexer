@@ -2,12 +2,12 @@ type Account @entity {
   id: ID!
 
   cereFreeBalance: BigInt!
-  ddcActiveBalance: BigInt!
 
   ddcBucketsUsage: [DdcCustomerUsage!]! @derivedFrom(field: "accountId")
 
   ddcCustomerDeposits: [DdcCustomerDeposit!]! @derivedFrom(field: "accountId")
   ddcCustomerCharges: [DdcCustomerCharge!]! @derivedFrom(field: "accountId")
+  ddcCustomerBalances: [DdcCustomerBalance!]! @derivedFrom(field: "accountId")
 
   ddcBuckets: [DdcBucket!] @derivedFrom(field: "ownerId")
   ddcClusters: [DdcCluster!] @derivedFrom(field: "managerId")
@@ -29,22 +29,34 @@ type DdcCustomerUsage @entity @index(fields: ["blockHeight", "accountId"]) @inde
   numberOfGets: BigInt!
 }
 
-type DdcCustomerDeposit @entity  @index(fields: ["blockTimestamp", "amount"]) {
+type DdcCustomerDeposit @entity  @index(fields: ["blockTimestamp", "amount"]) @index(fields: ["clusterId", "accountId"]) {
   id: ID!
 
   blockTimestamp: DateTime! @index
   accountId: Account! @index
+  clusterId: DdcCluster! @index
 
   amount: BigInt!
 }
 
-type DdcCustomerCharge @entity  @index(fields: ["blockTimestamp", "amount"]) {
+type DdcCustomerCharge @entity  @index(fields: ["blockTimestamp", "amount"]) @index(fields: ["clusterId", "accountId"]) {
   id: ID!
 
   blockTimestamp: DateTime! @index
   accountId: Account! @index
+  clusterId: DdcCluster! @index
 
   amount: BigInt!
+  expectedToCharge: BigInt
+}
+
+type DdcCustomerBalance @entity @index(fields: ["accountId", "clusterId"]) {
+  id: ID!
+  
+  accountId: Account! @index
+  clusterId: DdcCluster! @index
+  
+  activeBalance: BigInt!
 }
 
 type DdcCluster @entity {

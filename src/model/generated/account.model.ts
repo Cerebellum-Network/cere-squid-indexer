@@ -2,6 +2,7 @@ import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, B
 import {DdcCustomerUsage} from "./ddcCustomerUsage.model"
 import {DdcCustomerDeposit} from "./ddcCustomerDeposit.model"
 import {DdcCustomerCharge} from "./ddcCustomerCharge.model"
+import {DdcCustomerBalance} from "./ddcCustomerBalance.model"
 import {DdcBucket} from "./ddcBucket.model"
 import {DdcCluster} from "./ddcCluster.model"
 import {DdcNode} from "./ddcNode.model"
@@ -18,9 +19,6 @@ export class Account {
     @BigIntColumn_({nullable: false})
     cereFreeBalance!: bigint
 
-    @BigIntColumn_({nullable: false})
-    ddcActiveBalance!: bigint
-
     @OneToMany_(() => DdcCustomerUsage, e => e.accountId)
     ddcBucketsUsage!: DdcCustomerUsage[]
 
@@ -29,6 +27,9 @@ export class Account {
 
     @OneToMany_(() => DdcCustomerCharge, e => e.accountId)
     ddcCustomerCharges!: DdcCustomerCharge[]
+
+    @OneToMany_(() => DdcCustomerBalance, e => e.accountId)
+    ddcCustomerBalances!: DdcCustomerBalance[]
 
     @OneToMany_(() => DdcBucket, e => e.ownerId)
     ddcBuckets!: DdcBucket[]

@@ -1,13 +1,13 @@
 import {sts, Block, Bytes, Option, Result, ConstantType, RuntimeCtx} from '../support'
-import * as v48013 from '../v48013'
+import * as v63002 from '../v63002'
 
 export const palletId =  {
     /**
      *  The accounts's pallet id, used for deriving its sovereign account ID.
      */
-    v48013: new ConstantType(
+    v63002: new ConstantType(
         'DdcCustomers.PalletId',
-        v48013.PalletId
+        v63002.PalletId
     ),
 }
 
@@ -15,7 +15,7 @@ export const unlockingDelay =  {
     /**
      *  Number of eras that staked funds must remain locked for.
      */
-    v48013: new ConstantType(
+    v63002: new ConstantType(
         'DdcCustomers.UnlockingDelay',
         sts.number()
     ),

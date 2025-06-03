@@ -60,197 +60,67 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
         })
     }
 
-    private async processDdcNodesEvents(nodeId: string, block: Block, event: Event) {
-        let createdAtBlockHeight
-        if (event.name === events.ddcNodes.nodeCreated.name) {
-            createdAtBlockHeight = block.height
-        }
-
-        let nodeInfo: DdcNodeInfo | undefined
-        if (storage.ddcNodes.storageNodes.v54113.is(block)) {
-            const node = await storage.ddcNodes.storageNodes.v54113.get(block, nodeId)
+    private async processDdcNodeInfo(nodePubKey: string, block: Block) {
+        let nodeInfo
+        if (storage.ddcNodes.storageNodes.v63002.is(block)) {
+            const node = await storage.ddcNodes.storageNodes.v63002.get(block, nodePubKey)
             if (node) {
                 nodeInfo = {
-                    id: toCereAddress(node.pubKey),
-                    createdAtBlockHeight: createdAtBlockHeight,
+                    id: nodePubKey,
+                    createdAtBlockHeight: block.height,
                     providerId: node.providerId,
                     clusterId: node.clusterId,
-                    host: decodeAsciiStringFromScaleVecFixed(MaxHostLen, node.props.host as HexString),
-                    domain: decodeAsciiStringFromScaleVecFixed(MaxDomainLen, node.props.domain as HexString),
+                    host: Buffer.from(node.props.host).toString('utf8'),
+                    domain: Buffer.from(node.props.domain).toString('utf8'),
                     ssl: node.props.ssl,
                     httpPort: node.props.httpPort,
                     grpcPort: node.props.grpcPort,
                     p2pPort: node.props.p2PPort,
-                    mode: DdcNodeMode[node.props.mode.__kind],
-                    // TODO: set usage when usage mutation is implemented on the blockchain side.
+                    mode: node.props.mode.__kind as DdcNodeMode,
                 }
-            }
-        } else if (storage.ddcNodes.storageNodes.v54100.is(block)) {
-            const node = await storage.ddcNodes.storageNodes.v54100.get(block, nodeId)
-            if (node) {
-                nodeInfo = {
-                    id: toCereAddress(node.pubKey),
-                    createdAtBlockHeight: createdAtBlockHeight,
-                    providerId: node.providerId,
-                    clusterId: node.clusterId,
-                    host: decodeAsciiStringFromScaleVecFixed(MaxHostLen, node.props.host as HexString),
-                    domain: decodeAsciiStringFromScaleVecFixed(MaxDomainLen, node.props.domain as HexString),
-                    ssl: node.props.ssl,
-                    httpPort: node.props.httpPort,
-                    grpcPort: node.props.grpcPort,
-                    p2pPort: node.props.p2PPort,
-                    mode: DdcNodeMode[node.props.mode.__kind],
-                }
-            }
-        } else if (storage.ddcNodes.storageNodes.v48400.is(block)) {
-            const node = await storage.ddcNodes.storageNodes.v48400.get(block, nodeId)
-            if (node) {
-                nodeInfo = {
-                    id: toCereAddress(node.pubKey),
-                    createdAtBlockHeight: createdAtBlockHeight,
-                    providerId: node.providerId,
-                    clusterId: node.clusterId,
-                    host: decodeAsciiStringFromScaleVecFixed(MaxHostLen, node.props.host as HexString),
-                    domain: decodeAsciiStringFromScaleVecFixed(MaxDomainLen, node.props.domain as HexString),
-                    ssl: node.props.ssl,
-                    httpPort: node.props.httpPort,
-                    grpcPort: node.props.grpcPort,
-                    p2pPort: node.props.p2PPort,
-                    mode: DdcNodeMode[node.props.mode.__kind],
-                }
-            }
-        } else if (storage.ddcNodes.storageNodes.v48017.is(block)) {
-            const node = await storage.ddcNodes.storageNodes.v48017.get(block, nodeId)
-            if (node) {
-                nodeInfo = {
-                    id: toCereAddress(node.pubKey),
-                    createdAtBlockHeight: createdAtBlockHeight,
-                    providerId: node.providerId,
-                    clusterId: node.clusterId,
-                    host: decodeAsciiStringFromScaleVecFixed(MaxHostLen, node.props.host as HexString),
-                    domain: null,
-                    ssl: false,
-                    httpPort: node.props.httpPort,
-                    grpcPort: node.props.grpcPort,
-                    p2pPort: node.props.p2PPort,
-                    mode: DdcNodeMode[node.props.mode.__kind],
-                }
-            }
-        } else if (storage.ddcNodes.storageNodes.v48013.is(block)) {
-            const node = await storage.ddcNodes.storageNodes.v48013.get(block, nodeId)
-            if (node) {
-                nodeInfo = {
-                    id: toCereAddress(node.pubKey),
-                    createdAtBlockHeight: createdAtBlockHeight,
-                    providerId: node.providerId,
-                    clusterId: node.clusterId,
-                    host: decodeAsciiStringFromScaleVecFixed(MaxHostLen, node.props.host as HexString),
-                    domain: null,
-                    ssl: false,
-                    httpPort: node.props.httpPort,
-                    grpcPort: node.props.grpcPort,
-                    p2pPort: node.props.p2PPort,
-                    mode: DdcNodeMode.Storage,
-                }
-            }
-        } else if (storage.ddcNodes.storageNodes.v48008.is(block)) {
-            const node = await storage.ddcNodes.storageNodes.v48008.get(block, nodeId)
-            if (node) {
-                nodeInfo = {
-                    id: toCereAddress(node.pubKey),
-                    createdAtBlockHeight: createdAtBlockHeight,
-                    providerId: node.providerId,
-                    clusterId: node.clusterId,
-                    host: 'localhost',
-                    domain: null,
-                    ssl: false,
-                    httpPort: 8080,
-                    grpcPort: 9090,
-                    p2pPort: 9070,
-                    mode: DdcNodeMode.Storage,
-                }
+                this._state.updatedNodes.set(nodePubKey, nodeInfo)
             }
         } else {
             logUnsupportedStorageVersion('DdcNodes.StorageNodes', block)
         }
-        if (nodeInfo) {
-            nodeInfo.providerId = toCereAddress(nodeInfo.providerId)
-            this._state.updatedNodes.set(nodeId, nodeInfo)
-        } else {
-            logEmptyStorage('DdcNodes.StorageNodes', nodeId, block)
+        
+        if (!nodeInfo) {
+            logEmptyStorage('DdcNodes.StorageNodes', nodePubKey, block)
         }
     }
 
     async process(event: Event, block: Block) {
         switch (event.name) {
-            case events.ddcClusters.clusterNodeAdded.name: {
-                let decodedEvent
-                if (events.ddcClusters.clusterNodeAdded.v48008.is(event)) {
-                    decodedEvent = events.ddcClusters.clusterNodeAdded.v48008.decode(event)
-                } else if (events.ddcClusters.clusterNodeAdded.v48017.is(event)) {
-                    decodedEvent = events.ddcClusters.clusterNodeAdded.v48017.decode(event)
-                } else {
-                    logUnsupportedEventVersion(event)
-                }
-                if (decodedEvent) {
-                    const nodesInCluster = this._state.addedToCluster.get(decodedEvent.clusterId) ?? new Set<string>()
-                    nodesInCluster.add(decodedEvent.nodePubKey.value)
-                    this._state.addedToCluster.set(decodedEvent.clusterId, nodesInCluster)
-                }
-                break
-            }
-            case events.ddcClusters.clusterNodeRemoved.name: {
-                let decodedEvent
-                if (events.ddcClusters.clusterNodeRemoved.v48008.is(event)) {
-                    decodedEvent = events.ddcClusters.clusterNodeRemoved.v48008.decode(event)
-                } else if (events.ddcClusters.clusterNodeRemoved.v48017.is(event)) {
-                    decodedEvent = events.ddcClusters.clusterNodeRemoved.v48017.decode(event)
-                } else {
-                    logUnsupportedEventVersion(event)
-                }
-                if (decodedEvent) {
-                    const nodesRemovedFromCluster =
-                        this._state.removedFromCluster.get(decodedEvent.clusterId) ?? new Set<string>()
-                    nodesRemovedFromCluster.add(decodedEvent.nodePubKey.value)
-                    this._state.removedFromCluster.set(decodedEvent.clusterId, nodesRemovedFromCluster)
-                }
-                break
-            }
             case events.ddcNodes.nodeCreated.name: {
-                if (events.ddcNodes.nodeCreated.v48008.is(event)) {
-                    const nodeId = events.ddcNodes.nodeCreated.v48008.decode(event).nodePubKey.value
-                    await this.processDdcNodesEvents(nodeId, block, event)
-                } else if (events.ddcNodes.nodeCreated.v48017.is(event)) {
-                    const nodeId = events.ddcNodes.nodeCreated.v48017.decode(event).nodePubKey.value
-                    await this.processDdcNodesEvents(nodeId, block, event)
-                } else {
-                    logUnsupportedEventVersion(event)
-                }
-                break
-            }
-            case events.ddcNodes.nodeParamsChanged.name: {
-                if (events.ddcNodes.nodeParamsChanged.v48008.is(event)) {
-                    const nodeId = events.ddcNodes.nodeParamsChanged.v48008.decode(event).nodePubKey.value
-                    await this.processDdcNodesEvents(nodeId, block, event)
-                } else if (events.ddcNodes.nodeParamsChanged.v48017.is(event)) {
-                    const nodeId = events.ddcNodes.nodeParamsChanged.v48017.decode(event).nodePubKey.value
-                    await this.processDdcNodesEvents(nodeId, block, event)
+                if (events.ddcNodes.nodeCreated.v63002.is(event)) {
+                    const decoded = events.ddcNodes.nodeCreated.v63002.decode(event)
+                    const nodeKey = decoded.nodePubKey
+                    const nodePubKey = nodeKey.__kind === 'StoragePubKey' ? toCereAddress(nodeKey.value) : nodeKey.toString()
+                    await this.processDdcNodeInfo(nodePubKey, block)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
                 break
             }
             case events.ddcNodes.nodeDeleted.name: {
-                let removedNode
-                if (events.ddcNodes.nodeDeleted.v48008.is(event)) {
-                    removedNode = events.ddcNodes.nodeDeleted.v48008.decode(event).nodePubKey.value
-                } else if (events.ddcNodes.nodeDeleted.v48017.is(event)) {
-                    removedNode = events.ddcNodes.nodeDeleted.v48017.decode(event).nodePubKey.value
+                if (events.ddcNodes.nodeDeleted.v63002.is(event)) {
+                    const decoded = events.ddcNodes.nodeDeleted.v63002.decode(event)
+                    const nodeKey = decoded.nodePubKey
+                    const nodePubKey = nodeKey.__kind === 'StoragePubKey' ? toCereAddress(nodeKey.value) : nodeKey.toString()
+                    this._state.removedNodes.add(nodePubKey)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
-                if (removedNode) {
-                    this._state.removedNodes.add(removedNode)
+                break
+            }
+            case events.ddcNodes.nodeParamsChanged.name: {
+                if (events.ddcNodes.nodeParamsChanged.v63002.is(event)) {
+                    const decoded = events.ddcNodes.nodeParamsChanged.v63002.decode(event)
+                    const nodeKey = decoded.nodePubKey
+                    const nodePubKey = nodeKey.__kind === 'StoragePubKey' ? toCereAddress(nodeKey.value) : nodeKey.toString()
+                    await this.processDdcNodeInfo(nodePubKey, block)
+                } else {
+                    logUnsupportedEventVersion(event)
                 }
                 break
             }

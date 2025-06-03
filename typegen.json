@@ -1,6 +1,6 @@
 {
   "outDir": "src/types",
-  "specVersions": "specs/devnet-0-5190450.jsonl",
+  "specVersions": "specs/devnet-full.jsonl",
   "typesBundle": "specs/cere-types-bundle.json",
   "pallets": {
     "Balances": {

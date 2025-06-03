@@ -9,7 +9,9 @@ export interface DdcCustomerCharge {
     blockHeight?: number
     blockTimestamp?: Date
 
+    clusterId: string
     amount: bigint
+    expectedToCharge?: bigint
 }
 
 type State = Map<string, DdcCustomerCharge>
@@ -24,25 +26,34 @@ export class DdcCustomerChargesProcessor extends BaseProcessor<State> {
 
         switch (event.name) {
             case events.ddcCustomers.charged.name: {
-                if (events.ddcCustomers.charged.v48013.is(event)) {
-                    // unsupported version, just skip
-                } else if (events.ddcCustomers.charged.v48014.is(event)) {
-                    const decoded = events.ddcCustomers.charged.v48014.decode(event)
-                    const accountId = decoded[0]
-                    const amount = decoded[1]
-                    await this._state.set(toCereAddress(accountId), {
-                        blockTimestamp: blockTimestamp,
-                        blockHeight: block.height,
-                        amount: amount
-                    })
-                } else if (events.ddcCustomers.charged.v48800.is(event)) {
-                    const decoded = events.ddcCustomers.charged.v48800.decode(event)
+                if (events.ddcCustomers.charged.v63002.is(event)) {
+                    const decoded = events.ddcCustomers.charged.v63002.decode(event)
                     const accountId = decoded.ownerId
                     const amount = decoded.charged
-                    await this._state.set(toCereAddress(accountId), {
+                    const expectedToCharge = decoded.expectedToCharge
+                    // Use combination of accountId and blockHeight for unique key since there's no cluster
+                    const key = `${toCereAddress(accountId)}-${block.height}`
+                    await this._state.set(key, {
                         blockTimestamp: blockTimestamp,
                         blockHeight: block.height,
-                        amount: amount
+                        clusterId: '0x0000000000000000000000000000000000000000', // Default cluster for legacy events
+                        amount: amount,
+                        expectedToCharge: expectedToCharge
+                    })
+                } else if (events.ddcCustomers.charged.v73047.is(event)) {
+                    const decoded = events.ddcCustomers.charged.v73047.decode(event)
+                    const accountId = decoded.ownerId
+                    const clusterId = decoded.clusterId
+                    const amount = decoded.charged
+                    const expectedToCharge = decoded.expectedToCharge
+                    // Use combination of accountId, clusterId and blockHeight for unique key
+                    const key = `${toCereAddress(accountId)}-${clusterId}-${block.height}`
+                    await this._state.set(key, {
+                        blockTimestamp: blockTimestamp,
+                        blockHeight: block.height,
+                        clusterId: clusterId,
+                        amount: amount,
+                        expectedToCharge: expectedToCharge
                     })
                 } else {
                     logUnsupportedEventVersion(event)

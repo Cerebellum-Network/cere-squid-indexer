@@ -11,76 +11,86 @@ export class DdcBalancesProcessor extends BaseProcessor<State> {
         super(new Map<string, bigint>())
     }
 
-    private async processDdcCustomersBalancesEvents(accountId: string, block: Block) {
+    private async processDdcCustomersBalancesEvents(accountId: string, block: Block, clusterId?: string) {
         let accountInStorage
-        if (storage.ddcCustomers.ledger.v48013.is(block)) {
-            accountInStorage = await storage.ddcCustomers.ledger.v48013.get(block, accountId)
+        
+        if (clusterId && storage.ddcCustomers.clusterLedger.v73047.is(block)) {
+            // Use new clusterLedger storage for v73047+
+            accountInStorage = await storage.ddcCustomers.clusterLedger.v73047.get(block, clusterId, accountId)
+        } else if (storage.ddcCustomers.ledger.v63002.is(block)) {
+            // Use old ledger storage for older versions
+            accountInStorage = await storage.ddcCustomers.ledger.v63002.get(block, accountId)
         } else {
-            logUnsupportedStorageVersion('DdcCustomers.Ledger', block)
+            logUnsupportedStorageVersion('DdcCustomers.Ledger/ClusterLedger', block)
+            return
         }
+        
         if (accountInStorage) {
-            this._state.set(toCereAddress(accountId), accountInStorage.active)
+            // Create unique key for account+cluster combination
+            const stateKey = clusterId ? `${toCereAddress(accountId)}-${clusterId}` : toCereAddress(accountId)
+            this._state.set(stateKey, accountInStorage.active)
         } else {
-            logEmptyStorage('DdcCustomers.Ledger', accountId, block)
+            logEmptyStorage('DdcCustomers.Ledger/ClusterLedger', accountId, block)
         }
     }
 
     async process(event: Event, block: Block) {
         switch (event.name) {
             case events.ddcCustomers.deposited.name: {
-                if (events.ddcCustomers.deposited.v48013.is(event)) {
-                    const accountId = events.ddcCustomers.deposited.v48013.decode(event)[0]
+                if (events.ddcCustomers.deposited.v63002.is(event)) {
+                    const decoded = events.ddcCustomers.deposited.v63002.decode(event)
+                    const accountId = decoded.ownerId
                     await this.processDdcCustomersBalancesEvents(accountId, block)
-                } else if (events.ddcCustomers.deposited.v48800.is(event)) {
-                    const accountId = events.ddcCustomers.deposited.v48800.decode(event).ownerId
-                    await this.processDdcCustomersBalancesEvents(accountId, block)
-                } else {
-                    logUnsupportedEventVersion(event)
-                }
-                break
-            }
-            case events.ddcCustomers.initiatDepositUnlock.name: {
-                if (events.ddcCustomers.initiatDepositUnlock.v48013.is(event)) {
-                    const accountId = events.ddcCustomers.initiatDepositUnlock.v48013.decode(event)[0]
-                    await this.processDdcCustomersBalancesEvents(accountId, block)
-                } else {
-                    logUnsupportedEventVersion(event)
-                }
-                break
-            }
-            case events.ddcCustomers.withdrawn.name: {
-                if (events.ddcCustomers.withdrawn.v48013.is(event)) {
-                    const accountId = events.ddcCustomers.withdrawn.v48013.decode(event)[0]
-                    await this.processDdcCustomersBalancesEvents(accountId, block)
-                } else if (events.ddcCustomers.withdrawn.v48800.is(event)) {
-                    const accountId = events.ddcCustomers.withdrawn.v48800.decode(event).ownerId
-                    await this.processDdcCustomersBalancesEvents(accountId, block)
-                } else {
-                    logUnsupportedEventVersion(event)
-                }
-                break
-            }
-            case events.ddcCustomers.charged.name: {
-                if (events.ddcCustomers.charged.v48013.is(event)) {
-                    // unsupported version, just skip
-                } else if (events.ddcCustomers.charged.v48014.is(event)) {
-                    const accountId = events.ddcCustomers.charged.v48014.decode(event)[0]
-                    await this.processDdcCustomersBalancesEvents(accountId, block)
-                } else if (events.ddcCustomers.charged.v48800.is(event)) {
-                    const accountId = events.ddcCustomers.charged.v48800.decode(event).ownerId
-                    await this.processDdcCustomersBalancesEvents(accountId, block)
+                } else if (events.ddcCustomers.deposited.v73047.is(event)) {
+                    const decoded = events.ddcCustomers.deposited.v73047.decode(event)
+                    const accountId = decoded.ownerId
+                    const clusterId = decoded.clusterId
+                    await this.processDdcCustomersBalancesEvents(accountId, block, clusterId)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
                 break
             }
             case events.ddcCustomers.initialDepositUnlock.name: {
-                if (events.ddcCustomers.initialDepositUnlock.v48014.is(event)) {
-                    const accountId = events.ddcCustomers.initialDepositUnlock.v48014.decode(event)[0]
+                if (events.ddcCustomers.initialDepositUnlock.v63002.is(event)) {
+                    const decoded = events.ddcCustomers.initialDepositUnlock.v63002.decode(event)
+                    const accountId = decoded.ownerId
                     await this.processDdcCustomersBalancesEvents(accountId, block)
-                } else if (events.ddcCustomers.initialDepositUnlock.v48800.is(event)) {
-                    const accountId = events.ddcCustomers.initialDepositUnlock.v48800.decode(event).ownerId
+                } else if (events.ddcCustomers.initialDepositUnlock.v73047.is(event)) {
+                    const decoded = events.ddcCustomers.initialDepositUnlock.v73047.decode(event)
+                    const accountId = decoded.ownerId
+                    const clusterId = decoded.clusterId
+                    await this.processDdcCustomersBalancesEvents(accountId, block, clusterId)
+                } else {
+                    logUnsupportedEventVersion(event)
+                }
+                break
+            }
+            case events.ddcCustomers.withdrawn.name: {
+                if (events.ddcCustomers.withdrawn.v63002.is(event)) {
+                    const decoded = events.ddcCustomers.withdrawn.v63002.decode(event)
+                    const accountId = decoded.ownerId
                     await this.processDdcCustomersBalancesEvents(accountId, block)
+                } else if (events.ddcCustomers.withdrawn.v73047.is(event)) {
+                    const decoded = events.ddcCustomers.withdrawn.v73047.decode(event)
+                    const accountId = decoded.ownerId
+                    const clusterId = decoded.clusterId
+                    await this.processDdcCustomersBalancesEvents(accountId, block, clusterId)
+                } else {
+                    logUnsupportedEventVersion(event)
+                }
+                break
+            }
+            case events.ddcCustomers.charged.name: {
+                if (events.ddcCustomers.charged.v63002.is(event)) {
+                    const decoded = events.ddcCustomers.charged.v63002.decode(event)
+                    const accountId = decoded.ownerId
+                    await this.processDdcCustomersBalancesEvents(accountId, block)
+                } else if (events.ddcCustomers.charged.v73047.is(event)) {
+                    const decoded = events.ddcCustomers.charged.v73047.decode(event)
+                    const accountId = decoded.ownerId
+                    const clusterId = decoded.clusterId
+                    await this.processDdcCustomersBalancesEvents(accountId, block, clusterId)
                 } else {
                     logUnsupportedEventVersion(event)
                 }

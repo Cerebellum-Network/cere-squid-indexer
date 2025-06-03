@@ -8,7 +8,8 @@ import {
     DdcCluster,
     DdcNode,
     DdcCustomerDeposit,
-    DdcCustomerCharge
+    DdcCustomerCharge,
+    DdcCustomerBalance
 } from './model'
 import { CereBalancesProcessor } from './processors/cereBalancesProcessor'
 import { DdcBalancesProcessor } from './processors/ddcBalancesProcessor'
@@ -59,7 +60,7 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     const ddcCustomerDeposits = ddcCustomerDepositsProcessor.state
     const ddcCustomerCharges = ddcCustomerChargesProcessor.state
 
-    // create missing accounts
+    // Create missing accounts - now include accounts from DDC balances
     const accounts = new Map<string, Account>()
 
     async function createAccounts(source: string[]) {
@@ -76,7 +77,6 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
                     new Account({
                         id: id,
                         cereFreeBalance: 0n,
-                        ddcActiveBalance: 0n,
                     }),
                 )
             }
@@ -84,7 +84,13 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     }
 
     await createAccounts([...accountToCereBalance.keys()])
-    await createAccounts([...accountToDdcBalance.keys()])
+    
+    // Extract account IDs from DDC balance keys (which may include cluster info)
+    const ddcBalanceAccountIds = [...accountToDdcBalance.keys()].map(key => {
+        // Key format can be "accountId" or "accountId-clusterId"
+        return key.split('-')[0] // Always take the first part as account ID
+    })
+    await createAccounts(ddcBalanceAccountIds)
 
     const ddcClusterAccounts = [...ddcClusters.values()].map((c) => c.managerId)
     await createAccounts(ddcClusterAccounts)
@@ -101,13 +107,8 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
         account.cereFreeBalance = balance
         accounts.set(id, account)
     })
-    // update DDC balances
-    accountToDdcBalance.forEach((balance, id) => {
-        const account = assertNotNull(accounts.get(id))
-        account.ddcActiveBalance = balance
-        accounts.set(id, account)
-    })
-    // persist accounts
+    
+    // persist accounts first
     await ctx.store.upsert([...accounts.values()])
 
     // map DDC Clusters to entities
@@ -138,13 +139,35 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     // persist DDC Clusters
     await ctx.store.upsert(ddcClusterEntities)
 
-    // Find clusters for nodes and buckets mapping
+    // Find clusters for nodes, buckets, deposits, charges and balances mapping
     const clusterIdsToFind: Set<String> = new Set<String>()
     ddcNodes.addedToCluster.forEach((_, clusterId) => {
         clusterIdsToFind.add(clusterId)
     })
     ddcBuckets.forEach((bucket) => {
         clusterIdsToFind.add(bucket.clusterId)
+    })
+    // Add cluster IDs from deposits and charges
+    ddcCustomerDeposits.forEach((deposit) => {
+        if (deposit.clusterId !== '0x0000000000000000000000000000000000000000') {
+            clusterIdsToFind.add(deposit.clusterId)
+        }
+    })
+    ddcCustomerCharges.forEach((charge) => {
+        if (charge.clusterId !== '0x0000000000000000000000000000000000000000') {
+            clusterIdsToFind.add(charge.clusterId)
+        }
+    })
+    // Add cluster IDs from DDC balances
+    accountToDdcBalance.forEach((_, key) => {
+        const keyParts = key.split('-')
+        if (keyParts.length > 1) {
+            // Has cluster ID in the key
+            const clusterId = keyParts.slice(1).join('-') // Rejoin in case cluster ID has dashes
+            if (clusterId !== '0x0000000000000000000000000000000000000000') {
+                clusterIdsToFind.add(clusterId)
+            }
+        }
     })
 
     const existingClusters = await ctx.store.findBy(DdcCluster, {
@@ -154,6 +177,63 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     existingClusters.forEach((c) => {
         ddcClustersMap.set(c.id, c)
     })
+    
+    // Add default cluster if needed for legacy events
+    if (!ddcClustersMap.has('0x0000000000000000000000000000000000000000')) {
+        const defaultCluster = new DdcCluster({
+            id: '0x0000000000000000000000000000000000000000',
+            createdAtBlockHeight: 0,
+            managerId: accounts.get('5C4hrfjw9DjXZTzV3MwzrrAr9P1MJhSrvWGWqi1eSuyUpnhM') || accounts.values().next().value, // Use first account as manager for default cluster
+            treasuryShare: 0n,
+            validatorsShare: 0n,
+            clusterReserveShare: 0n,
+            storageBondSize: 0n,
+            storageChillDelay: 0,
+            storageUnbondingDelay: 0,
+            unitPerMbStored: 0n,
+            unitPerMbStreamed: 0n,
+            unitPerPutRequest: 0n,
+            unitPerGetRequest: 0n,
+            erasureCodingRequired: 0,
+            erasureCodingTotal: 0,
+            replicationTotal: 0,
+            status: 'Activated' as any
+        })
+        ddcClustersMap.set('0x0000000000000000000000000000000000000000', defaultCluster)
+        await ctx.store.upsert([defaultCluster])
+    }
+
+    // Create DDC Customer Balance entities
+    const ddcCustomerBalanceEntities: DdcCustomerBalance[] = []
+    accountToDdcBalance.forEach((balance, key) => {
+        const keyParts = key.split('-')
+        let accountId: string
+        let clusterId: string
+        
+        if (keyParts.length === 1) {
+            // Legacy format: just accountId
+            accountId = keyParts[0]
+            clusterId = '0x0000000000000000000000000000000000000000'
+        } else {
+            // New format: accountId-clusterId
+            accountId = keyParts[0]
+            clusterId = keyParts.slice(1).join('-') // Rejoin in case cluster ID has dashes
+        }
+        
+        const cluster = ddcClustersMap.get(clusterId)
+        if (!cluster) {
+            logger.warn(`No DDC cluster with id ${clusterId} found. Skipping balance for persistence`)
+            return
+        }
+        
+        ddcCustomerBalanceEntities.push(new DdcCustomerBalance({
+            id: key,
+            accountId: accounts.get(accountId),
+            clusterId: cluster,
+            activeBalance: balance
+        }))
+    })
+    await ctx.store.upsert(ddcCustomerBalanceEntities)
 
     // Find existing DDC Nodes
     const allModifiedDdcNodes = new Set<string>()
@@ -299,10 +379,28 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     await ctx.store.insert(Array.from(ddcCustomerUsageEntities.values()))
 
     const ddcCustomerDepositEntities: DdcCustomerDeposit[] = []
-    ddcCustomerDeposits.forEach((deposit, accountId) => {
+    ddcCustomerDeposits.forEach((deposit, depositKey) => {
+        // Extract account ID from the key (format: accountId-clusterId-blockHeight or accountId-blockHeight)
+        const keyParts = depositKey.split('-')
+        let accountId: string
+        if (keyParts.length === 3) {
+            // New format: accountId-clusterId-blockHeight
+            accountId = keyParts[0]
+        } else {
+            // Legacy format: accountId-blockHeight
+            accountId = keyParts.slice(0, -1).join('-') // Join all parts except the last one (blockHeight)
+        }
+        
+        const cluster = ddcClustersMap.get(deposit.clusterId)
+        if (!cluster) {
+            logger.warn(`No DDC cluster with id ${deposit.clusterId} found. Skipping deposit for persistence`)
+            return
+        }
+        
         ddcCustomerDepositEntities.push(new DdcCustomerDeposit({
-            id: `${deposit.blockHeight}-${accountId}`,
+            id: depositKey,
             accountId: accounts.get(accountId),
+            clusterId: cluster,
             blockTimestamp: deposit.blockTimestamp,
             amount: deposit.amount
         }))
@@ -310,12 +408,31 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     await ctx.store.insert(ddcCustomerDepositEntities)
 
     const ddcCustomerChargeEntities: DdcCustomerCharge[] = []
-    ddcCustomerCharges.forEach((charge, accountId) => {
+    ddcCustomerCharges.forEach((charge, chargeKey) => {
+        // Extract account ID from the key (format: accountId-clusterId-blockHeight or accountId-blockHeight)
+        const keyParts = chargeKey.split('-')
+        let accountId: string
+        if (keyParts.length === 3) {
+            // New format: accountId-clusterId-blockHeight
+            accountId = keyParts[0]
+        } else {
+            // Legacy format: accountId-blockHeight
+            accountId = keyParts.slice(0, -1).join('-') // Join all parts except the last one (blockHeight)
+        }
+        
+        const cluster = ddcClustersMap.get(charge.clusterId)
+        if (!cluster) {
+            logger.warn(`No DDC cluster with id ${charge.clusterId} found. Skipping charge for persistence`)
+            return
+        }
+        
         ddcCustomerChargeEntities.push(new DdcCustomerCharge({
-            id: `${charge.blockHeight}-${accountId}`,
+            id: chargeKey,
             accountId: accounts.get(accountId),
+            clusterId: cluster,
             blockTimestamp: charge.blockTimestamp,
-            amount: charge.amount
+            amount: charge.amount,
+            expectedToCharge: charge.expectedToCharge
         }))
     })
     await ctx.store.insert(ddcCustomerChargeEntities)
