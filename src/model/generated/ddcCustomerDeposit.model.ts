@@ -24,12 +24,4 @@ export class DdcCustomerDeposit {
     @Index_()
     @StringColumn_({nullable: true})
     clusterId!: string | undefined | null
-
-    @Index_()
-    @ManyToOne_(() => Account, {nullable: true})
-    fromAccountId!: Account | undefined | null
-
-    @Index_()
-    @ManyToOne_(() => Account, {nullable: true})
-    toAccountId!: Account | undefined | null
 }

@@ -35,7 +35,7 @@ export const UnlockChunk: sts.Type<UnlockChunk> = sts.struct(() => {
 })
 
 // DdcCustomers Events with cluster_id support
-export type DdcCustomersEvent = DdcCustomersEvent_BucketCreated | DdcCustomersEvent_BucketRemoved | DdcCustomersEvent_BucketTotalCustomersUsageUpdated | DdcCustomersEvent_BucketTotalNodesUsageUpdated | DdcCustomersEvent_BucketUpdated | DdcCustomersEvent_Charged | DdcCustomersEvent_Deposited | DdcCustomersEvent_DepositedFor | DdcCustomersEvent_InitialDepositUnlock | DdcCustomersEvent_Withdrawn
+export type DdcCustomersEvent = DdcCustomersEvent_BucketCreated | DdcCustomersEvent_BucketRemoved | DdcCustomersEvent_BucketTotalCustomersUsageUpdated | DdcCustomersEvent_BucketTotalNodesUsageUpdated | DdcCustomersEvent_BucketUpdated | DdcCustomersEvent_Charged | DdcCustomersEvent_Deposited | DdcCustomersEvent_InitialDepositUnlock | DdcCustomersEvent_Withdrawn
 
 export interface DdcCustomersEvent_BucketCreated {
     __kind: 'BucketCreated'
@@ -69,13 +69,6 @@ export interface DdcCustomersEvent_Charged {
  */
 export interface DdcCustomersEvent_Deposited {
     __kind: 'Deposited'
-}
-
-/**
- * An account has deposited this amount for another account to a specific cluster. [cluster_id, from, to, amount]
- */
-export interface DdcCustomersEvent_DepositedFor {
-    __kind: 'DepositedFor'
 }
 
 /**
@@ -131,12 +124,6 @@ export const DdcCustomersEvent: sts.Type<DdcCustomersEvent> = sts.closedEnum(() 
         Deposited: sts.struct({
             clusterId: H160,
             ownerId: AccountId32,
-            amount: sts.bigint(),
-        }),
-        DepositedFor: sts.struct({
-            clusterId: H160,
-            from: AccountId32,
-            to: AccountId32,
             amount: sts.bigint(),
         }),
         InitialDepositUnlock: sts.struct({

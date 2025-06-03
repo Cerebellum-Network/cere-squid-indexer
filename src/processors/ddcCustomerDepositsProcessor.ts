@@ -10,9 +10,8 @@ export interface DdcCustomerDeposit {
     blockTimestamp: Date
     amount: bigint
     clusterId?: string
-    // For DepositedFor events
-    from?: string
-    to?: string
+    // Owner of the deposit
+    ownerId: string
 }
 
 type State = Map<string, DdcCustomerDeposit>
@@ -35,6 +34,7 @@ export class DdcCustomerDepositsProcessor extends BaseProcessor<State> {
                         blockTimestamp: blockTimestamp,
                         amount: decoded.amount,
                         clusterId: decoded.clusterId,
+                        ownerId: decoded.ownerId,
                     })
                 } else if (events.ddcCustomers.deposited.v48013.is(event)) {
                     const decoded = events.ddcCustomers.deposited.v48013.decode(event)
@@ -44,6 +44,7 @@ export class DdcCustomerDepositsProcessor extends BaseProcessor<State> {
                         blockHeight: block.height,
                         blockTimestamp: blockTimestamp,
                         amount: amount,
+                        ownerId: accountId,
                     })
                 } else if (events.ddcCustomers.deposited.v48800.is(event)) {
                     const decoded = events.ddcCustomers.deposited.v48800.decode(event)
@@ -51,26 +52,25 @@ export class DdcCustomerDepositsProcessor extends BaseProcessor<State> {
                         blockHeight: block.height,
                         blockTimestamp: blockTimestamp,
                         amount: decoded.amount,
+                        ownerId: decoded.ownerId,
                     })
                 } else {
-                    logUnsupportedEventVersion(event)
-                }
-                break
-            }
-            case events.ddcCustomers.depositedFor.name: {
-                if (events.ddcCustomers.depositedFor.v54114.is(event)) {
-                    const decoded = events.ddcCustomers.depositedFor.v54114.decode(event)
-                    const key = `${decoded.clusterId}-${decoded.to}-depositedFor`
-                    this._state.set(key, {
-                        blockHeight: block.height,
-                        blockTimestamp: blockTimestamp,
-                        amount: decoded.amount,
-                        clusterId: decoded.clusterId,
-                        from: decoded.from,
-                        to: decoded.to,
-                    })
-                } else {
-                    logUnsupportedEventVersion(event)
+                    // Fallback: Try to decode as latest known version (v54114)
+                    try {
+                        const decoded = events.ddcCustomers.deposited.v54114.decode(event)
+                        const key = `${decoded.clusterId}-${decoded.ownerId}`
+                        this._state.set(key, {
+                            blockHeight: block.height,
+                            blockTimestamp: blockTimestamp,
+                            amount: decoded.amount,
+                            clusterId: decoded.clusterId,
+                            ownerId: decoded.ownerId,
+                        })
+                        console.warn(`Using fallback decoding for deposited event in block ${block.height}. Consider updating types for newer version.`)
+                    } catch (error) {
+                        logUnsupportedEventVersion(event)
+                        console.error(`Failed to decode deposited event in block ${block.height}:`, error)
+                    }
                 }
                 break
             }

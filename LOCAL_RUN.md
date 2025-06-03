@@ -482,7 +482,7 @@ SQD_CAPACITY=5
 This indexer supports new blockchain v54114 features:
 
 1. **Cluster-based balances**: Each account can have different balances in different clusters
-2. **DepositedFor events**: Support for deposits from one account for another
+2. **Deposited Events**: Deposit Processing with Cluster Support
 3. **Backward compatibility**: Support for old event and storage versions
 
 ### Testing New Features

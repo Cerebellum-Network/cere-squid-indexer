@@ -46,22 +46,6 @@ export const deposited =  {
     ),
 }
 
-export const depositedFor =  {
-    name: 'DdcCustomers.DepositedFor',
-    /**
-     * An account has deposited this amount for another account to a specific cluster. \[cluster_id, from, to, amount\]
-     */
-    v54114: new EventType(
-        'DdcCustomers.DepositedFor',
-        sts.struct({
-            clusterId: v54114.H160,
-            from: v54114.AccountId32,
-            to: v54114.AccountId32,
-            amount: sts.bigint(),
-        })
-    ),
-}
-
 export const initiatDepositUnlock =  {
     name: 'DdcCustomers.InitiatDepositUnlock',
     /**

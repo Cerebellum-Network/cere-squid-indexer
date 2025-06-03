@@ -321,11 +321,7 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
         let clusterId: string | undefined
 
         if (parts.length > 1 && parts[1].length === 42) {
-            // Format: accountId-clusterId
-            accountId = parts[0]
-            clusterId = parts[1]
-        } else if (key.endsWith('-depositedFor')) {
-            // Format: clusterId-accountId-depositedFor
+            // Format: clusterId-accountId
             clusterId = parts[0]
             accountId = parts[1]
         } else {
@@ -346,16 +342,6 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
             amount: deposit.amount,
             clusterId: clusterId,
         })
-
-        // Handle DepositedFor events
-        if (deposit.from && deposit.to) {
-            const fromAccount = accounts.get(deposit.from)
-            const toAccount = accounts.get(deposit.to)
-            if (fromAccount && toAccount) {
-                depositEntity.fromAccountId = fromAccount
-                depositEntity.toAccountId = toAccount
-            }
-        }
 
         ddcCustomerDepositEntities.push(depositEntity)
     })

@@ -51,17 +51,16 @@ export class DdcBalancesProcessor extends BaseProcessor<State> {
                     const accountId = events.ddcCustomers.deposited.v48800.decode(event).ownerId
                     await this.processDdcCustomersBalancesEvents(accountId, block, undefined)
                 } else {
-                    logUnsupportedEventVersion(event)
-                }
-                break
-            }
-            case events.ddcCustomers.depositedFor.name: {
-                if (events.ddcCustomers.depositedFor.v54114.is(event)) {
-                    const decoded = events.ddcCustomers.depositedFor.v54114.decode(event)
-                    // Process balance update for the target account
-                    await this.processDdcCustomersBalancesEvents(decoded.to, block, decoded.clusterId)
-                } else {
-                    logUnsupportedEventVersion(event)
+                    // Fallback: Try to decode as latest known version (v54114)
+                    // This handles newer versions that might have the same structure
+                    try {
+                        const decoded = events.ddcCustomers.deposited.v54114.decode(event)
+                        await this.processDdcCustomersBalancesEvents(decoded.ownerId, block, decoded.clusterId)
+                        console.warn(`Using fallback decoding for deposited event in block ${block.height}. Consider updating types for newer version.`)
+                    } catch (error) {
+                        logUnsupportedEventVersion(event)
+                        console.error(`Failed to decode deposited event in block ${block.height}:`, error)
+                    }
                 }
                 break
             }
