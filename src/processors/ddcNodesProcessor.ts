@@ -94,8 +94,15 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
             case events.ddcNodes.nodeCreated.name: {
                 if (events.ddcNodes.nodeCreated.v63002.is(event)) {
                     const decoded = events.ddcNodes.nodeCreated.v63002.decode(event)
-                    const nodeKey = decoded.nodePubKey
-                    const nodePubKey = nodeKey.__kind === 'StoragePubKey' ? toCereAddress(nodeKey.value) : nodeKey.toString()
+                    const nodePubKey = decoded.nodePubKey.toString()
+                    await this.processDdcNodeInfo(nodePubKey, block)
+                } else if (events.ddcNodes.nodeCreated.v54100.is(event)) {
+                    const decoded = events.ddcNodes.nodeCreated.v54100.decode(event)
+                    const nodePubKey = decoded.nodePubKey.toString()
+                    await this.processDdcNodeInfo(nodePubKey, block)
+                } else if (events.ddcNodes.nodeCreated.v48013.is(event)) {
+                    const decoded = events.ddcNodes.nodeCreated.v48013.decode(event)
+                    const nodePubKey = decoded.nodePubKey.toString()
                     await this.processDdcNodeInfo(nodePubKey, block)
                 } else {
                     logUnsupportedEventVersion(event)
@@ -105,8 +112,15 @@ export class DdcNodesProcessor extends BaseProcessor<State> {
             case events.ddcNodes.nodeDeleted.name: {
                 if (events.ddcNodes.nodeDeleted.v63002.is(event)) {
                     const decoded = events.ddcNodes.nodeDeleted.v63002.decode(event)
-                    const nodeKey = decoded.nodePubKey
-                    const nodePubKey = nodeKey.__kind === 'StoragePubKey' ? toCereAddress(nodeKey.value) : nodeKey.toString()
+                    const nodePubKey = decoded.nodePubKey.toString()
+                    this._state.removedNodes.add(nodePubKey)
+                } else if (events.ddcNodes.nodeDeleted.v54100.is(event)) {
+                    const decoded = events.ddcNodes.nodeDeleted.v54100.decode(event)
+                    const nodePubKey = decoded.nodePubKey.toString()
+                    this._state.removedNodes.add(nodePubKey)
+                } else if (events.ddcNodes.nodeDeleted.v48013.is(event)) {
+                    const decoded = events.ddcNodes.nodeDeleted.v48013.decode(event)
+                    const nodePubKey = decoded.nodePubKey.toString()
                     this._state.removedNodes.add(nodePubKey)
                 } else {
                     logUnsupportedEventVersion(event)

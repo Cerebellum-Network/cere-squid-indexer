@@ -39,6 +39,10 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
             bucket = await storage.ddcCustomers.buckets.v73047.get(block, bucketId)
         } else if (storage.ddcCustomers.buckets.v63002.is(block)) {
             bucket = await storage.ddcCustomers.buckets.v63002.get(block, bucketId)
+        } else if (storage.ddcCustomers.buckets.v54100.is(block)) {
+            bucket = await storage.ddcCustomers.buckets.v54100.get(block, bucketId)
+        } else if (storage.ddcCustomers.buckets.v48013.is(block)) {
+            bucket = await storage.ddcCustomers.buckets.v48013.get(block, bucketId)
         } else {
             logUnsupportedStorageVersion('DdcCustomers.Buckets', block)
         }
@@ -49,7 +53,7 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
                 createdAtBlockHeight: block.height,
                 createdAtBlockTimestamp: new Date(assertNotNull(block.timestamp, `Block ${block.height} timestamp is not set`)),
                 ownerId: toCereAddress(bucket.ownerId),
-                clusterId: bucket.clusterId,
+                clusterId: bucket.clusterId || '0x0000000000000000000000000000000000000000', // Default cluster for legacy buckets
                 isPublic: bucket.isPublic,
                 isRemoved: bucket.isRemoved,
             }
@@ -66,6 +70,14 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
                     const decoded = events.ddcCustomers.bucketCreated.v63002.decode(event)
                     const bucketId = decoded.bucketId
                     await this.processBucketInfo(bucketId, block)
+                } else if (events.ddcCustomers.bucketCreated.v54100.is(event)) {
+                    const decoded = events.ddcCustomers.bucketCreated.v54100.decode(event)
+                    const bucketId = decoded.bucketId
+                    await this.processBucketInfo(bucketId, block)
+                } else if (events.ddcCustomers.bucketCreated.v48013.is(event)) {
+                    const decoded = events.ddcCustomers.bucketCreated.v48013.decode(event)
+                    const bucketId = decoded.bucketId
+                    await this.processBucketInfo(bucketId, block)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
@@ -74,6 +86,14 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
             case events.ddcCustomers.bucketUpdated.name: {
                 if (events.ddcCustomers.bucketUpdated.v63002.is(event)) {
                     const decoded = events.ddcCustomers.bucketUpdated.v63002.decode(event)
+                    const bucketId = decoded.bucketId
+                    await this.processBucketInfo(bucketId, block)
+                } else if (events.ddcCustomers.bucketUpdated.v54100.is(event)) {
+                    const decoded = events.ddcCustomers.bucketUpdated.v54100.decode(event)
+                    const bucketId = decoded.bucketId
+                    await this.processBucketInfo(bucketId, block)
+                } else if (events.ddcCustomers.bucketUpdated.v48013.is(event)) {
+                    const decoded = events.ddcCustomers.bucketUpdated.v48013.decode(event)
                     const bucketId = decoded.bucketId
                     await this.processBucketInfo(bucketId, block)
                 } else {
@@ -88,6 +108,14 @@ export class DdcBucketsProcessor extends BaseProcessor<State> {
                     await this.processBucketInfo(bucketId, block)
                 } else if (events.ddcCustomers.bucketRemoved.v73047.is(event)) {
                     const decoded = events.ddcCustomers.bucketRemoved.v73047.decode(event)
+                    const bucketId = decoded.bucketId
+                    await this.processBucketInfo(bucketId, block)
+                } else if (events.ddcCustomers.bucketRemoved.v54100.is(event)) {
+                    const decoded = events.ddcCustomers.bucketRemoved.v54100.decode(event)
+                    const bucketId = decoded.bucketId
+                    await this.processBucketInfo(bucketId, block)
+                } else if (events.ddcCustomers.bucketRemoved.v48013.is(event)) {
+                    const decoded = events.ddcCustomers.bucketRemoved.v48013.decode(event)
                     const bucketId = decoded.bucketId
                     await this.processBucketInfo(bucketId, block)
                 } else {

@@ -125,6 +125,14 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
                     const decoded = events.ddcClusters.clusterCreated.v63002.decode(event)
                     const clusterId = decoded.clusterId
                     await this.processDdcClustersEvents(clusterId, block)
+                } else if (events.ddcClusters.clusterCreated.v54100.is(event)) {
+                    const decoded = events.ddcClusters.clusterCreated.v54100.decode(event)
+                    const clusterId = decoded.clusterId
+                    await this.processDdcClustersEvents(clusterId, block)
+                } else if (events.ddcClusters.clusterCreated.v48013.is(event)) {
+                    const decoded = events.ddcClusters.clusterCreated.v48013.decode(event)
+                    const clusterId = decoded.clusterId
+                    await this.processDdcClustersEvents(clusterId, block)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
@@ -153,6 +161,10 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
             case events.ddcClusters.clusterActivated.name: {
                 if (events.ddcClusters.clusterActivated.v63002.is(event)) {
                     const decoded = events.ddcClusters.clusterActivated.v63002.decode(event)
+                    const clusterId = decoded.clusterId
+                    await this.processDdcClustersEvents(clusterId, block)
+                } else if (events.ddcClusters.clusterActivated.v54100.is(event)) {
+                    const decoded = events.ddcClusters.clusterActivated.v54100.decode(event)
                     const clusterId = decoded.clusterId
                     await this.processDdcClustersEvents(clusterId, block)
                 } else {

@@ -56,6 +56,34 @@ export class DdcCustomerChargesProcessor extends BaseProcessor<State> {
                         amount: amount,
                         expectedToCharge: expectedToCharge
                     })
+                } else if (events.ddcCustomers.charged.v54100.is(event)) {
+                    const decoded = events.ddcCustomers.charged.v54100.decode(event)
+                    const accountId = decoded.ownerId
+                    const amount = decoded.charged
+                    const expectedToCharge = decoded.expectedToCharge
+                    // Use combination of accountId and blockHeight for unique key since there's no cluster
+                    const key = `${toCereAddress(accountId)}-${block.height}`
+                    await this._state.set(key, {
+                        blockTimestamp: blockTimestamp,
+                        blockHeight: block.height,
+                        clusterId: '0x0000000000000000000000000000000000000000', // Default cluster for legacy events
+                        amount: amount,
+                        expectedToCharge: expectedToCharge
+                    })
+                } else if (events.ddcCustomers.charged.v48013.is(event)) {
+                    const decoded = events.ddcCustomers.charged.v48013.decode(event)
+                    const accountId = decoded.ownerId
+                    const amount = decoded.charged
+                    const expectedToCharge = decoded.expectedToCharge
+                    // Use combination of accountId and blockHeight for unique key since there's no cluster
+                    const key = `${toCereAddress(accountId)}-${block.height}`
+                    await this._state.set(key, {
+                        blockTimestamp: blockTimestamp,
+                        blockHeight: block.height,
+                        clusterId: '0x0000000000000000000000000000000000000000', // Default cluster for legacy events
+                        amount: amount,
+                        expectedToCharge: expectedToCharge
+                    })
                 } else {
                     logUnsupportedEventVersion(event)
                 }

@@ -20,6 +20,12 @@ export class DdcBalancesProcessor extends BaseProcessor<State> {
         } else if (storage.ddcCustomers.ledger.v63002.is(block)) {
             // Use old ledger storage for older versions
             accountInStorage = await storage.ddcCustomers.ledger.v63002.get(block, accountId)
+        } else if (storage.ddcCustomers.ledger.v54100.is(block)) {
+            // Use v54100 ledger storage for historical data
+            accountInStorage = await storage.ddcCustomers.ledger.v54100.get(block, accountId)
+        } else if (storage.ddcCustomers.ledger.v48013.is(block)) {
+            // Use v48013 ledger storage for very old historical data
+            accountInStorage = await storage.ddcCustomers.ledger.v48013.get(block, accountId)
         } else {
             logUnsupportedStorageVersion('DdcCustomers.Ledger/ClusterLedger', block)
             return
@@ -46,6 +52,14 @@ export class DdcBalancesProcessor extends BaseProcessor<State> {
                     const accountId = decoded.ownerId
                     const clusterId = decoded.clusterId
                     await this.processDdcCustomersBalancesEvents(accountId, block, clusterId)
+                } else if (events.ddcCustomers.deposited.v54100.is(event)) {
+                    const decoded = events.ddcCustomers.deposited.v54100.decode(event)
+                    const accountId = decoded.ownerId
+                    await this.processDdcCustomersBalancesEvents(accountId, block)
+                } else if (events.ddcCustomers.deposited.v48013.is(event)) {
+                    const decoded = events.ddcCustomers.deposited.v48013.decode(event)
+                    const accountId = decoded.ownerId
+                    await this.processDdcCustomersBalancesEvents(accountId, block)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
@@ -61,6 +75,14 @@ export class DdcBalancesProcessor extends BaseProcessor<State> {
                     const accountId = decoded.ownerId
                     const clusterId = decoded.clusterId
                     await this.processDdcCustomersBalancesEvents(accountId, block, clusterId)
+                } else if (events.ddcCustomers.initialDepositUnlock.v54100.is(event)) {
+                    const decoded = events.ddcCustomers.initialDepositUnlock.v54100.decode(event)
+                    const accountId = decoded.ownerId
+                    await this.processDdcCustomersBalancesEvents(accountId, block)
+                } else if (events.ddcCustomers.initialDepositUnlock.v48013.is(event)) {
+                    const decoded = events.ddcCustomers.initialDepositUnlock.v48013.decode(event)
+                    const accountId = decoded.ownerId
+                    await this.processDdcCustomersBalancesEvents(accountId, block)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
@@ -76,6 +98,14 @@ export class DdcBalancesProcessor extends BaseProcessor<State> {
                     const accountId = decoded.ownerId
                     const clusterId = decoded.clusterId
                     await this.processDdcCustomersBalancesEvents(accountId, block, clusterId)
+                } else if (events.ddcCustomers.withdrawn.v54100.is(event)) {
+                    const decoded = events.ddcCustomers.withdrawn.v54100.decode(event)
+                    const accountId = decoded.ownerId
+                    await this.processDdcCustomersBalancesEvents(accountId, block)
+                } else if (events.ddcCustomers.withdrawn.v48013.is(event)) {
+                    const decoded = events.ddcCustomers.withdrawn.v48013.decode(event)
+                    const accountId = decoded.ownerId
+                    await this.processDdcCustomersBalancesEvents(accountId, block)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
@@ -91,6 +121,14 @@ export class DdcBalancesProcessor extends BaseProcessor<State> {
                     const accountId = decoded.ownerId
                     const clusterId = decoded.clusterId
                     await this.processDdcCustomersBalancesEvents(accountId, block, clusterId)
+                } else if (events.ddcCustomers.charged.v54100.is(event)) {
+                    const decoded = events.ddcCustomers.charged.v54100.decode(event)
+                    const accountId = decoded.ownerId
+                    await this.processDdcCustomersBalancesEvents(accountId, block)
+                } else if (events.ddcCustomers.charged.v48013.is(event)) {
+                    const decoded = events.ddcCustomers.charged.v48013.decode(event)
+                    const accountId = decoded.ownerId
+                    await this.processDdcCustomersBalancesEvents(accountId, block)
                 } else {
                     logUnsupportedEventVersion(event)
                 }

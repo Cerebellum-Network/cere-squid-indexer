@@ -1,8 +1,22 @@
 import {sts, Block, Bytes, Option, Result, EventType, RuntimeCtx} from '../support'
+import * as v48013 from '../v48013'
+import * as v54100 from '../v54100'
 import * as v63002 from '../v63002'
 
 export const clusterCreated =  {
     name: 'DdcClusters.ClusterCreated',
+    v48013: new EventType(
+        'DdcClusters.ClusterCreated',
+        sts.struct({
+            clusterId: sts.string(),
+        })
+    ),
+    v54100: new EventType(
+        'DdcClusters.ClusterCreated',
+        sts.struct({
+            clusterId: sts.string(),
+        })
+    ),
     v63002: new EventType(
         'DdcClusters.ClusterCreated',
         sts.struct({
@@ -55,6 +69,12 @@ export const clusterProtocolParamsSet =  {
 
 export const clusterActivated =  {
     name: 'DdcClusters.ClusterActivated',
+    v54100: new EventType(
+        'DdcClusters.ClusterActivated',
+        sts.struct({
+            clusterId: sts.string(),
+        })
+    ),
     v63002: new EventType(
         'DdcClusters.ClusterActivated',
         sts.struct({
