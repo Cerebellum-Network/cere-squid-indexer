@@ -26,21 +26,8 @@ export class DdcCustomerChargesProcessor extends BaseProcessor<State> {
 
         switch (event.name) {
             case events.ddcCustomers.charged.name: {
-                if (events.ddcCustomers.charged.v63002.is(event)) {
-                    const decoded = events.ddcCustomers.charged.v63002.decode(event)
-                    const accountId = decoded.ownerId
-                    const amount = decoded.charged
-                    const expectedToCharge = decoded.expectedToCharge
-                    // Use combination of accountId and blockHeight for unique key since there's no cluster
-                    const key = `${toCereAddress(accountId)}-${block.height}`
-                    await this._state.set(key, {
-                        blockTimestamp: blockTimestamp,
-                        blockHeight: block.height,
-                        clusterId: '0x0000000000000000000000000000000000000000', // Default cluster for legacy events
-                        amount: amount,
-                        expectedToCharge: expectedToCharge
-                    })
-                } else if (events.ddcCustomers.charged.v73047.is(event)) {
+                // Check newer version first
+                if (events.ddcCustomers.charged.v73047.is(event)) {
                     const decoded = events.ddcCustomers.charged.v73047.decode(event)
                     const accountId = decoded.ownerId
                     const clusterId = decoded.clusterId
@@ -52,6 +39,20 @@ export class DdcCustomerChargesProcessor extends BaseProcessor<State> {
                         blockTimestamp: blockTimestamp,
                         blockHeight: block.height,
                         clusterId: clusterId,
+                        amount: amount,
+                        expectedToCharge: expectedToCharge
+                    })
+                } else if (events.ddcCustomers.charged.v63002.is(event)) {
+                    const decoded = events.ddcCustomers.charged.v63002.decode(event)
+                    const accountId = decoded.ownerId
+                    const amount = decoded.charged
+                    const expectedToCharge = decoded.expectedToCharge
+                    // Use combination of accountId and blockHeight for unique key since there's no cluster
+                    const key = `${toCereAddress(accountId)}-${block.height}`
+                    await this._state.set(key, {
+                        blockTimestamp: blockTimestamp,
+                        blockHeight: block.height,
+                        clusterId: '0x0000000000000000000000000000000000000000', // Default cluster for legacy events
                         amount: amount,
                         expectedToCharge: expectedToCharge
                     })
