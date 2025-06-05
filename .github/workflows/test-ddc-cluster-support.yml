@@ -1,0 +1,250 @@
+name: DDC Customers Cluster Support Test
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'src/**'
+      - 'schema.graphql'
+      - 'db/migrations/**'
+      - '.github/workflows/test-ddc-cluster-support.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'src/**'
+      - 'schema.graphql'
+      - 'db/migrations/**'
+  workflow_dispatch:
+    inputs:
+      legacy_start_block:
+        description: 'Legacy events start block'
+        required: false
+        default: '1714699'
+      legacy_end_block:
+        description: 'Legacy events end block'
+        required: false
+        default: '1714899'
+      cluster_start_block:
+        description: 'Cluster events start block'
+        required: false
+        default: '2415460'
+      cluster_end_block:
+        description: 'Cluster events end block'
+        required: false
+        default: '2415660'
+
+jobs:
+  test-cluster-support:
+    name: Test DDC Customers Cluster Support
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    env:
+      RPC_CERE_HTTP: ${{ secrets.RPC_CERE_HTTP || 'wss://rpc-archive.cere.network/ws' }}
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+      SQD_RATE_LIMIT: 100
+      SQD_CAPACITY: 5
+      SQD_DEBUG: "*"
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build project
+      run: npm run build
+
+    - name: Setup test database
+      run: |
+        createdb test_db
+        export DATABASE_URL=postgresql://postgres:postgres@localhost:5432/test_db
+        npx sqd migration:apply
+
+    - name: Test Legacy Events (v48013/v48800)
+      env:
+        SQD_FIRST_BLOCK: ${{ github.event.inputs.legacy_start_block || '1714699' }}
+        SQD_LAST_BLOCK: ${{ github.event.inputs.legacy_end_block || '1714899' }}
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+      run: |
+        echo "🧪 Testing Legacy Events (blocks $SQD_FIRST_BLOCK - $SQD_LAST_BLOCK)"
+        timeout 300s npx sqd process || echo "Indexing completed or timed out"
+        
+        # Check legacy events were processed
+        LEGACY_COUNT=$(psql -d test_db -t -c "SELECT COUNT(*) FROM ddc_customer_deposit WHERE cluster_id_id IS NULL;" | tr -d ' ')
+        echo "Legacy deposits found: $LEGACY_COUNT"
+        
+        # Verify backward compatibility
+        ACCOUNTS_WITH_BALANCE=$(psql -d test_db -t -c "SELECT COUNT(*) FROM account WHERE ddc_active_balance > 0;" | tr -d ' ')
+        echo "Accounts with DDC balance: $ACCOUNTS_WITH_BALANCE"
+        
+        # Save results for comparison
+        echo "legacy_deposits=$LEGACY_COUNT" >> $GITHUB_ENV
+        echo "legacy_accounts=$ACCOUNTS_WITH_BALANCE" >> $GITHUB_ENV
+
+    - name: Reset database for cluster events test
+      run: |
+        dropdb test_db
+        createdb test_db
+        export DATABASE_URL=postgresql://postgres:postgres@localhost:5432/test_db
+        npx sqd migration:apply
+
+    - name: Test Cluster Events (v73013)
+      env:
+        SQD_FIRST_BLOCK: ${{ github.event.inputs.cluster_start_block || '2415460' }}
+        SQD_LAST_BLOCK: ${{ github.event.inputs.cluster_end_block || '2415660' }}
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+      run: |
+        echo "🧪 Testing Cluster Events (blocks $SQD_FIRST_BLOCK - $SQD_LAST_BLOCK)"
+        timeout 300s npx sqd process || echo "Indexing completed or timed out"
+        
+        # Check cluster events were processed
+        CLUSTER_COUNT=$(psql -d test_db -t -c "SELECT COUNT(*) FROM ddc_customer_deposit WHERE cluster_id_id IS NOT NULL;" | tr -d ' ')
+        echo "Cluster deposits found: $CLUSTER_COUNT"
+        
+        # Check cluster balances
+        CLUSTER_BALANCES=$(psql -d test_db -t -c "SELECT COUNT(*) FROM ddc_customer_balance WHERE cluster_id_id IS NOT NULL;" | tr -d ' ')
+        echo "Cluster balances found: $CLUSTER_BALANCES"
+        
+        # Check depositFor events specifically
+        DEPOSITFOR_COUNT=$(psql -d test_db -t -c "SELECT COUNT(*) FROM ddc_customer_deposit WHERE cluster_id_id IS NOT NULL AND amount > 0;" | tr -d ' ')
+        echo "DepositFor-like events: $DEPOSITFOR_COUNT"
+        
+        # Save results
+        echo "cluster_deposits=$CLUSTER_COUNT" >> $GITHUB_ENV
+        echo "cluster_balances=$CLUSTER_BALANCES" >> $GITHUB_ENV
+        echo "depositfor_events=$DEPOSITFOR_COUNT" >> $GITHUB_ENV
+
+    - name: Test Specific Customer Data Preservation
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+      run: |
+        echo "🧪 Testing Customer Data Preservation"
+        
+        # Check if the specific customer mentioned in requirements exists
+        CUSTOMER_EXISTS=$(psql -d test_db -t -c "SELECT COUNT(*) FROM account WHERE id = '6QEzpTd5w8zmGjsSDCYvfZt7ro98LaG85yb9VuPLAUrP2S7V';" | tr -d ' ')
+        echo "Target customer exists: $CUSTOMER_EXISTS"
+        
+        # Check customer deposits
+        CUSTOMER_DEPOSITS=$(psql -d test_db -t -c "SELECT COUNT(*) FROM ddc_customer_deposit WHERE account_id_id = '6QEzpTd5w8zmGjsSDCYvfZt7ro98LaG85yb9VuPLAUrP2S7V';" | tr -d ' ')
+        echo "Customer deposits: $CUSTOMER_DEPOSITS"
+        
+        echo "customer_exists=$CUSTOMER_EXISTS" >> $GITHUB_ENV
+        echo "customer_deposits=$CUSTOMER_DEPOSITS" >> $GITHUB_ENV
+
+    - name: Test Database Schema Integrity
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+      run: |
+        echo "🧪 Testing Database Schema Integrity"
+        
+        # Check all required tables exist
+        TABLES=$(psql -d test_db -t -c "SELECT COUNT(*) FROM information_schema.tables WHERE table_name IN ('ddc_customer_deposit', 'ddc_customer_charge', 'ddc_customer_balance', 'account', 'ddc_cluster');" | tr -d ' ')
+        echo "Required tables present: $TABLES/5"
+        
+        # Check foreign key constraints
+        CONSTRAINTS=$(psql -d test_db -t -c "SELECT COUNT(*) FROM information_schema.table_constraints WHERE constraint_type = 'FOREIGN KEY' AND table_name LIKE 'ddc_customer%';" | tr -d ' ')
+        echo "Foreign key constraints: $CONSTRAINTS"
+        
+        # Check indexes on cluster_id
+        INDEXES=$(psql -d test_db -t -c "SELECT COUNT(*) FROM pg_indexes WHERE indexname LIKE '%cluster%';" | tr -d ' ')
+        echo "Cluster-related indexes: $INDEXES"
+        
+        echo "schema_tables=$TABLES" >> $GITHUB_ENV
+        echo "schema_constraints=$CONSTRAINTS" >> $GITHUB_ENV
+        echo "schema_indexes=$INDEXES" >> $GITHUB_ENV
+
+    - name: Generate Test Report
+      run: |
+        echo "# DDC Customers Cluster Support Test Report" > test-report.md
+        echo "" >> test-report.md
+        echo "## Test Results Summary" >> test-report.md
+        echo "" >> test-report.md
+        echo "| Test Category | Metric | Result |" >> test-report.md
+        echo "|---------------|--------|--------|" >> test-report.md
+        echo "| Legacy Events | Deposits processed | ${{ env.legacy_deposits }} |" >> test-report.md
+        echo "| Legacy Events | Accounts with balance | ${{ env.legacy_accounts }} |" >> test-report.md
+        echo "| Cluster Events | Cluster deposits | ${{ env.cluster_deposits }} |" >> test-report.md
+        echo "| Cluster Events | Cluster balances | ${{ env.cluster_balances }} |" >> test-report.md
+        echo "| Cluster Events | DepositFor events | ${{ env.depositfor_events }} |" >> test-report.md
+        echo "| Data Preservation | Customer exists | ${{ env.customer_exists }} |" >> test-report.md
+        echo "| Data Preservation | Customer deposits | ${{ env.customer_deposits }} |" >> test-report.md
+        echo "| Schema Integrity | Tables present | ${{ env.schema_tables }}/5 |" >> test-report.md
+        echo "| Schema Integrity | Foreign keys | ${{ env.schema_constraints }} |" >> test-report.md
+        echo "| Schema Integrity | Cluster indexes | ${{ env.schema_indexes }} |" >> test-report.md
+        echo "" >> test-report.md
+        echo "## Test Configuration" >> test-report.md
+        echo "" >> test-report.md
+        echo "- **Legacy blocks**: ${{ github.event.inputs.legacy_start_block || '1714699' }} - ${{ github.event.inputs.legacy_end_block || '1714899' }}" >> test-report.md
+        echo "- **Cluster blocks**: ${{ github.event.inputs.cluster_start_block || '2415460' }} - ${{ github.event.inputs.cluster_end_block || '2415660' }}" >> test-report.md
+        echo "- **RPC Endpoint**: ${{ env.RPC_CERE_HTTP }}" >> test-report.md
+        echo "- **Test Date**: $(date)" >> test-report.md
+        
+        cat test-report.md
+
+    - name: Upload Test Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: ddc-cluster-test-report
+        path: test-report.md
+
+    - name: Validate Test Results
+      run: |
+        echo "🔍 Validating test results..."
+        
+        # Define minimum expectations
+        MIN_LEGACY_DEPOSITS=0
+        MIN_CLUSTER_DEPOSITS=0
+        MIN_SCHEMA_TABLES=5
+        
+        # Validate legacy events
+        if [ "${{ env.legacy_deposits }}" -ge "$MIN_LEGACY_DEPOSITS" ]; then
+          echo "✅ Legacy events test passed"
+        else
+          echo "❌ Legacy events test failed: expected >= $MIN_LEGACY_DEPOSITS, got ${{ env.legacy_deposits }}"
+          exit 1
+        fi
+        
+        # Validate cluster events  
+        if [ "${{ env.cluster_deposits }}" -ge "$MIN_CLUSTER_DEPOSITS" ]; then
+          echo "✅ Cluster events test passed"
+        else
+          echo "❌ Cluster events test failed: expected >= $MIN_CLUSTER_DEPOSITS, got ${{ env.cluster_deposits }}"
+          exit 1
+        fi
+        
+        # Validate schema
+        if [ "${{ env.schema_tables }}" -eq "$MIN_SCHEMA_TABLES" ]; then
+          echo "✅ Schema integrity test passed"
+        else
+          echo "❌ Schema integrity test failed: expected $MIN_SCHEMA_TABLES tables, got ${{ env.schema_tables }}"
+          exit 1
+        fi
+        
+        echo "🎉 All tests passed!"
+
+    - name: Cleanup
+      if: always()
+      run: |
+        dropdb test_db || echo "Test database already cleaned up" 

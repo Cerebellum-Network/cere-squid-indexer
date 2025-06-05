@@ -8,6 +8,7 @@ type Account @entity {
 
   ddcCustomerDeposits: [DdcCustomerDeposit!]! @derivedFrom(field: "accountId")
   ddcCustomerCharges: [DdcCustomerCharge!]! @derivedFrom(field: "accountId")
+  ddcCustomerBalances: [DdcCustomerBalance!]! @derivedFrom(field: "accountId")
 
   ddcBuckets: [DdcBucket!] @derivedFrom(field: "ownerId")
   ddcClusters: [DdcCluster!] @derivedFrom(field: "managerId")
@@ -34,6 +35,7 @@ type DdcCustomerDeposit @entity  @index(fields: ["blockTimestamp", "amount"]) {
 
   blockTimestamp: DateTime! @index
   accountId: Account! @index
+  clusterId: DdcCluster @index
 
   amount: BigInt!
 }
@@ -43,8 +45,18 @@ type DdcCustomerCharge @entity  @index(fields: ["blockTimestamp", "amount"]) {
 
   blockTimestamp: DateTime! @index
   accountId: Account! @index
+  clusterId: DdcCluster @index
 
   amount: BigInt!
+}
+
+type DdcCustomerBalance @entity {
+  id: ID!
+
+  accountId: Account! @index
+  clusterId: DdcCluster @index
+
+  activeBalance: BigInt!
 }
 
 type DdcCluster @entity {
