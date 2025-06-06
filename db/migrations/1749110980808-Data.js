@@ -53,7 +53,7 @@ module.exports = class Data1749110980808 {
         
         await db.query(`CREATE TABLE IF NOT EXISTS "ddc_customer_balance" (
             "id" character varying NOT NULL,
-            "balance" numeric NOT NULL,
+            "active_balance" numeric NOT NULL,
             "cluster_id_id" character varying,
             "account_id_id" character varying,
             CONSTRAINT "PK_8ea116156bd184ae6562ab4ec1d" PRIMARY KEY ("id")
