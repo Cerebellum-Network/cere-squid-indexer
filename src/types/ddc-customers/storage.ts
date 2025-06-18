@@ -12,6 +12,13 @@ export const ledger =  {
     v48013: new StorageType('DdcCustomers.Ledger', 'Optional', [v48013.AccountId32], v48013.AccountsLedger) as LedgerV48013,
 }
 
+export const clusterLedger =  {
+    /**
+     *  Double map from cluster_id and owner accounts to the info regarding the staking per cluster.
+     */
+    v73013: new StorageType('DdcCustomers.ClusterLedger', 'Optional', [v73115.H160, v73115.AccountId32], v48013.AccountsLedger) as ClusterLedgerV73013,
+}
+
 /**
  *  Map from all (unlocked) "owner" accounts to the info regarding the staking.
  */
@@ -145,4 +152,25 @@ export interface BucketsV73115  {
     getPairs(block: Block, key: bigint): Promise<[k: bigint, v: (v73115.Bucket | undefined)][]>
     getPairsPaged(pageSize: number, block: Block): AsyncIterable<[k: bigint, v: (v73115.Bucket | undefined)][]>
     getPairsPaged(pageSize: number, block: Block, key: bigint): AsyncIterable<[k: bigint, v: (v73115.Bucket | undefined)][]>
+}
+
+/**
+ *  Double map from cluster_id and owner accounts to the info regarding the staking per cluster.
+ */
+export interface ClusterLedgerV73013  {
+    is(block: RuntimeCtx): boolean
+    get(block: Block, key1: v73115.H160, key2: v73115.AccountId32): Promise<(v48013.AccountsLedger | undefined)>
+    getMany(block: Block, keys: [v73115.H160, v73115.AccountId32][]): Promise<(v48013.AccountsLedger | undefined)[]>
+    getKeys(block: Block): Promise<[v73115.H160, v73115.AccountId32][]>
+    getKeys(block: Block, key1: v73115.H160): Promise<[v73115.H160, v73115.AccountId32][]>
+    getKeys(block: Block, key1: v73115.H160, key2: v73115.AccountId32): Promise<[v73115.H160, v73115.AccountId32][]>
+    getKeysPaged(pageSize: number, block: Block): AsyncIterable<[v73115.H160, v73115.AccountId32][]>
+    getKeysPaged(pageSize: number, block: Block, key1: v73115.H160): AsyncIterable<[v73115.H160, v73115.AccountId32][]>
+    getKeysPaged(pageSize: number, block: Block, key1: v73115.H160, key2: v73115.AccountId32): AsyncIterable<[v73115.H160, v73115.AccountId32][]>
+    getPairs(block: Block): Promise<[k: [v73115.H160, v73115.AccountId32], v: (v48013.AccountsLedger | undefined)][]>
+    getPairs(block: Block, key1: v73115.H160): Promise<[k: [v73115.H160, v73115.AccountId32], v: (v48013.AccountsLedger | undefined)][]>
+    getPairs(block: Block, key1: v73115.H160, key2: v73115.AccountId32): Promise<[k: [v73115.H160, v73115.AccountId32], v: (v48013.AccountsLedger | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block): AsyncIterable<[k: [v73115.H160, v73115.AccountId32], v: (v48013.AccountsLedger | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block, key1: v73115.H160): AsyncIterable<[k: [v73115.H160, v73115.AccountId32], v: (v48013.AccountsLedger | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block, key1: v73115.H160, key2: v73115.AccountId32): AsyncIterable<[k: [v73115.H160, v73115.AccountId32], v: (v48013.AccountsLedger | undefined)][]>
 }

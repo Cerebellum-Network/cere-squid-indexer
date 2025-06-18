@@ -18,7 +18,7 @@ export const processor = new SubstrateBatchProcessor()
         from: parseInt(process.env.SQD_FIRST_BLOCK || '0'),
         to: parseInt(process.env.SQD_LAST_BLOCK || '0') || undefined,
     })
-    .setTypesBundle(process.env.TYPES_BUNDLE || '../specs/cere-types-bundle.json')
+    .setTypesBundle(process.env.TYPES_BUNDLE || './specs/cere-types-bundle.json')
     .addEvent({
         name: [
             events.balances.endowed.name,
@@ -56,6 +56,7 @@ export const processor = new SubstrateBatchProcessor()
             events.ddcClusters.clusterUnbonding.name,
 
             events.ddcCustomers.deposited.name,
+            events.ddcCustomers.depositFor?.name,
             events.ddcCustomers.initiatDepositUnlock.name,
             events.ddcCustomers.withdrawn.name,
             events.ddcCustomers.charged.name,

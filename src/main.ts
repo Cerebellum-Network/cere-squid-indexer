@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import { processor } from './processor'
 import { TypeormDatabase } from '@subsquid/typeorm-store'
 import {
@@ -8,7 +9,9 @@ import {
     DdcCluster,
     DdcNode,
     DdcCustomerDeposit,
-    DdcCustomerCharge
+    DdcCustomerCharge,
+    DdcCustomerBalance,
+    DdcClusterStatus
 } from './model'
 import { CereBalancesProcessor } from './processors/cereBalancesProcessor'
 import { DdcBalancesProcessor } from './processors/ddcBalancesProcessor'
@@ -84,7 +87,10 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     }
 
     await createAccounts([...accountToCereBalance.keys()])
-    await createAccounts([...accountToDdcBalance.keys()])
+    
+    // Extract account IDs from DDC balances
+    const ddcBalanceAccountIds = [...accountToDdcBalance.values()].map(balance => balance.accountId)
+    await createAccounts(ddcBalanceAccountIds)
 
     const ddcClusterAccounts = [...ddcClusters.values()].map((c) => c.managerId)
     await createAccounts(ddcClusterAccounts)
@@ -101,12 +107,20 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
         account.cereFreeBalance = balance
         accounts.set(id, account)
     })
-    // update DDC balances
-    accountToDdcBalance.forEach((balance, id) => {
-        const account = assertNotNull(accounts.get(id))
-        account.ddcActiveBalance = balance
-        accounts.set(id, account)
+    
+    // Update DDC active balance for backward compatibility (use first balance found)
+    const ddcActiveBalances = new Map<string, bigint>()
+    accountToDdcBalance.forEach((balance) => {
+        if (!ddcActiveBalances.has(balance.accountId)) {
+            ddcActiveBalances.set(balance.accountId, balance.activeBalance)
+        }
     })
+    ddcActiveBalances.forEach((balance, accountId) => {
+        const account = assertNotNull(accounts.get(accountId))
+        account.ddcActiveBalance = balance
+        accounts.set(accountId, account)
+    })
+    
     // persist accounts
     await ctx.store.upsert([...accounts.values()])
 
@@ -138,7 +152,7 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     // persist DDC Clusters
     await ctx.store.upsert(ddcClusterEntities)
 
-    // Find clusters for nodes and buckets mapping
+    // Find clusters for deposits, charges and balances mapping
     const clusterIdsToFind: Set<String> = new Set<String>()
     ddcNodes.addedToCluster.forEach((_, clusterId) => {
         clusterIdsToFind.add(clusterId)
@@ -146,6 +160,31 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     ddcBuckets.forEach((bucket) => {
         clusterIdsToFind.add(bucket.clusterId)
     })
+    
+    // Add cluster IDs from deposits and charges
+    ddcCustomerDeposits.forEach((deposit) => {
+        if (deposit.clusterId) {
+            clusterIdsToFind.add(deposit.clusterId)
+        }
+    })
+    ddcCustomerCharges.forEach((charge) => {
+        if (charge.clusterId) {
+            clusterIdsToFind.add(charge.clusterId)
+        }
+    })
+    accountToDdcBalance.forEach((balance) => {
+        if (balance.clusterId) {
+            clusterIdsToFind.add(balance.clusterId)
+        }
+    })
+
+    // Create default clusters for legacy events if they don't exist
+    const DEFAULT_CLUSTERS = {
+        DEVNET: '0x7f82864e4f097e63d04cc279e4d8d2eb45a42ffa',
+        TESTNET: '0x825c4b2352850de9986d9d28568db6f0c023a1e3', 
+        QANET: '0xb1242a78440e20f50841ffa399fd9d607a2e93b8',
+        MAINNET: '0x0059f5ada35eee46802d80750d5ca4a490640511'
+    }
 
     const existingClusters = await ctx.store.findBy(DdcCluster, {
         id: In([...clusterIdsToFind.values()]),
@@ -154,6 +193,43 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     existingClusters.forEach((c) => {
         ddcClustersMap.set(c.id, c)
     })
+
+    // Create missing default clusters (for legacy events)
+    const clustersToCreate: DdcCluster[] = []
+    clusterIdsToFind.forEach(clusterId => {
+        if (!ddcClustersMap.has(clusterId as string)) {
+            // This is a default cluster for legacy events
+            if (Object.values(DEFAULT_CLUSTERS).includes(clusterId as string)) {
+                const defaultCluster = new DdcCluster({
+                    id: clusterId as string,
+                    createdAtBlockHeight: 0, // Default for legacy
+                    managerId: undefined, // Will be set later or remain undefined for legacy
+                    treasuryShare: 10n,
+                    validatorsShare: 20n,
+                    clusterReserveShare: 5n,
+                    storageBondSize: 1000000000000n,
+                    storageChillDelay: 100,
+                    storageUnbondingDelay: 200,
+                    unitPerMbStored: 1000000n,
+                    unitPerMbStreamed: 2000000n,
+                    unitPerPutRequest: 100000n,
+                    unitPerGetRequest: 50000n,
+                    erasureCodingRequired: 2,
+                    erasureCodingTotal: 3,
+                    replicationTotal: 3,
+                    status: DdcClusterStatus.Activated
+                })
+                clustersToCreate.push(defaultCluster)
+                ddcClustersMap.set(clusterId as string, defaultCluster)
+                logger.info(`Created default cluster for legacy events: ${clusterId}`)
+            }
+        }
+    })
+
+    // Persist default clusters
+    if (clustersToCreate.length > 0) {
+        await ctx.store.upsert(clustersToCreate)
+    }
 
     // Find existing DDC Nodes
     const allModifiedDdcNodes = new Set<string>()
@@ -299,10 +375,13 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     await ctx.store.insert(Array.from(ddcCustomerUsageEntities.values()))
 
     const ddcCustomerDepositEntities: DdcCustomerDeposit[] = []
-    ddcCustomerDeposits.forEach((deposit, accountId) => {
+    ddcCustomerDeposits.forEach((deposit, key) => {
+        const keyParts = key.split('-')
+        const accountId = keyParts[1] // blockHeight-accountId or blockHeight-accountId-clusterId
         ddcCustomerDepositEntities.push(new DdcCustomerDeposit({
-            id: `${deposit.blockHeight}-${accountId}`,
+            id: key,
             accountId: accounts.get(accountId),
+            clusterId: deposit.clusterId ? ddcClustersMap.get(deposit.clusterId) : undefined,
             blockTimestamp: deposit.blockTimestamp,
             amount: deposit.amount
         }))
@@ -310,13 +389,28 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     await ctx.store.insert(ddcCustomerDepositEntities)
 
     const ddcCustomerChargeEntities: DdcCustomerCharge[] = []
-    ddcCustomerCharges.forEach((charge, accountId) => {
+    ddcCustomerCharges.forEach((charge, key) => {
+        const keyParts = key.split('-')
+        const accountId = keyParts[1] // blockHeight-accountId or blockHeight-accountId-clusterId
         ddcCustomerChargeEntities.push(new DdcCustomerCharge({
-            id: `${charge.blockHeight}-${accountId}`,
+            id: key,
             accountId: accounts.get(accountId),
+            clusterId: charge.clusterId ? ddcClustersMap.get(charge.clusterId) : undefined,
             blockTimestamp: charge.blockTimestamp,
             amount: charge.amount
         }))
     })
     await ctx.store.insert(ddcCustomerChargeEntities)
+
+    const ddcCustomerBalanceEntities: DdcCustomerBalance[] = []
+    accountToDdcBalance.forEach((balance, key) => {
+        const cluster = balance.clusterId ? ddcClustersMap.get(balance.clusterId) : undefined
+        ddcCustomerBalanceEntities.push(new DdcCustomerBalance({
+            id: key,
+            accountId: accounts.get(balance.accountId),
+            clusterId: cluster,
+            activeBalance: balance.activeBalance
+        }))
+    })
+    await ctx.store.upsert(ddcCustomerBalanceEntities)
 })
