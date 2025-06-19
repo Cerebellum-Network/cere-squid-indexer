@@ -28,12 +28,26 @@ export class DdcBalancesProcessor extends BaseProcessor<State> {
                     accountInStorage = await storage.ddcCustomers.clusterLedger.v73013.get(block, clusterId, accountId)
                     balanceKey = `${toCereAddress(accountId)}-${clusterId}`
                 } else {
-                    logUnsupportedStorageVersion('DdcCustomers.ClusterLedger', block)
-                    return
+                    // Try fallback to older ledger storage with warning
+                    console.warn(`Unsupported ClusterLedger version at block ${block.height}, spec ${block.specVersion}. Falling back to legacy Ledger storage.`)
+                    
+                    if (storage.ddcCustomers.ledger.v73156 && storage.ddcCustomers.ledger.v73156.is(block)) {
+                        accountInStorage = await storage.ddcCustomers.ledger.v73156.get(block, accountId)
+                        balanceKey = `${toCereAddress(accountId)}-${clusterId}`
+                    } else if (storage.ddcCustomers.ledger.v48013.is(block)) {
+                        accountInStorage = await storage.ddcCustomers.ledger.v48013.get(block, accountId)
+                        balanceKey = `${toCereAddress(accountId)}-${clusterId}`
+                    } else {
+                        logUnsupportedStorageVersion('DdcCustomers.Ledger', block)
+                        return
+                    }
                 }
             } else {
                 // Fallback to old ledger for compatibility when cluster storage not available
-                if (storage.ddcCustomers.ledger.v48013.is(block)) {
+                if (storage.ddcCustomers.ledger.v73156 && storage.ddcCustomers.ledger.v73156.is(block)) {
+                    accountInStorage = await storage.ddcCustomers.ledger.v73156.get(block, accountId)
+                    balanceKey = `${toCereAddress(accountId)}-${clusterId}`
+                } else if (storage.ddcCustomers.ledger.v48013.is(block)) {
                     accountInStorage = await storage.ddcCustomers.ledger.v48013.get(block, accountId)
                     balanceKey = `${toCereAddress(accountId)}-${clusterId}`
                 } else {
@@ -43,10 +57,15 @@ export class DdcBalancesProcessor extends BaseProcessor<State> {
             }
         } else {
             // Old ledger storage for backward compatibility
-            if (storage.ddcCustomers.ledger.v48013.is(block)) {
+            if (storage.ddcCustomers.ledger.v73156 && storage.ddcCustomers.ledger.v73156.is(block)) {
+                accountInStorage = await storage.ddcCustomers.ledger.v73156.get(block, accountId)
+                balanceKey = `${toCereAddress(accountId)}`
+            } else if (storage.ddcCustomers.ledger.v48013.is(block)) {
                 accountInStorage = await storage.ddcCustomers.ledger.v48013.get(block, accountId)
                 balanceKey = `${toCereAddress(accountId)}`
             } else {
+                // For unsupported versions, log the warning and skip processing
+                console.warn(`Unsupported Ledger storage version at block ${block.height}, spec ${block.specVersion}. Skipping balance processing.`)
                 logUnsupportedStorageVersion('DdcCustomers.Ledger', block)
                 return
             }

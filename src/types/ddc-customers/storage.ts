@@ -10,6 +10,11 @@ export const ledger =  {
      *  Map from all (unlocked) "owner" accounts to the info regarding the staking.
      */
     v48013: new StorageType('DdcCustomers.Ledger', 'Optional', [v48013.AccountId32], v48013.AccountsLedger) as LedgerV48013,
+    /**
+     *  Map from all (unlocked) "owner" accounts to the info regarding the staking.
+     *  Note: v73156 assumed to be compatible with v48013 structure
+     */
+    v73156: new StorageType('DdcCustomers.Ledger', 'Optional', [v48013.AccountId32], v48013.AccountsLedger) as LedgerV73156,
 }
 
 export const clusterLedger =  {
@@ -23,6 +28,24 @@ export const clusterLedger =  {
  *  Map from all (unlocked) "owner" accounts to the info regarding the staking.
  */
 export interface LedgerV48013  {
+    is(block: RuntimeCtx): boolean
+    get(block: Block, key: v48013.AccountId32): Promise<(v48013.AccountsLedger | undefined)>
+    getMany(block: Block, keys: v48013.AccountId32[]): Promise<(v48013.AccountsLedger | undefined)[]>
+    getKeys(block: Block): Promise<v48013.AccountId32[]>
+    getKeys(block: Block, key: v48013.AccountId32): Promise<v48013.AccountId32[]>
+    getKeysPaged(pageSize: number, block: Block): AsyncIterable<v48013.AccountId32[]>
+    getKeysPaged(pageSize: number, block: Block, key: v48013.AccountId32): AsyncIterable<v48013.AccountId32[]>
+    getPairs(block: Block): Promise<[k: v48013.AccountId32, v: (v48013.AccountsLedger | undefined)][]>
+    getPairs(block: Block, key: v48013.AccountId32): Promise<[k: v48013.AccountId32, v: (v48013.AccountsLedger | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block): AsyncIterable<[k: v48013.AccountId32, v: (v48013.AccountsLedger | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block, key: v48013.AccountId32): AsyncIterable<[k: v48013.AccountId32, v: (v48013.AccountsLedger | undefined)][]>
+}
+
+/**
+ *  Map from all (unlocked) "owner" accounts to the info regarding the staking.
+ *  v73156 interface - assumed compatible with v48013
+ */
+export interface LedgerV73156  {
     is(block: RuntimeCtx): boolean
     get(block: Block, key: v48013.AccountId32): Promise<(v48013.AccountsLedger | undefined)>
     getMany(block: Block, keys: v48013.AccountId32[]): Promise<(v48013.AccountsLedger | undefined)[]>
