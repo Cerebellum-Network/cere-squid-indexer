@@ -65,11 +65,19 @@ export class CereBalancesProcessor extends BaseProcessor<State> {
             }
             case events.balances.transfer.name: {
                 if (events.balances.transfer.v266.is(event)) {
-                    const accountId = events.balances.transfer.v266.decode(event)[0]
-                    await this.processBalancesEvent(accountId, block)
+                    const decoded = events.balances.transfer.v266.decode(event)
+                    const fromAccountId = decoded[0]
+                    const toAccountId = decoded[1]
+                    // Process both sender and receiver
+                    await this.processBalancesEvent(fromAccountId, block)
+                    await this.processBalancesEvent(toAccountId, block)
                 } else if (events.balances.transfer.v297.is(event)) {
-                    const accountId = events.balances.transfer.v297.decode(event).from
-                    await this.processBalancesEvent(accountId, block)
+                    const decoded = events.balances.transfer.v297.decode(event)
+                    const fromAccountId = decoded.from
+                    const toAccountId = decoded.to
+                    // Process both sender and receiver
+                    await this.processBalancesEvent(fromAccountId, block)
+                    await this.processBalancesEvent(toAccountId, block)
                 } else {
                     logUnsupportedEventVersion(event)
                 }
