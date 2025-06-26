@@ -86,8 +86,15 @@ export class DdcBalancesProcessor extends BaseProcessor<State> {
                 if (events.ddcCustomers.depositFor.v73013.is(event)) {
                     const decoded = events.ddcCustomers.depositFor.v73013.decode(event)
                     const targetId = decoded.targetId
+                    const depositorId = decoded.depositorId
                     const clusterId = decoded.clusterId
+                    
+                    // Process both target (recipient) and depositor (sender) balances
                     await this.processDdcCustomersBalancesEvents(targetId, clusterId, block)
+                    if (targetId !== depositorId) {
+                        // Only process depositor separately if it's different from target
+                        await this.processDdcCustomersBalancesEvents(depositorId, clusterId, block)
+                    }
                 } else {
                     logUnsupportedEventVersion(event)
                 }
