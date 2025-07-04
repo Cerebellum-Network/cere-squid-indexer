@@ -49,6 +49,8 @@ import * as v54106 from '../v54106'
 import * as v54112 from '../v54112'
 import * as v54113 from '../v54113'
 import * as v73115 from '../v73115'
+import * as v73149 from '../v73149'
+import * as v73160 from '../v73160'
 
 export const account =  {
     /**
@@ -788,6 +790,26 @@ export const events =  {
      *  just in case someone still reads them from within the runtime.
      */
     v73115: new StorageType('System.Events', 'Default', [], sts.array(() => v73115.EventRecord)) as EventsV73115,
+    /**
+     *  Events deposited for the current block.
+     * 
+     *  NOTE: The item is unbound and should therefore never be read on chain.
+     *  It could otherwise inflate the PoV size of a block.
+     * 
+     *  Events have a large in-memory size. Box the events to not go out-of-memory
+     *  just in case someone still reads them from within the runtime.
+     */
+    v73160: new StorageType('System.Events', 'Default', [], sts.array(() => v73160.EventRecord)) as EventsV73160,
+    /**
+     *  Events deposited for the current block.
+     * 
+     *  NOTE: The item is unbound and should therefore never be read on chain.
+     *  It could otherwise inflate the PoV size of a block.
+     * 
+     *  Events have a large in-memory size. Box the events to not go out-of-memory
+     *  just in case someone still reads them from within the runtime.
+     */
+    v73149: new StorageType('System.Events', 'Default', [], sts.array(() => v73149.EventRecord)) as EventsV73149,
 }
 
 /**
@@ -1483,6 +1505,36 @@ export interface EventsV73115  {
     get(block: Block): Promise<(v73115.EventRecord[] | undefined)>
 }
 
+/**
+ *  Events deposited for the current block.
+ * 
+ *  NOTE: The item is unbound and should therefore never be read on chain.
+ *  It could otherwise inflate the PoV size of a block.
+ * 
+ *  Events have a large in-memory size. Box the events to not go out-of-memory
+ *  just in case someone still reads them from within the runtime.
+ */
+export interface EventsV73160  {
+    is(block: RuntimeCtx): boolean
+    getDefault(block: Block): v73160.EventRecord[]
+    get(block: Block): Promise<(v73160.EventRecord[] | undefined)>
+}
+
+/**
+ *  Events deposited for the current block.
+ * 
+ *  NOTE: The item is unbound and should therefore never be read on chain.
+ *  It could otherwise inflate the PoV size of a block.
+ * 
+ *  Events have a large in-memory size. Box the events to not go out-of-memory
+ *  just in case someone still reads them from within the runtime.
+ */
+export interface EventsV73149  {
+    is(block: RuntimeCtx): boolean
+    getDefault(block: Block): v73149.EventRecord[]
+    get(block: Block): Promise<(v73149.EventRecord[] | undefined)>
+}
+
 export const eventCount =  {
     /**
      *  The number of events in the `Events<T>` list.
@@ -1653,4 +1705,32 @@ export const authorizedUpgrade =  {
 export interface AuthorizedUpgradeV73115  {
     is(block: RuntimeCtx): boolean
     get(block: Block): Promise<(v73115.CodeUpgradeAuthorization | undefined)>
+}
+
+export const extrinsicWeightReclaimed =  {
+    /**
+     *  The weight reclaimed for the extrinsic.
+     * 
+     *  This information is available until the end of the extrinsic execution.
+     *  More precisely this information is removed in `note_applied_extrinsic`.
+     * 
+     *  Logic doing some post dispatch weight reduction must update this storage to avoid duplicate
+     *  reduction.
+     */
+    v73160: new StorageType('System.ExtrinsicWeightReclaimed', 'Default', [], v73160.Weight) as ExtrinsicWeightReclaimedV73160,
+}
+
+/**
+ *  The weight reclaimed for the extrinsic.
+ * 
+ *  This information is available until the end of the extrinsic execution.
+ *  More precisely this information is removed in `note_applied_extrinsic`.
+ * 
+ *  Logic doing some post dispatch weight reduction must update this storage to avoid duplicate
+ *  reduction.
+ */
+export interface ExtrinsicWeightReclaimedV73160  {
+    is(block: RuntimeCtx): boolean
+    getDefault(block: Block): v73160.Weight
+    get(block: Block): Promise<(v73160.Weight | undefined)>
 }
