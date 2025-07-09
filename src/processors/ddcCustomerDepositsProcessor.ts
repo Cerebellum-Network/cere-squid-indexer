@@ -74,7 +74,38 @@ export class DdcCustomerDepositsProcessor extends BaseProcessor<State> {
                 }
                 break
             }
-            // depositFor event not found in metadata - removed
+            case events.ddcCustomers.depositFor?.name: {
+                if (events.ddcCustomers.depositFor.v73013.is(event)) {
+                    const decoded = events.ddcCustomers.depositFor.v73013.decode(event)
+                    const targetId = decoded.targetId
+                    const depositorId = decoded.depositorId
+                    const amount = decoded.amount
+                    const clusterId = decoded.clusterId
+                    
+                    // Create deposit record for target (recipient)
+                    const targetKey = `${block.height}-${toCereAddress(targetId)}-${clusterId}-target`
+                    await this._state.set(targetKey, {
+                        blockTimestamp: blockTimestamp,
+                        blockHeight: block.height,
+                        amount: amount,
+                        clusterId: clusterId
+                    })
+                    
+                    // Create deposit record for depositor (sender) if different
+                    if (targetId !== depositorId) {
+                        const depositorKey = `${block.height}-${toCereAddress(depositorId)}-${clusterId}-depositor`
+                        await this._state.set(depositorKey, {
+                            blockTimestamp: blockTimestamp,
+                            blockHeight: block.height,
+                            amount: BigInt(-1) * amount, // Negative amount for the sender
+                            clusterId: clusterId
+                        })
+                    }
+                } else {
+                    logUnsupportedEventVersion(event)
+                }
+                break
+            }
             default: {
                 break
             }

@@ -56,6 +56,7 @@ export const processor = new SubstrateBatchProcessor()
             events.ddcClusters.clusterUnbonding.name,
 
             events.ddcCustomers.deposited.name,
+            events.ddcCustomers.depositFor?.name,
             events.ddcCustomers.initiatDepositUnlock.name,
             events.ddcCustomers.initialDepositUnlock.name,
             events.ddcCustomers.withdrawn.name,

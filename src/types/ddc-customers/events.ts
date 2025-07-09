@@ -321,3 +321,20 @@ export const bucketTotalCustomersUsageUpdated =  {
         })
     ),
 }
+
+export const depositFor =  {
+    name: 'DdcCustomers.DepositFor',
+    /**
+     * An account has deposited funds for another account [depositor, target, amount]
+     * This event was manually added for compatibility with older versions
+     */
+    v73013: new EventType(
+        'DdcCustomers.DepositFor',
+        sts.struct({
+            depositorId: v73160.AccountId32,
+            targetId: v73160.AccountId32,
+            amount: sts.bigint(),
+            clusterId: v73160.H160,
+        })
+    ),
+}
