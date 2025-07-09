@@ -3,8 +3,7 @@ import * as v48013 from '../v48013'
 import * as v48014 from '../v48014'
 import * as v48800 from '../v48800'
 import * as v54100 from '../v54100'
-import * as v73149 from '../v73149'
-import * as v73160 from '../v73160'
+import * as v73115 from '../v73115'
 
 export const deposited =  {
     name: 'DdcCustomers.Deposited',
@@ -32,29 +31,16 @@ export const deposited =  {
         })
     ),
     /**
-     * An account has deposited this amount. \[owner, amount\]
+     * An account has deposited this amount for a specific cluster. \[cluster_id, owner, amount\]
      * 
      * NOTE: This event is only emitted when funds are deposited via a dispatchable. Notably,
      * it will not be emitted for staking rewards when they are added to stake.
      */
-    v73160: new EventType(
+    v73013: new EventType(
         'DdcCustomers.Deposited',
         sts.struct({
-            clusterId: v73160.H160,
-            ownerId: v73160.AccountId32,
-            amount: sts.bigint(),
-        })
-    ),
-    /**
-     * An account has deposited this amount. \[owner, amount\]
-     * 
-     * NOTE: This event is only emitted when funds are deposited via a dispatchable. Notably,
-     * it will not be emitted for staking rewards when they are added to stake.
-     */
-    v73149: new EventType(
-        'DdcCustomers.Deposited',
-        sts.struct({
-            ownerId: v73149.AccountId32,
+            clusterId: v73115.H160,
+            ownerId: v73115.AccountId32,
             amount: sts.bigint(),
         })
     ),
@@ -94,24 +80,13 @@ export const withdrawn =  {
     ),
     /**
      * An account has called `withdraw_unlocked_deposit` and removed unlocking chunks worth
-     * `Balance` from the unlocking queue. \[owner, amount\]
+     * `Balance` from the unlocking queue for a specific cluster. \[cluster_id, owner, amount\]
      */
-    v73160: new EventType(
+    v73013: new EventType(
         'DdcCustomers.Withdrawn',
         sts.struct({
-            clusterId: v73160.H160,
-            ownerId: v73160.AccountId32,
-            amount: sts.bigint(),
-        })
-    ),
-    /**
-     * An account has called `withdraw_unlocked_deposit` and removed unlocking chunks worth
-     * `Balance` from the unlocking queue. \[owner, amount\]
-     */
-    v73149: new EventType(
-        'DdcCustomers.Withdrawn',
-        sts.struct({
-            ownerId: v73149.AccountId32,
+            clusterId: v73115.H160,
+            ownerId: v73115.AccountId32,
             amount: sts.bigint(),
         })
     ),
@@ -145,24 +120,13 @@ export const charged =  {
         })
     ),
     /**
-     * The account has been charged for the usage
+     * The account has been charged for the usage in a specific cluster
      */
-    v73160: new EventType(
+    v73013: new EventType(
         'DdcCustomers.Charged',
         sts.struct({
-            clusterId: v73160.H160,
-            ownerId: v73160.AccountId32,
-            charged: sts.bigint(),
-            expectedToCharge: sts.bigint(),
-        })
-    ),
-    /**
-     * The account has been charged for the usage
-     */
-    v73149: new EventType(
-        'DdcCustomers.Charged',
-        sts.struct({
-            ownerId: v73149.AccountId32,
+            clusterId: v73115.H160,
+            ownerId: v73115.AccountId32,
             charged: sts.bigint(),
             expectedToCharge: sts.bigint(),
         })
@@ -206,25 +170,6 @@ export const bucketCreated =  {
             bucketId: sts.bigint(),
         })
     ),
-    /**
-     * Bucket with specific id created
-     */
-    v73160: new EventType(
-        'DdcCustomers.BucketCreated',
-        sts.struct({
-            clusterId: v73160.H160,
-            bucketId: sts.bigint(),
-        })
-    ),
-    /**
-     * Bucket with specific id created
-     */
-    v73149: new EventType(
-        'DdcCustomers.BucketCreated',
-        sts.struct({
-            bucketId: sts.bigint(),
-        })
-    ),
 }
 
 export const initialDepositUnlock =  {
@@ -247,23 +192,13 @@ export const initialDepositUnlock =  {
         })
     ),
     /**
-     * An account has initiated unlock for amount. \[owner, amount\]
+     * An account has initiated unlock for amount in a specific cluster. \[cluster_id, owner, amount\]
      */
-    v73160: new EventType(
+    v73013: new EventType(
         'DdcCustomers.InitialDepositUnlock',
         sts.struct({
-            clusterId: v73160.H160,
-            ownerId: v73160.AccountId32,
-            amount: sts.bigint(),
-        })
-    ),
-    /**
-     * An account has initiated unlock for amount. \[owner, amount\]
-     */
-    v73149: new EventType(
-        'DdcCustomers.InitialDepositUnlock',
-        sts.struct({
-            ownerId: v73149.AccountId32,
+            clusterId: v73115.H160,
+            ownerId: v73115.AccountId32,
             amount: sts.bigint(),
         })
     ),
@@ -306,25 +241,6 @@ export const bucketUpdated =  {
             bucketId: sts.bigint(),
         })
     ),
-    /**
-     * Bucket with specific id updated
-     */
-    v73160: new EventType(
-        'DdcCustomers.BucketUpdated',
-        sts.struct({
-            clusterId: v73160.H160,
-            bucketId: sts.bigint(),
-        })
-    ),
-    /**
-     * Bucket with specific id updated
-     */
-    v73149: new EventType(
-        'DdcCustomers.BucketUpdated',
-        sts.struct({
-            bucketId: sts.bigint(),
-        })
-    ),
 }
 
 export const bucketRemoved =  {
@@ -333,25 +249,6 @@ export const bucketRemoved =  {
      * Bucket with specific id marked as removed
      */
     v50000: new EventType(
-        'DdcCustomers.BucketRemoved',
-        sts.struct({
-            bucketId: sts.bigint(),
-        })
-    ),
-    /**
-     * Bucket with specific id marked as removed
-     */
-    v73160: new EventType(
-        'DdcCustomers.BucketRemoved',
-        sts.struct({
-            clusterId: v73160.H160,
-            bucketId: sts.bigint(),
-        })
-    ),
-    /**
-     * Bucket with specific id marked as removed
-     */
-    v73149: new EventType(
         'DdcCustomers.BucketRemoved',
         sts.struct({
             bucketId: sts.bigint(),
@@ -391,6 +288,22 @@ export const bucketTotalCustomersUsageUpdated =  {
             storedBytes: sts.bigint(),
             numberOfPuts: sts.bigint(),
             numberOfGets: sts.bigint(),
+        })
+    ),
+}
+
+export const depositFor =  {
+    name: 'DdcCustomers.DepositFor',
+    /**
+     * A third party has deposited funds for a target account in a specific cluster. \[cluster_id, target, depositor, amount\]
+     */
+    v73013: new EventType(
+        'DdcCustomers.DepositFor',
+        sts.struct({
+            clusterId: v73115.H160,
+            targetId: v73115.AccountId32,
+            depositorId: v73115.AccountId32,
+            amount: sts.bigint(),
         })
     ),
 }
