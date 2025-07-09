@@ -23,9 +23,9 @@ export class DdcBalancesProcessor extends BaseProcessor<State> {
         
         if (clusterId) {
             // New cluster ledger storage
-            if (storage.ddcCustomers.clusterLedger && storage.ddcCustomers.clusterLedger.v73013) {
-                if (storage.ddcCustomers.clusterLedger.v73013.is(block)) {
-                    accountInStorage = await storage.ddcCustomers.clusterLedger.v73013.get(block, clusterId, accountId)
+            if (storage.ddcCustomers.clusterLedger && storage.ddcCustomers.clusterLedger.v73160) {
+                if (storage.ddcCustomers.clusterLedger.v73160.is(block)) {
+                    accountInStorage = await storage.ddcCustomers.clusterLedger.v73160.get(block, clusterId, accountId)
                     balanceKey = `${toCereAddress(accountId)}-${clusterId}`
                 } else {
                     logUnsupportedStorageVersion('DdcCustomers.ClusterLedger', block)
@@ -72,29 +72,11 @@ export class DdcBalancesProcessor extends BaseProcessor<State> {
                 } else if (events.ddcCustomers.deposited.v48800.is(event)) {
                     const accountId = events.ddcCustomers.deposited.v48800.decode(event).ownerId
                     await this.processDdcCustomersBalancesEvents(accountId, undefined, block)
-                } else if (events.ddcCustomers.deposited.v73013.is(event)) {
-                    const decoded = events.ddcCustomers.deposited.v73013.decode(event)
+                } else if (events.ddcCustomers.deposited.v73160.is(event)) {
+                    const decoded = events.ddcCustomers.deposited.v73160.decode(event)
                     const accountId = decoded.ownerId
                     const clusterId = decoded.clusterId
                     await this.processDdcCustomersBalancesEvents(accountId, clusterId, block)
-                } else {
-                    logUnsupportedEventVersion(event)
-                }
-                break
-            }
-            case events.ddcCustomers.depositFor?.name: {
-                if (events.ddcCustomers.depositFor.v73013.is(event)) {
-                    const decoded = events.ddcCustomers.depositFor.v73013.decode(event)
-                    const targetId = decoded.targetId
-                    const depositorId = decoded.depositorId
-                    const clusterId = decoded.clusterId
-                    
-                    // Process both target (recipient) and depositor (sender) balances
-                    await this.processDdcCustomersBalancesEvents(targetId, clusterId, block)
-                    if (targetId !== depositorId) {
-                        // Only process depositor separately if it's different from target
-                        await this.processDdcCustomersBalancesEvents(depositorId, clusterId, block)
-                    }
                 } else {
                     logUnsupportedEventVersion(event)
                 }
@@ -116,8 +98,8 @@ export class DdcBalancesProcessor extends BaseProcessor<State> {
                 } else if (events.ddcCustomers.withdrawn.v48800.is(event)) {
                     const accountId = events.ddcCustomers.withdrawn.v48800.decode(event).ownerId
                     await this.processDdcCustomersBalancesEvents(accountId, undefined, block)
-                } else if (events.ddcCustomers.withdrawn.v73013.is(event)) {
-                    const decoded = events.ddcCustomers.withdrawn.v73013.decode(event)
+                } else if (events.ddcCustomers.withdrawn.v73160.is(event)) {
+                    const decoded = events.ddcCustomers.withdrawn.v73160.decode(event)
                     const accountId = decoded.ownerId
                     const clusterId = decoded.clusterId
                     await this.processDdcCustomersBalancesEvents(accountId, clusterId, block)
@@ -135,8 +117,8 @@ export class DdcBalancesProcessor extends BaseProcessor<State> {
                 } else if (events.ddcCustomers.charged.v48800.is(event)) {
                     const accountId = events.ddcCustomers.charged.v48800.decode(event).ownerId
                     await this.processDdcCustomersBalancesEvents(accountId, undefined, block)
-                } else if (events.ddcCustomers.charged.v73013.is(event)) {
-                    const decoded = events.ddcCustomers.charged.v73013.decode(event)
+                } else if (events.ddcCustomers.charged.v73160.is(event)) {
+                    const decoded = events.ddcCustomers.charged.v73160.decode(event)
                     const accountId = decoded.ownerId
                     const clusterId = decoded.clusterId
                     await this.processDdcCustomersBalancesEvents(accountId, clusterId, block)
@@ -152,8 +134,8 @@ export class DdcBalancesProcessor extends BaseProcessor<State> {
                 } else if (events.ddcCustomers.initialDepositUnlock.v48800.is(event)) {
                     const accountId = events.ddcCustomers.initialDepositUnlock.v48800.decode(event).ownerId
                     await this.processDdcCustomersBalancesEvents(accountId, undefined, block)
-                } else if (events.ddcCustomers.initialDepositUnlock.v73013.is(event)) {
-                    const decoded = events.ddcCustomers.initialDepositUnlock.v73013.decode(event)
+                } else if (events.ddcCustomers.initialDepositUnlock.v73160.is(event)) {
+                    const decoded = events.ddcCustomers.initialDepositUnlock.v73160.decode(event)
                     const accountId = decoded.ownerId
                     const clusterId = decoded.clusterId
                     await this.processDdcCustomersBalancesEvents(accountId, clusterId, block)

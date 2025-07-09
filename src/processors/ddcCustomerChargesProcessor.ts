@@ -61,11 +61,12 @@ export class DdcCustomerChargesProcessor extends BaseProcessor<State> {
                         amount: amount,
                         clusterId: clusterId
                     })
-                } else if (events.ddcCustomers.charged.v73013.is(event)) {
-                    const decoded = events.ddcCustomers.charged.v73013.decode(event)
+                } else if (events.ddcCustomers.charged.v73160.is(event)) {
+                    const decoded = events.ddcCustomers.charged.v73160.decode(event)
                     const accountId = decoded.ownerId
-                    const amount = decoded.charged
                     const clusterId = getClusterIdFromEventOrDefault(decoded)
+                    const amount = decoded.charged
+
                     const key = `${block.height}-${toCereAddress(accountId)}-${clusterId}`
                     await this._state.set(key, {
                         blockTimestamp: blockTimestamp,
