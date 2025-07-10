@@ -2,6 +2,7 @@ import {sts, Block, Bytes, Option, Result, StorageType, RuntimeCtx} from '../sup
 import * as v48015 from '../v48015'
 import * as v48400 from '../v48400'
 import * as v48800 from '../v48800'
+import * as v73160 from '../v73160'
 
 export const activeBillingReports =  {
     v48015: new StorageType('DdcPayouts.ActiveBillingReports', 'Optional', [v48015.H160, sts.number()], v48015.BillingReport) as ActiveBillingReportsV48015,
@@ -95,4 +96,44 @@ export interface OwingProvidersV48400  {
     getPairsPaged(pageSize: number, block: Block): AsyncIterable<[k: [v48400.H160, v48400.AccountId32], v: (bigint | undefined)][]>
     getPairsPaged(pageSize: number, block: Block, key1: v48400.H160): AsyncIterable<[k: [v48400.H160, v48400.AccountId32], v: (bigint | undefined)][]>
     getPairsPaged(pageSize: number, block: Block, key1: v48400.H160, key2: v48400.AccountId32): AsyncIterable<[k: [v48400.H160, v48400.AccountId32], v: (bigint | undefined)][]>
+}
+
+export const payoutReceipts =  {
+    v73160: new StorageType('DdcPayouts.PayoutReceipts', 'Optional', [v73160.H160, sts.number()], v73160.PayoutReceipt) as PayoutReceiptsV73160,
+}
+
+export interface PayoutReceiptsV73160  {
+    is(block: RuntimeCtx): boolean
+    get(block: Block, key1: v73160.H160, key2: number): Promise<(v73160.PayoutReceipt | undefined)>
+    getMany(block: Block, keys: [v73160.H160, number][]): Promise<(v73160.PayoutReceipt | undefined)[]>
+    getKeys(block: Block): Promise<[v73160.H160, number][]>
+    getKeys(block: Block, key1: v73160.H160): Promise<[v73160.H160, number][]>
+    getKeys(block: Block, key1: v73160.H160, key2: number): Promise<[v73160.H160, number][]>
+    getKeysPaged(pageSize: number, block: Block): AsyncIterable<[v73160.H160, number][]>
+    getKeysPaged(pageSize: number, block: Block, key1: v73160.H160): AsyncIterable<[v73160.H160, number][]>
+    getKeysPaged(pageSize: number, block: Block, key1: v73160.H160, key2: number): AsyncIterable<[v73160.H160, number][]>
+    getPairs(block: Block): Promise<[k: [v73160.H160, number], v: (v73160.PayoutReceipt | undefined)][]>
+    getPairs(block: Block, key1: v73160.H160): Promise<[k: [v73160.H160, number], v: (v73160.PayoutReceipt | undefined)][]>
+    getPairs(block: Block, key1: v73160.H160, key2: number): Promise<[k: [v73160.H160, number], v: (v73160.PayoutReceipt | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block): AsyncIterable<[k: [v73160.H160, number], v: (v73160.PayoutReceipt | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block, key1: v73160.H160): AsyncIterable<[k: [v73160.H160, number], v: (v73160.PayoutReceipt | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block, key1: v73160.H160, key2: number): AsyncIterable<[k: [v73160.H160, number], v: (v73160.PayoutReceipt | undefined)][]>
+}
+
+export const payoutFingerprints =  {
+    v73160: new StorageType('DdcPayouts.PayoutFingerprints', 'Optional', [v73160.H256], v73160.PayoutFingerprint) as PayoutFingerprintsV73160,
+}
+
+export interface PayoutFingerprintsV73160  {
+    is(block: RuntimeCtx): boolean
+    get(block: Block, key: v73160.H256): Promise<(v73160.PayoutFingerprint | undefined)>
+    getMany(block: Block, keys: v73160.H256[]): Promise<(v73160.PayoutFingerprint | undefined)[]>
+    getKeys(block: Block): Promise<v73160.H256[]>
+    getKeys(block: Block, key: v73160.H256): Promise<v73160.H256[]>
+    getKeysPaged(pageSize: number, block: Block): AsyncIterable<v73160.H256[]>
+    getKeysPaged(pageSize: number, block: Block, key: v73160.H256): AsyncIterable<v73160.H256[]>
+    getPairs(block: Block): Promise<[k: v73160.H256, v: (v73160.PayoutFingerprint | undefined)][]>
+    getPairs(block: Block, key: v73160.H256): Promise<[k: v73160.H256, v: (v73160.PayoutFingerprint | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block): AsyncIterable<[k: v73160.H256, v: (v73160.PayoutFingerprint | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block, key: v73160.H256): AsyncIterable<[k: v73160.H256, v: (v73160.PayoutFingerprint | undefined)][]>
 }
