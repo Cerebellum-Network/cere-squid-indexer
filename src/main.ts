@@ -22,6 +22,7 @@ import { In } from 'typeorm'
 import { assertNotNull } from '@subsquid/util-internal'
 import {DdcCustomerDepositsProcessor} from "./processors/ddcCustomerDepositsProcessor";
 import {DdcCustomerChargesProcessor} from "./processors/ddcCustomerChargesProcessor";
+import {SmartContractBalancesProcessor} from "./processors/smartContractBalancesProcessor";
 
 processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     const logger = ctx.log
@@ -29,6 +30,7 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     // set up processors
     const cereBalancesProcessor = new CereBalancesProcessor()
     const ddcBalancesProcessor = new DdcBalancesProcessor()
+    const smartContractBalancesProcessor = new SmartContractBalancesProcessor()
     const ddcClustersProcessor = new DdcClustersProcessor()
     const ddcNodesProcessor = new DdcNodesProcessor()
     const ddcBucketsProcessor = new DdcBucketsProcessor()
@@ -44,6 +46,7 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
             await Promise.all([
                 cereBalancesProcessor.process(event, block),
                 ddcBalancesProcessor.process(event, block),
+                smartContractBalancesProcessor.process(event, block),
                 ddcClustersProcessor.process(event, block),
                 ddcNodesProcessor.process(event, block),
                 ddcBucketsProcessor.process(event, block),
@@ -56,6 +59,7 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     // retrieving state from processors
     const accountToCereBalance = cereBalancesProcessor.state
     const accountToDdcBalance = ddcBalancesProcessor.state
+    const smartContractBalances = smartContractBalancesProcessor.state
     const ddcClusters = ddcClustersProcessor.state
     const ddcNodes = ddcNodesProcessor.state
     const ddcBuckets = ddcBucketsProcessor.state
@@ -87,10 +91,12 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     }
 
     await createAccounts([...accountToCereBalance.keys()])
-    
-    // Extract account IDs from DDC balances
+
+    // Extract account IDs from DDC balances (both pallet and smart contract)
     const ddcBalanceAccountIds = [...accountToDdcBalance.values()].map(balance => balance.accountId)
+    const smartContractAccountIds = [...smartContractBalances.values()].map(balance => balance.accountId)
     await createAccounts(ddcBalanceAccountIds)
+    await createAccounts(smartContractAccountIds)
 
     const ddcClusterAccounts = [...ddcClusters.values()].map((c) => c.managerId)
     await createAccounts(ddcClusterAccounts)
@@ -107,20 +113,29 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
         account.cereFreeBalance = balance
         accounts.set(id, account)
     })
-    
-    // Update DDC active balance for backward compatibility (use first balance found)
+
+    // Update DDC active balance - combine pallet and smart contract data
     const ddcActiveBalances = new Map<string, bigint>()
+
+    // First, add pallet-based balances
     accountToDdcBalance.forEach((balance) => {
         if (!ddcActiveBalances.has(balance.accountId)) {
             ddcActiveBalances.set(balance.accountId, balance.activeBalance)
         }
     })
+
+    // Then, add or override with smart contract balances (priority for new data)
+    smartContractBalances.forEach((balance) => {
+        // Smart contract balances take priority over pallet balances
+        ddcActiveBalances.set(balance.accountId, balance.activeBalance)
+    })
+
     ddcActiveBalances.forEach((balance, accountId) => {
         const account = assertNotNull(accounts.get(accountId))
         account.ddcActiveBalance = balance
         accounts.set(accountId, account)
     })
-    
+
     // persist accounts
     await ctx.store.upsert([...accounts.values()])
 
@@ -160,7 +175,7 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     ddcBuckets.forEach((bucket) => {
         clusterIdsToFind.add(bucket.clusterId)
     })
-    
+
     // Add cluster IDs from deposits and charges
     ddcCustomerDeposits.forEach((deposit) => {
         if (deposit.clusterId) {
@@ -177,11 +192,16 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
             clusterIdsToFind.add(balance.clusterId)
         }
     })
+    smartContractBalances.forEach((balance) => {
+        if (balance.clusterId) {
+            clusterIdsToFind.add(balance.clusterId)
+        }
+    })
 
     // Create default clusters for legacy events if they don't exist
     const DEFAULT_CLUSTERS = {
         DEVNET: '0x7f82864e4f097e63d04cc279e4d8d2eb45a42ffa',
-        TESTNET: '0x825c4b2352850de9986d9d28568db6f0c023a1e3', 
+        TESTNET: '0x825c4b2352850de9986d9d28568db6f0c023a1e3',
         QANET: '0xb1242a78440e20f50841ffa399fd9d607a2e93b8',
         MAINNET: '0x0059f5ada35eee46802d80750d5ca4a490640511'
     }
@@ -403,6 +423,8 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     await ctx.store.insert(ddcCustomerChargeEntities)
 
     const ddcCustomerBalanceEntities: DdcCustomerBalance[] = []
+
+    // Add pallet-based balances
     accountToDdcBalance.forEach((balance, key) => {
         const cluster = balance.clusterId ? ddcClustersMap.get(balance.clusterId) : undefined
         ddcCustomerBalanceEntities.push(new DdcCustomerBalance({
@@ -412,5 +434,39 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
             activeBalance: balance.activeBalance
         }))
     })
+
+    // Add smart contract balances
+    smartContractBalances.forEach((balance, key) => {
+        const cluster = balance.clusterId ? ddcClustersMap.get(balance.clusterId) : undefined
+
+        // Check if we already have this balance from pallet (avoid duplicates)
+        const existingIndex = ddcCustomerBalanceEntities.findIndex(entity =>
+            entity.accountId?.id === balance.accountId &&
+            entity.clusterId?.id === balance.clusterId
+        )
+
+        const balanceEntity = new DdcCustomerBalance({
+            id: `sc-${key}`, // Prefix with 'sc-' to distinguish smart contract balances
+            accountId: accounts.get(balance.accountId),
+            clusterId: cluster,
+            activeBalance: balance.activeBalance
+        })
+
+        if (existingIndex >= 0) {
+            // Replace pallet balance with smart contract balance (higher priority)
+            ddcCustomerBalanceEntities[existingIndex] = balanceEntity
+        } else {
+            // Add new smart contract balance
+            ddcCustomerBalanceEntities.push(balanceEntity)
+        }
+    })
+
     await ctx.store.upsert(ddcCustomerBalanceEntities)
+
+    // Cleanup smart contract processor connections
+    try {
+        await smartContractBalancesProcessor.cleanup()
+    } catch (error) {
+        logger.warn(`Failed to cleanup smart contract processor: ${(error as any).message}`)
+    }
 })
