@@ -16,7 +16,8 @@ const SMART_CONTRACT_ADDRESSES = {
     MAINNET: '', // @TODO: Add when deployed
 } as const
 
-const SMART_CONTRACT_ABI = require('../abi/customer_deposit.json')
+const path = require('path')
+const SMART_CONTRACT_ABI = require(path.resolve(process.cwd(), 'src/abi/customer_deposit.json'))
 
 type State = Map<string, DdcCustomerBalance>
 
