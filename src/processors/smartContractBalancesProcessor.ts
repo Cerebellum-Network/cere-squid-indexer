@@ -67,7 +67,7 @@ export class SmartContractBalancesProcessor extends BaseProcessor<State> {
         try {
             const { result, output } = await this.contract!.query['ddcBalancesFetcher::getBalance'](
                 accountId, // caller
-                { gasLimit: this.api!.registry.createType('WeightV2', { refTime: 10000000000n, proofSize: 10000000000n }) as WeightV2 },
+                { gasLimit: -1 }, // Unlimited gas for queries
                 accountId // actual parameter
             )
 
@@ -102,25 +102,9 @@ export class SmartContractBalancesProcessor extends BaseProcessor<State> {
     }
 
     /**
-     * Get accounts that have had deposit activity to poll their balances
-     */
-    private getAccountsToPolling(): string[] {
-        // Get accounts that we've seen before in our state
-        const knownAccounts = Array.from(this._state.keys()).map(key => {
-            const parts = key.split('-')
-            return parts[0] // accountId part
-        })
-        const priorityAccounts = Array.from(this.accountsToRefresh)
-
-        const allAccounts = [...new Set([...knownAccounts, ...priorityAccounts])]
-
-        return allAccounts
-    }
-
-    /**
      * Check for events that should trigger immediate balance refresh
      */
-    private checkForDepositEvents(event: Event) {
+    private checkForDepositEvents(event: Event): void {
         // Debug: Log only contract events we're interested in
         if (event.name === 'Contracts.ContractEmitted') {
             console.log(`[SmartContract] DEBUG: Found Contracts.ContractEmitted event!`)
@@ -133,7 +117,8 @@ export class SmartContractBalancesProcessor extends BaseProcessor<State> {
                 let accountId: string | undefined
 
                 if (events.ddcCustomers.deposited.v48013.is(event)) {
-                    accountId = events.ddcCustomers.deposited.v48013.decode(event)[0]
+                    const decoded = events.ddcCustomers.deposited.v48013.decode(event)
+                    accountId = Array.isArray(decoded) ? decoded[0] : decoded
                 } else if (events.ddcCustomers.deposited.v48800.is(event)) {
                     accountId = events.ddcCustomers.deposited.v48800.decode(event).ownerId
                 } else if (events.ddcCustomers.deposited.v73160.is(event)) {
@@ -148,8 +133,48 @@ export class SmartContractBalancesProcessor extends BaseProcessor<State> {
                 break
             }
 
-            case events.ddcCustomers.withdrawn.name:
-            case events.ddcCustomers.charged.name:
+            case events.ddcCustomers.withdrawn.name: {
+                // Extract account ID from withdrawal event
+                let accountId: string | undefined
+
+                if (events.ddcCustomers.withdrawn.v48013.is(event)) {
+                    const decoded = events.ddcCustomers.withdrawn.v48013.decode(event)
+                    accountId = Array.isArray(decoded) ? decoded[0] : decoded
+                } else if (events.ddcCustomers.withdrawn.v48800.is(event)) {
+                    accountId = events.ddcCustomers.withdrawn.v48800.decode(event).ownerId
+                } else if (events.ddcCustomers.withdrawn.v73160.is(event)) {
+                    accountId = events.ddcCustomers.withdrawn.v73160.decode(event).ownerId
+                }
+
+                if (accountId) {
+                    console.log(`[SmartContract] Withdrawal detected for account ${accountId}, forcing immediate refresh`)
+                    this.accountsToRefresh.add(accountId)
+                    this.forcePollNextBlock = true
+                }
+                break
+            }
+
+            case events.ddcCustomers.charged.name: {
+                // Extract account ID from charge event
+                let accountId: string | undefined
+
+                if (events.ddcCustomers.charged.v48013.is(event)) {
+                    const decoded = events.ddcCustomers.charged.v48013.decode(event)
+                    accountId = Array.isArray(decoded) ? decoded[0] : decoded
+                } else if (events.ddcCustomers.charged.v48800.is(event)) {
+                    accountId = events.ddcCustomers.charged.v48800.decode(event).ownerId
+                } else if (events.ddcCustomers.charged.v73160.is(event)) {
+                    accountId = events.ddcCustomers.charged.v73160.decode(event).ownerId
+                }
+
+                if (accountId) {
+                    console.log(`[SmartContract] Charge detected for account ${accountId}, forcing immediate refresh`)
+                    this.accountsToRefresh.add(accountId)
+                    this.forcePollNextBlock = true
+                }
+                break
+            }
+
             case events.ddcCustomers.initiatDepositUnlock.name:
             case events.ddcCustomers.initialDepositUnlock.name: {
                 // These events also affect balances, so trigger refresh
@@ -160,66 +185,114 @@ export class SmartContractBalancesProcessor extends BaseProcessor<State> {
             // Handle smart contract events
             case 'Contracts.ContractEmitted': {
                 // Check if it's from our customer-deposit contract
+                let contractAddress: string
+                let rawData: string
+                
+                // Try to extract data from different event formats
                 const eventData = (event as any).args
+                console.log(`[SmartContract] DEBUG: Raw event data:`, eventData)
+                console.log(`[SmartContract] DEBUG: Is array:`, Array.isArray(eventData))
+                console.log(`[SmartContract] DEBUG: Length:`, eventData?.length)
+                
+                // Format 1: Array format [contractAddress, data] (DevConsole shows this)
                 if (eventData && Array.isArray(eventData) && eventData.length >= 2) {
-                    const contractAddress = eventData[0] // Contract address
-                    const rawData = eventData[1] // Raw event data
+                    contractAddress = eventData[0]
+                    rawData = eventData[1]
+                    console.log(`[SmartContract] DEBUG: Using ARRAY format`)
+                }
+                // Format 2: Object format { contract: '...', data: '...' } (newer Squid)
+                else if (eventData && typeof eventData === 'object' && eventData.contract && eventData.data) {
+                    contractAddress = eventData.contract
+                    rawData = eventData.data
+                    console.log(`[SmartContract] DEBUG: Using OBJECT format`)
+                }
+                // Format 3: Direct properties on event
+                else if (eventData && typeof eventData === 'object') {
+                    contractAddress = (eventData as any).contract || (eventData as any).contractAddress
+                    rawData = (eventData as any).data || (eventData as any).rawData
+                    console.log(`[SmartContract] DEBUG: Using DIRECT PROPERTIES format`)
+                }
+                else {
+                    console.log(`[SmartContract] DEBUG: Unknown event format, skipping`)
+                    break
+                }
+                
+                if (!contractAddress || !rawData) {
+                    console.log(`[SmartContract] DEBUG: Missing contractAddress or rawData, skipping`)
+                    break
+                }
 
-                    // Get contract address for current environment
-                    const chainEnv = process.env.CHAIN_ENV || 'DEVNET'
-                    const expectedAddress = SMART_CONTRACT_ADDRESSES[chainEnv as keyof typeof SMART_CONTRACT_ADDRESSES]
+                // Get contract address for current environment
+                const chainEnv = process.env.CHAIN_ENV || 'DEVNET'
+                const expectedAddress = SMART_CONTRACT_ADDRESSES[chainEnv as keyof typeof SMART_CONTRACT_ADDRESSES]
 
-                    console.log(`[SmartContract] DEBUG: Contract address comparison:`)
-                    console.log(`[SmartContract] DEBUG: - Event contract: ${contractAddress}`)
-                    console.log(`[SmartContract] DEBUG: - Expected (${chainEnv}): ${expectedAddress}`)
-                    console.log(`[SmartContract] DEBUG: - Match: ${contractAddress === expectedAddress}`)
+                console.log(`[SmartContract] DEBUG: Contract address comparison:`)
+                console.log(`[SmartContract] DEBUG: - Event contract: ${contractAddress}`)
+                console.log(`[SmartContract] DEBUG: - Expected (${chainEnv}): ${expectedAddress}`)
+                console.log(`[SmartContract] DEBUG: - Match: ${contractAddress === expectedAddress}`)
 
-                    if (contractAddress === expectedAddress) {
+                if (contractAddress === expectedAddress) {
+                    // Force immediate refresh for contract events
+                    this.forcePollNextBlock = true
 
+                    // Try to extract account ID from the event data
+                    // For DdcBalanceDeposited: cluster_id (32 bytes) + owner_id (32 bytes)
+                    try {
+                        if (typeof rawData === 'string' && rawData.startsWith('0x') && rawData.length >= 130) {
+                            const clusterId = '0x' + rawData.slice(2, 66)   // bytes 0-31
+                            const ownerIdRaw = '0x' + rawData.slice(66, 130) // bytes 32-63
 
-                        // Force immediate refresh for contract events
-                        this.forcePollNextBlock = true
+                            console.log(`[SmartContract] Parsed event data:`)
+                            console.log(`[SmartContract] - Cluster ID: ${clusterId}`)
+                            console.log(`[SmartContract] - Owner ID (raw): ${ownerIdRaw}`)
+                            console.log(`[SmartContract] - Full raw data: ${rawData}`)
 
-                        // Try to extract account ID from the event data
-                        // For DdcBalanceDeposited: cluster_id (32 bytes) + owner_id (32 bytes)
-                        try {
-                            if (typeof rawData === 'string' && rawData.startsWith('0x') && rawData.length >= 130) {
-                                const clusterId = '0x' + rawData.slice(2, 66)   // bytes 0-31
-                                const ownerIdRaw = '0x' + rawData.slice(66, 130) // bytes 32-63
+                            // Add both raw owner ID and try to convert to different formats
+                            this.accountsToRefresh.add(ownerIdRaw)
 
-                                console.log(`[SmartContract] Parsed event data:`)
-                                console.log(`[SmartContract] - Cluster ID: ${clusterId}`)
-                                console.log(`[SmartContract] - Owner ID (raw): ${ownerIdRaw}`)
-                                console.log(`[SmartContract] - Full raw data: ${rawData}`)
-
-                                // Add both raw owner ID and try to convert to different formats
-                                this.accountsToRefresh.add(ownerIdRaw)
-
-                                // Also try to convert raw bytes to SS58 format if possible
-                                try {
-                                    const { toCereAddress } = require('../utils')
-                                    const ownerIdSS58 = toCereAddress(ownerIdRaw)
-                                    console.log(`[SmartContract] - Owner ID (SS58): ${ownerIdSS58}`)
-                                    this.accountsToRefresh.add(ownerIdSS58)
-                                } catch (conversionError) {
-                                    console.log(`[SmartContract] - SS58 conversion failed:`, conversionError)
-                                }
-
-                                console.log(`[SmartContract] Added accounts to refresh queue`)
-                            } else {
-                                console.log(`[SmartContract] Raw data too short or invalid: ${rawData} (length: ${rawData?.length})`)
+                            // Also try to convert raw bytes to SS58 format if possible
+                            try {
+                                const { toCereAddress } = require('../utils')
+                                const ownerIdSS58 = toCereAddress(ownerIdRaw)
+                                console.log(`[SmartContract] - Owner ID (SS58): ${ownerIdSS58}`)
+                                this.accountsToRefresh.add(ownerIdSS58)
+                            } catch (conversionError) {
+                                console.log(`[SmartContract] - SS58 conversion failed:`, conversionError)
                             }
-                        } catch (error) {
-                            console.warn(`[SmartContract] Failed to parse event data:`, error)
+
+                            console.log(`[SmartContract] Added accounts to refresh queue`)
+                        } else {
+                            console.log(`[SmartContract] Raw data too short or invalid: ${rawData} (length: ${rawData?.length})`)
                         }
+                    } catch (error) {
+                        console.warn(`[SmartContract] Failed to parse event data:`, error)
                     }
+                } else {
+                    console.log(`[SmartContract] DEBUG: Contract address mismatch, skipping`)
                 }
                 break
             }
         }
     }
 
-    async process(event: Event, block: Block) {
+    /**
+     * Get all accounts that need to be polled
+     */
+    private getAccountsToPolling(): string[] {
+        // Get known accounts from internal state
+        const knownAccounts = Array.from(this._state.keys()).map(key => {
+            const parts = key.split('-')
+            return parts[0] // accountId part
+        })
+
+        const priorityAccounts = Array.from(this.accountsToRefresh)
+
+        const allAccounts = [...new Set([...knownAccounts, ...priorityAccounts])]
+
+        return allAccounts
+    }
+
+    async process(event: Event, block: Block): Promise<void> {
         // Check for deposit-related events that should trigger immediate balance refresh
         this.checkForDepositEvents(event)
 
