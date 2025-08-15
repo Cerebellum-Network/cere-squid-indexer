@@ -381,14 +381,21 @@ export class SmartContractBalancesProcessor extends BaseProcessor<State> {
             const allAccountsToCheck = this.getAccountsToPolling()
             const priorityAccountsCount = this.accountsToRefresh.size
 
+            console.log(`[SmartContract] DEBUG: Process method - accounts to check:`, allAccountsToCheck)
+            console.log(`[SmartContract] DEBUG: Process method - priority accounts count:`, priorityAccountsCount)
+
             // Clear the priority accounts set after getting the list
             this.accountsToRefresh.clear()
 
             for (const accountId of allAccountsToCheck) {
+                console.log(`[SmartContract] DEBUG: Querying balance for account: ${accountId}`)
                 const balance = await this.queryContractBalance(accountId)
                 if (balance) {
                     const key = `${balance.accountId}${balance.clusterId ? `-${balance.clusterId}` : ''}`
                     this._state.set(key, balance)
+                    console.log(`[SmartContract] DEBUG: Balance found and saved:`, balance)
+                } else {
+                    console.log(`[SmartContract] DEBUG: No balance found for account: ${accountId}`)
                 }
             }
 
