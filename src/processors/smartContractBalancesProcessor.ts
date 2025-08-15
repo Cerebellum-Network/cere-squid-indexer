@@ -65,26 +65,34 @@ export class SmartContractBalancesProcessor extends BaseProcessor<State> {
         }
 
         try {
+            console.log(`[SmartContract] DEBUG: queryContractBalance - Calling ddcBalancesFetcher::getBalance`)
             const { result, output } = await this.contract!.query['ddcBalancesFetcher::getBalance'](
                 accountId, // caller
                 { gasLimit: -1 }, // Unlimited gas for queries
                 accountId // actual parameter
             )
 
+            console.log(`[SmartContract] DEBUG: queryContractBalance - Result:`, result)
+            console.log(`[SmartContract] DEBUG: queryContractBalance - Output:`, output)
+
             if (!result.isOk || !output) {
+                console.log(`[SmartContract] DEBUG: queryContractBalance - Result not OK or no output`)
                 return null
             }
 
             // Parse the Result<Option<Ledger>, LangError> return type
             const humanOutput = (output as any).toHuman()
+            console.log(`[SmartContract] DEBUG: queryContractBalance - Human output:`, humanOutput)
 
             if (humanOutput.Err || !humanOutput.Ok) {
+                console.log(`[SmartContract] DEBUG: queryContractBalance - Error in output:`, humanOutput.Err)
                 return null
             }
 
             const optionLedger = humanOutput.Ok
             if (!optionLedger) {
                 // Option::None - no balance found
+                console.log(`[SmartContract] DEBUG: queryContractBalance - Option::None - no balance found`)
                 return null
             }
 
