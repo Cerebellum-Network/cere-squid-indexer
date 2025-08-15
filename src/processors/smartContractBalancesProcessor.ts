@@ -66,11 +66,46 @@ export class SmartContractBalancesProcessor extends BaseProcessor<State> {
 
         try {
             console.log(`[SmartContract] DEBUG: queryContractBalance - Calling ddcBalancesFetcher::getBalance`)
-            const { result, output } = await this.contract!.query['ddcBalancesFetcher::getBalance'](
-                accountId, // caller
-                { gasLimit: -1 }, // Unlimited gas for queries
-                accountId // actual parameter
-            )
+            
+            // Try different calling patterns for ink! contracts
+            let result, output
+            
+            try {
+                // Pattern 1: Direct method call
+                const response = await (this.contract!.query as any).ddcBalancesFetcher.getBalance(
+                    accountId,
+                    { gasLimit: -1 }
+                )
+                result = response.result
+                output = response.output
+                console.log(`[SmartContract] DEBUG: Pattern 1 success`)
+            } catch (error1: any) {
+                console.log(`[SmartContract] DEBUG: Pattern 1 failed:`, error1.message)
+                
+                try {
+                    // Pattern 2: Bracket notation with method name
+                    const response = await this.contract!.query['ddcBalancesFetcher::getBalance'](
+                        accountId,
+                        { gasLimit: -1 }
+                    )
+                    result = response.result
+                    output = response.output
+                    console.log(`[SmartContract] DEBUG: Pattern 2 success`)
+                } catch (error2: any) {
+                    console.log(`[SmartContract] DEBUG: Pattern 2 failed:`, error2.message)
+                    
+                    try {
+                        // Pattern 3: Try without gas limit
+                        const response = await (this.contract!.query as any).ddcBalancesFetcher.getBalance(accountId)
+                        result = response.result
+                        output = response.output
+                        console.log(`[SmartContract] DEBUG: Pattern 3 success`)
+                    } catch (error3: any) {
+                        console.log(`[SmartContract] DEBUG: Pattern 3 failed:`, error3.message)
+                        throw new Error(`All calling patterns failed: ${error1.message}, ${error2.message}, ${error3.message}`)
+                    }
+                }
+            }
 
             console.log(`[SmartContract] DEBUG: queryContractBalance - Result:`, result)
             console.log(`[SmartContract] DEBUG: queryContractBalance - Output:`, output)
