@@ -121,6 +121,10 @@ export class SmartContractBalancesProcessor extends BaseProcessor<State> {
      * Check for events that should trigger immediate balance refresh
      */
     private checkForDepositEvents(event: Event) {
+        // Debug: Log only contract events we're interested in
+        if (event.name === 'Contracts.ContractEmitted') {
+            console.log(`[SmartContract] DEBUG: Found Contracts.ContractEmitted event!`)
+        }
 
         // Check for deposit-related pallet events
         switch (event.name) {
@@ -164,6 +168,11 @@ export class SmartContractBalancesProcessor extends BaseProcessor<State> {
                     // Get contract address for current environment
                     const chainEnv = process.env.CHAIN_ENV || 'DEVNET'
                     const expectedAddress = SMART_CONTRACT_ADDRESSES[chainEnv as keyof typeof SMART_CONTRACT_ADDRESSES]
+
+                    console.log(`[SmartContract] DEBUG: Contract address comparison:`)
+                    console.log(`[SmartContract] DEBUG: - Event contract: ${contractAddress}`)
+                    console.log(`[SmartContract] DEBUG: - Expected (${chainEnv}): ${expectedAddress}`)
+                    console.log(`[SmartContract] DEBUG: - Match: ${contractAddress === expectedAddress}`)
 
                     if (contractAddress === expectedAddress) {
 
