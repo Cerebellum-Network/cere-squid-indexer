@@ -83,8 +83,8 @@ export class SmartContractBalancesProcessor extends BaseProcessor<State> {
                 console.log(`[SmartContract] DEBUG: Pattern 1 failed:`, error1.message)
 
                 try {
-                                    // Pattern 2: Try without gas limit
-                const response = await this.contract!.query['DdcBalancesFetcher::get_balance'](accountId, {})
+                    // Pattern 2: Try without gas limit
+                    const response = await this.contract!.query['DdcBalancesFetcher::get_balance'](accountId, {})
                     result = response.result
                     output = response.output
                     console.log(`[SmartContract] DEBUG: Pattern 2 success`)
@@ -92,8 +92,8 @@ export class SmartContractBalancesProcessor extends BaseProcessor<State> {
                     console.log(`[SmartContract] DEBUG: Pattern 2 failed:`, error2.message)
 
                     try {
-                                            // Pattern 3: Try with explicit selector
-                    const response = await this.contract!.query['0xa40735c6'](accountId, {})
+                        // Pattern 3: Try with explicit selector
+                        const response = await this.contract!.query['0xa40735c6'](accountId, {})
                         result = response.result
                         output = response.output
                         console.log(`[SmartContract] DEBUG: Pattern 3 success`)
