@@ -5,7 +5,7 @@
     "node": ">=16"
   },
   "scripts": {
-    "build": "rm -rf lib && tsc",
+    "build": "rm -rf lib && tsc && mkdir -p lib/abi && cp src/abi/*.json lib/abi/",
     "format": "prettier . '!./data' --write",
     "process": "node lib/main.js",
     "serve": "npx squid-graphql-server --dumb-cache in-memory --dumb-cache-ttl 1000 --dumb-cache-size 100 --dumb-cache-max-age 1000"
