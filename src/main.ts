@@ -223,7 +223,7 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
                 const defaultCluster = new DdcCluster({
                     id: clusterId as string,
                     createdAtBlockHeight: 0, // Default for legacy
-                    managerId: undefined, // Will be set later or remain undefined for legacy
+                    managerId: null as any, // Explicitly null for legacy clusters
                     treasuryShare: 10n,
                     validatorsShare: 20n,
                     clusterReserveShare: 5n,
