@@ -69,6 +69,9 @@ export const processor = new SubstrateBatchProcessor()
             events.ddcNodes.nodeCreated.name,
             events.ddcNodes.nodeDeleted.name,
             events.ddcNodes.nodeParamsChanged.name,
+
+            // Smart contract events for balance tracking
+            'Contracts.ContractEmitted',
         ],
         extrinsic: true,
     })
