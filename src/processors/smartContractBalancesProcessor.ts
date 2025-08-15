@@ -199,7 +199,46 @@ export class SmartContractBalancesProcessor extends BaseProcessor<State> {
                 console.log(`[SmartContract] DEBUG: Length:`, eventData?.length)
                 console.log(`[SmartContract] DEBUG: Event keys:`, Object.keys(event))
                 console.log(`[SmartContract] DEBUG: EventData keys:`, eventData ? Object.keys(eventData) : 'undefined')
+                console.log(`[SmartContract] DEBUG: Event topics:`, (event as any).topics)
                 console.log(`[SmartContract] DEBUG: ================================`)
+                
+                // Try to extract indexed parameters from topics (cluster_id, owner_id)
+                let clusterId: string | undefined
+                let ownerId: string | undefined
+                
+                if ((event as any).topics && Array.isArray((event as any).topics) && (event as any).topics.length >= 3) {
+                    // topics[1] = cluster_id (indexed), topics[2] = owner_id (indexed)
+                    clusterId = (event as any).topics[1]
+                    ownerId = (event as any).topics[2]
+                    
+                    console.log(`[SmartContract] DEBUG: Found indexed parameters in topics:`)
+                    console.log(`[SmartContract] DEBUG: - Cluster ID (topic[1]): ${clusterId}`)
+                    console.log(`[SmartContract] DEBUG: - Owner ID (topic[2]): ${ownerId}`)
+                    
+                    if (ownerId) {
+                        // Convert hex owner_id to SS58 if needed
+                        let ownerIdSS58 = ownerId
+                        try {
+                            if (ownerId.startsWith('0x')) {
+                                ownerIdSS58 = toCereAddress(ownerId)
+                                console.log(`[SmartContract] DEBUG: - Owner ID (SS58): ${ownerIdSS58}`)
+                            }
+                        } catch (conversionError) {
+                            console.log(`[SmartContract] DEBUG: - SS58 conversion failed:`, conversionError)
+                        }
+                        
+                        // Add to refresh queue
+                        this.accountsToRefresh.add(ownerId)
+                        if (ownerIdSS58 !== ownerId) {
+                            this.accountsToRefresh.add(ownerIdSS58)
+                        }
+                        
+                        console.log(`[SmartContract] DEBUG: Added owner_id from topics to refresh queue`)
+                        this.forcePollNextBlock = true
+                    }
+                } else {
+                    console.log(`[SmartContract] DEBUG: No indexed parameters found in topics, falling back to raw data parsing`)
+                }
                 
                 // Format 1: Array format [contractAddress, data] (DevConsole shows this)
                 if (eventData && Array.isArray(eventData) && eventData.length >= 2) {
