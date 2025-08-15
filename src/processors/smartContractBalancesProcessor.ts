@@ -190,9 +190,16 @@ export class SmartContractBalancesProcessor extends BaseProcessor<State> {
                 
                 // Try to extract data from different event formats
                 const eventData = (event as any).args
-                console.log(`[SmartContract] DEBUG: Raw event data:`, eventData)
+                console.log(`[SmartContract] DEBUG: ===== CONTRACT EVENT DEBUG =====`)
+                console.log(`[SmartContract] DEBUG: Full event object:`, event)
+                console.log(`[SmartContract] DEBUG: Event name:`, event.name)
+                console.log(`[SmartContract] DEBUG: Event args:`, event.args)
+                console.log(`[SmartContract] DEBUG: Event data:`, eventData)
                 console.log(`[SmartContract] DEBUG: Is array:`, Array.isArray(eventData))
                 console.log(`[SmartContract] DEBUG: Length:`, eventData?.length)
+                console.log(`[SmartContract] DEBUG: Event keys:`, Object.keys(event))
+                console.log(`[SmartContract] DEBUG: EventData keys:`, eventData ? Object.keys(eventData) : 'undefined')
+                console.log(`[SmartContract] DEBUG: ================================`)
                 
                 // Format 1: Array format [contractAddress, data] (DevConsole shows this)
                 if (eventData && Array.isArray(eventData) && eventData.length >= 2) {
