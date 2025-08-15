@@ -226,12 +226,25 @@ export class SmartContractBalancesProcessor extends BaseProcessor<State> {
                 const chainEnv = process.env.CHAIN_ENV || 'DEVNET'
                 const expectedAddress = SMART_CONTRACT_ADDRESSES[chainEnv as keyof typeof SMART_CONTRACT_ADDRESSES]
 
-                console.log(`[SmartContract] DEBUG: Contract address comparison:`)
-                console.log(`[SmartContract] DEBUG: - Event contract: ${contractAddress}`)
-                console.log(`[SmartContract] DEBUG: - Expected (${chainEnv}): ${expectedAddress}`)
-                console.log(`[SmartContract] DEBUG: - Match: ${contractAddress === expectedAddress}`)
+                // Try to convert hex address to SS58 for comparison
+                let contractAddressSS58 = contractAddress
+                try {
+                    if (contractAddress.startsWith('0x')) {
+                        contractAddressSS58 = toCereAddress(contractAddress)
+                        console.log(`[SmartContract] DEBUG: Converted hex to SS58: ${contractAddress} → ${contractAddressSS58}`)
+                    }
+                } catch (conversionError) {
+                    console.log(`[SmartContract] DEBUG: Failed to convert hex address:`, conversionError)
+                }
 
-                if (contractAddress === expectedAddress) {
+                console.log(`[SmartContract] DEBUG: Contract address comparison:`)
+                console.log(`[SmartContract] DEBUG: - Event contract (original): ${contractAddress}`)
+                console.log(`[SmartContract] DEBUG: - Event contract (SS58): ${contractAddressSS58}`)
+                console.log(`[SmartContract] DEBUG: - Expected (${chainEnv}): ${expectedAddress}`)
+                console.log(`[SmartContract] DEBUG: - Match (original): ${contractAddress === expectedAddress}`)
+                console.log(`[SmartContract] DEBUG: - Match (SS58): ${contractAddressSS58 === expectedAddress}`)
+
+                if (contractAddress === expectedAddress || contractAddressSS58 === expectedAddress) {
                     // Force immediate refresh for contract events
                     this.forcePollNextBlock = true
 
