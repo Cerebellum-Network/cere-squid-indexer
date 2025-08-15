@@ -40,7 +40,7 @@ export class DdcClustersProcessor extends BaseProcessor<State> {
     private newClusterInfo(clusterId: string, managerId: string, createdAt: number | undefined): DdcClusterInfo {
         return {
             id: clusterId,
-            createdAtBlockHeight: createdAt,
+            createdAtBlockHeight: createdAt ?? 0,
             managerId: managerId,
             clusterReserveShare: 0n,
             erasureCodingRequired: 0,
