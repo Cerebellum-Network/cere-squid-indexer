@@ -65,14 +65,14 @@ export class SmartContractBalancesProcessor extends BaseProcessor<State> {
         }
 
         try {
-            console.log(`[SmartContract] DEBUG: queryContractBalance - Calling ddcBalancesFetcher::getBalance`)
+            console.log(`[SmartContract] DEBUG: queryContractBalance - Calling get_balance with selector 0xa40735c6`)
 
             // Try different calling patterns for ink! contracts
             let result, output
 
             try {
-                // Pattern 1: Use the correct method name from ABI
-                const response = await this.contract!.query['DdcBalancesFetcher::get_balance'](
+                // Pattern 1: Use the selector directly (most reliable for ink! contracts)
+                const response = await this.contract!.query['0xa40735c6'](
                     accountId,
                     { gasLimit: -1 }
                 )
@@ -84,7 +84,7 @@ export class SmartContractBalancesProcessor extends BaseProcessor<State> {
 
                 try {
                     // Pattern 2: Try without gas limit
-                    const response = await this.contract!.query['DdcBalancesFetcher::get_balance'](accountId, {})
+                    const response = await this.contract!.query['0xa40735c6'](accountId, {})
                     result = response.result
                     output = response.output
                     console.log(`[SmartContract] DEBUG: Pattern 2 success`)
@@ -92,8 +92,8 @@ export class SmartContractBalancesProcessor extends BaseProcessor<State> {
                     console.log(`[SmartContract] DEBUG: Pattern 2 failed:`, error2.message)
 
                     try {
-                        // Pattern 3: Try with explicit selector
-                        const response = await this.contract!.query['0xa40735c6'](accountId, {})
+                        // Pattern 3: Try with contract.query directly using dot notation
+                        const response = await (this.contract!.query as any).getBalance(accountId, {})
                         result = response.result
                         output = response.output
                         console.log(`[SmartContract] DEBUG: Pattern 3 success`)
