@@ -110,14 +110,11 @@ export class SmartContractBalancesProcessor extends BaseProcessor<State> {
             const parts = key.split('-')
             return parts[0] // accountId part
         })
+        const priorityAccounts = Array.from(this.accountsToRefresh)
 
-        // For now, just return known accounts
-        // In the future, this could be enhanced to:
-        // 1. Track contract events for new deposits
-        // 2. Get a list of active accounts from an external source
-        // 3. Poll all accounts that have ever made a deposit
+        const allAccounts = [...new Set([...knownAccounts, ...priorityAccounts])]
 
-        return [...new Set(knownAccounts)]
+        return allAccounts
     }
 
     /**
@@ -156,13 +153,60 @@ export class SmartContractBalancesProcessor extends BaseProcessor<State> {
                 break
             }
 
-            // TODO: Add smart contract events when available
-            // case 'Contracts.ContractEmitted': {
-            //     // Check if it's from our customer-deposit contract
-            //     // and if it's a balance-related event
-            //     this.forcePollNextBlock = true
-            //     break
-            // }
+            // Handle smart contract events
+            case 'Contracts.ContractEmitted': {
+                // Check if it's from our customer-deposit contract
+                const eventData = (event as any).args
+                if (eventData && Array.isArray(eventData) && eventData.length >= 2) {
+                    const contractAddress = eventData[0] // Contract address
+                    const rawData = eventData[1] // Raw event data
+
+                    // Get contract address for current environment
+                    const chainEnv = process.env.CHAIN_ENV || 'DEVNET'
+                    const expectedAddress = SMART_CONTRACT_ADDRESSES[chainEnv as keyof typeof SMART_CONTRACT_ADDRESSES]
+
+                    if (contractAddress === expectedAddress) {
+
+
+                        // Force immediate refresh for contract events
+                        this.forcePollNextBlock = true
+
+                        // Try to extract account ID from the event data
+                        // For DdcBalanceDeposited: cluster_id (32 bytes) + owner_id (32 bytes)
+                        try {
+                            if (typeof rawData === 'string' && rawData.startsWith('0x') && rawData.length >= 130) {
+                                const clusterId = '0x' + rawData.slice(2, 66)   // bytes 0-31
+                                const ownerIdRaw = '0x' + rawData.slice(66, 130) // bytes 32-63
+
+                                console.log(`[SmartContract] Parsed event data:`)
+                                console.log(`[SmartContract] - Cluster ID: ${clusterId}`)
+                                console.log(`[SmartContract] - Owner ID (raw): ${ownerIdRaw}`)
+                                console.log(`[SmartContract] - Full raw data: ${rawData}`)
+
+                                // Add both raw owner ID and try to convert to different formats
+                                this.accountsToRefresh.add(ownerIdRaw)
+
+                                // Also try to convert raw bytes to SS58 format if possible
+                                try {
+                                    const { toCereAddress } = require('../utils')
+                                    const ownerIdSS58 = toCereAddress(ownerIdRaw)
+                                    console.log(`[SmartContract] - Owner ID (SS58): ${ownerIdSS58}`)
+                                    this.accountsToRefresh.add(ownerIdSS58)
+                                } catch (conversionError) {
+                                    console.log(`[SmartContract] - SS58 conversion failed:`, conversionError)
+                                }
+
+                                console.log(`[SmartContract] Added accounts to refresh queue`)
+                            } else {
+                                console.log(`[SmartContract] Raw data too short or invalid: ${rawData} (length: ${rawData?.length})`)
+                            }
+                        } catch (error) {
+                            console.warn(`[SmartContract] Failed to parse event data:`, error)
+                        }
+                    }
+                }
+                break
+            }
         }
     }
 
@@ -184,15 +228,11 @@ export class SmartContractBalancesProcessor extends BaseProcessor<State> {
         try {
             await this.initializeApi()
 
-            const accountsToCheck = this.getAccountsToPolling()
+            // Get all accounts to check (includes both known accounts and priority refresh accounts)
+            const allAccountsToCheck = this.getAccountsToPolling()
+            const priorityAccountsCount = this.accountsToRefresh.size
 
-            // Include accounts that need immediate refresh
-            const priorityAccounts = Array.from(this.accountsToRefresh)
-
-            // Combine all accounts to check (remove duplicates)
-            const allAccountsToCheck = [...new Set([...accountsToCheck, ...priorityAccounts])]
-
-            // Clear the priority accounts set after processing
+            // Clear the priority accounts set after getting the list
             this.accountsToRefresh.clear()
 
             for (const accountId of allAccountsToCheck) {
@@ -203,7 +243,6 @@ export class SmartContractBalancesProcessor extends BaseProcessor<State> {
                 }
             }
 
-            const priorityAccountsCount = priorityAccounts.length
             const totalAccountsCount = allAccountsToCheck.length
 
             if (priorityAccountsCount > 0) {
