@@ -252,8 +252,16 @@ export class SmartContractBalancesProcessor extends BaseProcessor<State> {
                     // For DdcBalanceDeposited: cluster_id (32 bytes) + owner_id (32 bytes)
                     try {
                         if (typeof rawData === 'string' && rawData.startsWith('0x') && rawData.length >= 130) {
+                            // Raw data: 0x + 64 bytes = 130 characters
+                            // Skip '0x' (2 chars) + cluster_id (32 bytes = 64 chars) = 66 chars
                             const clusterId = '0x' + rawData.slice(2, 66)   // bytes 0-31
                             const ownerIdRaw = '0x' + rawData.slice(66, 130) // bytes 32-63
+                            
+                            console.log(`[SmartContract] DEBUG: Raw data analysis:`)
+                            console.log(`[SmartContract] DEBUG: - Total length: ${rawData.length} chars`)
+                            console.log(`[SmartContract] DEBUG: - Cluster ID slice: 2-66 (${rawData.slice(2, 66).length} chars)`)
+                            console.log(`[SmartContract] DEBUG: - Owner ID slice: 66-130 (${rawData.slice(66, 130).length} chars)`)
+                            console.log(`[SmartContract] DEBUG: - Expected owner ID: 6SMyixxnAdhxFwATJ2C3rjB9J1BMu9fhjmMNrQQCETU2qFsT`)
 
                             console.log(`[SmartContract] Parsed event data:`)
                             console.log(`[SmartContract] - Cluster ID: ${clusterId}`)
