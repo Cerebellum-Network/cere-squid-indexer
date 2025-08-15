@@ -66,13 +66,13 @@ export class SmartContractBalancesProcessor extends BaseProcessor<State> {
 
         try {
             console.log(`[SmartContract] DEBUG: queryContractBalance - Calling ddcBalancesFetcher::getBalance`)
-            
+
             // Try different calling patterns for ink! contracts
             let result, output
-            
+
             try {
-                // Pattern 1: Direct method call
-                const response = await (this.contract!.query as any).ddcBalancesFetcher.getBalance(
+                // Pattern 1: Use the correct method name from ABI
+                const response = await this.contract!.query['DdcBalancesFetcher::get_balance'](
                     accountId,
                     { gasLimit: -1 }
                 )
@@ -81,22 +81,19 @@ export class SmartContractBalancesProcessor extends BaseProcessor<State> {
                 console.log(`[SmartContract] DEBUG: Pattern 1 success`)
             } catch (error1: any) {
                 console.log(`[SmartContract] DEBUG: Pattern 1 failed:`, error1.message)
-                
+
                 try {
-                    // Pattern 2: Bracket notation with method name
-                    const response = await this.contract!.query['ddcBalancesFetcher::getBalance'](
-                        accountId,
-                        { gasLimit: -1 }
-                    )
+                                    // Pattern 2: Try without gas limit
+                const response = await this.contract!.query['DdcBalancesFetcher::get_balance'](accountId, {})
                     result = response.result
                     output = response.output
                     console.log(`[SmartContract] DEBUG: Pattern 2 success`)
                 } catch (error2: any) {
                     console.log(`[SmartContract] DEBUG: Pattern 2 failed:`, error2.message)
-                    
+
                     try {
-                        // Pattern 3: Try without gas limit
-                        const response = await (this.contract!.query as any).ddcBalancesFetcher.getBalance(accountId)
+                                            // Pattern 3: Try with explicit selector
+                    const response = await this.contract!.query['0xa40735c6'](accountId, {})
                         result = response.result
                         output = response.output
                         console.log(`[SmartContract] DEBUG: Pattern 3 success`)
@@ -230,7 +227,7 @@ export class SmartContractBalancesProcessor extends BaseProcessor<State> {
                 // Check if it's from our customer-deposit contract
                 let contractAddress: string
                 let rawData: string
-                
+
                 // Try to extract data from different event formats
                 const eventData = (event as any).args
                 console.log(`[SmartContract] DEBUG: ===== CONTRACT EVENT DEBUG =====`)
@@ -244,20 +241,20 @@ export class SmartContractBalancesProcessor extends BaseProcessor<State> {
                 console.log(`[SmartContract] DEBUG: EventData keys:`, eventData ? Object.keys(eventData) : 'undefined')
                 console.log(`[SmartContract] DEBUG: Event topics:`, (event as any).topics)
                 console.log(`[SmartContract] DEBUG: ================================`)
-                
+
                 // Try to extract indexed parameters from topics (cluster_id, owner_id)
                 let clusterId: string | undefined
                 let ownerId: string | undefined
-                
+
                 if ((event as any).topics && Array.isArray((event as any).topics) && (event as any).topics.length >= 3) {
                     // topics[1] = cluster_id (indexed), topics[2] = owner_id (indexed)
                     clusterId = (event as any).topics[1]
                     ownerId = (event as any).topics[2]
-                    
+
                     console.log(`[SmartContract] DEBUG: Found indexed parameters in topics:`)
                     console.log(`[SmartContract] DEBUG: - Cluster ID (topic[1]): ${clusterId}`)
                     console.log(`[SmartContract] DEBUG: - Owner ID (topic[2]): ${ownerId}`)
-                    
+
                     if (ownerId) {
                         // Convert hex owner_id to SS58 if needed
                         let ownerIdSS58 = ownerId
@@ -269,20 +266,20 @@ export class SmartContractBalancesProcessor extends BaseProcessor<State> {
                         } catch (conversionError) {
                             console.log(`[SmartContract] DEBUG: - SS58 conversion failed:`, conversionError)
                         }
-                        
+
                         // Add to refresh queue
                         this.accountsToRefresh.add(ownerId)
                         if (ownerIdSS58 !== ownerId) {
                             this.accountsToRefresh.add(ownerIdSS58)
                         }
-                        
+
                         console.log(`[SmartContract] DEBUG: Added owner_id from topics to refresh queue`)
                         this.forcePollNextBlock = true
                     }
                 } else {
                     console.log(`[SmartContract] DEBUG: No indexed parameters found in topics, falling back to raw data parsing`)
                 }
-                
+
                 // Format 1: Array format [contractAddress, data] (DevConsole shows this)
                 if (eventData && Array.isArray(eventData) && eventData.length >= 2) {
                     contractAddress = eventData[0]
@@ -305,7 +302,7 @@ export class SmartContractBalancesProcessor extends BaseProcessor<State> {
                     console.log(`[SmartContract] DEBUG: Unknown event format, skipping`)
                     break
                 }
-                
+
                 if (!contractAddress || !rawData) {
                     console.log(`[SmartContract] DEBUG: Missing contractAddress or rawData, skipping`)
                     break
@@ -345,7 +342,7 @@ export class SmartContractBalancesProcessor extends BaseProcessor<State> {
                             // Skip '0x' (2 chars) + cluster_id (32 bytes = 64 chars) = 66 chars
                             const clusterId = '0x' + rawData.slice(2, 66)   // bytes 0-31
                             const ownerIdRaw = '0x' + rawData.slice(66, 130) // bytes 32-63
-                            
+
                             console.log(`[SmartContract] DEBUG: Raw data analysis:`)
                             console.log(`[SmartContract] DEBUG: - Total length: ${rawData.length} chars`)
                             console.log(`[SmartContract] DEBUG: - Cluster ID slice: 2-66 (${rawData.slice(2, 66).length} chars)`)
